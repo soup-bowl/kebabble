@@ -1,0 +1,12 @@
+{
+    "require": {
+        "monolog/monolog": "^1.22",
+        "nesbot/carbon": "^1.22",
+        "twig/twig": "^2.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "kebabble\\": "app/"
+        }
+    }
+}

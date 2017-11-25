@@ -1,0 +1,38 @@
+<?php namespace kebabble;
+
+defined( 'ABSPATH' ) or die( 'Operation not permitted.' );
+
+use kebabble\processes\publish;
+use kebabble\settings\settings;
+use kebabble\config\fields\fields;
+
+class hooks {
+	protected $publish;
+	protected $settings;
+	protected $fields;
+
+	public function __construct() {
+		$this->publish  = new publish();
+		$this->settings = new settings();
+		$this->fields   = new fields();
+	}
+
+	public function main() {
+		$this->settings();
+		$this->fields->orderOptions();
+
+		wp_enqueue_style( 'kebabble-orders-css', plugins_url('/../resource/orders.css', __FILE__), array(), '1.0' );
+
+		add_action( 'init', ['kebabble\config\taxonomy\orders', 'orders'],   0 );
+		
+		add_action( 'publish_kebabble_orders', array(&$this->publish, 'handlePublish'), 10, 2 );
+		add_filter( 'wp_insert_post_data', array(&$this->publish, 'changeTitle'), '99', 2 );
+	}
+
+	private function settings() {
+		$newSettings = new settings();
+		add_action( 'admin_menu', [&$this->settings, 'page'] );
+		add_action( 'admin_init', [&$this->settings, 'settings'] );
+	}
+	
+}
