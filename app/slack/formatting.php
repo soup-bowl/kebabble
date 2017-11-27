@@ -2,6 +2,8 @@
 
 defined( 'ABSPATH' ) or die( 'Operation not permitted.' );
 
+use Carbon\Carbon;
+
 class formatting extends slack {	
 	protected $slogans;
 
@@ -14,23 +16,26 @@ class formatting extends slack {
 	
 	/**
 	 * Makes a kebabble menu listing status.
-	 * @param string $rolls
-	 * @param string $dishes
-	 * @param string $misc
-	 * @param string $date
-	 * @param string $driver
-	 * @param array[string] $payments 
+	 * @param string $food Dictates header. e.g. Kebab Mondays.
+	 * @param string $rolls First dishes.
+	 * @param string $dishes Second Dishes.
+	 * @param string $misc Third Dishes.
+	 * @param string $driver Driver name.
+	 * @param Carbon $date Date of order, typically today.
+	 * @param array[string] $payments Payment methods accepted.
 	 * @return string
 	 */
-	public function status($rolls, $dishes, $misc, $date, $driver, $payments = ["Cash"]) {
+	public function status($food, $rolls, $dishes, $misc, $driver, $date = false, $payments = ["Cash"]) {
 		$rolls    = ($rolls == "")    ? "N/A"         : $rolls;
 		$dishes   = ($dishes == "")   ? "N/A"         : $dishes;
 		$misc     = ($misc == "")     ? "N/A"         : $misc;
 		$driver   = ($driver == "")   ? "Unspecified" : $driver;
+		$date     = ($date == false)  ? Carbon::now() : $date;
+		$evMoji   = $this->emojiPicker($food);
 		
 		$formattedString = "";
 		$formattedPosts = [
-			":burrito: *Kebab Mondays ({$date})* :burrito:",
+			"{$evMoji} *{$food} {$date->format('l')} ({$date->format('jS F')})* {$evMoji}",
 			"*Rolls*```{$rolls}```",
 			"*Dishes*```{$dishes}```",
 			"*Misc*```{$misc}```\n(MD = Meal Deal - see pinned)",
@@ -67,5 +72,23 @@ class formatting extends slack {
 			$formatString .= "{$acceptedPayments[0]}.";
 		}
 		return $formatString;
+	}
+	
+	/**
+	 * Chooses the emoji for the food type... yep, this exists.
+	 * @param string $food
+	 * @return string Slack-formatted emoji
+	 */
+	private function emojiPicker($food) {
+		switch ( strtolower($food) ) {
+			case "burger":
+				return ":hamburger:";
+			case "pizza":
+				return ":pizza:";
+			case "event":
+				return ":popcorn:";
+			default:
+				return ":burrito:";
+		}
 	}
 }

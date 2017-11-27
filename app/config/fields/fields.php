@@ -12,6 +12,7 @@ class fields {
 		$format = new \stdClass();
 		$format->override = $this->isChecked( $response["field_5a1446fb18a6c"] );
 		$format->message  = $response["field_5a14475e0c1ea"];
+		$format->food     = (empty($response["field_5a1c19fa8cc47"])) ? $response["field_5a1c16a61e789"] : $response["field_5a1c19fa8cc47"]; 
 		$format->rolls    = $response["field_5a14314fa1666"];
 		$format->dishes   = $response["field_5a1431b0a1667"];
 		$format->misc     = $response["field_5a1431bea1668"];
@@ -66,6 +67,62 @@ class fields {
 						'maxlength' => '',
 						'rows' => '',
 						'formatting' => 'br',
+					),
+					array (
+						'key' => 'field_5a1c16a61e789',
+						'label' => 'Food',
+						'name' => 'ordering_type',
+						'type' => 'select',
+						'choices' => array (
+							'Kebab' => 'Kebab',
+							'Pizza' => 'Pizza',
+							'Burger' => 'Burger',
+							'Resturant' => 'Resturant',
+							'Event' => 'Event',
+							'Other' => 'Other',
+						),
+						'conditional_logic' => array (
+							'status' => 1,
+							'rules' => array (
+								array (
+									'field' => 'field_5a1446fb18a6c',
+									'operator' => '!=',
+									'value' => 'Enabled',
+								),
+							),
+							'allorany' => 'all',
+						),
+						'default_value' => '',
+						'allow_null' => 0,
+						'multiple' => 0,
+					),
+					array (
+						'key' => 'field_5a1c19fa8cc47',
+						'label' => 'Other food...',
+						'name' => 'ordering_type_other',
+						'type' => 'text',
+						'conditional_logic' => array (
+							'status' => 1,
+							'rules' => array (
+								array (
+									'field' => 'field_5a1c16a61e789',
+									'operator' => '==',
+									'value' => 'Other',
+								),
+								array (
+									'field' => 'field_5a1446fb18a6c',
+									'operator' => '!=',
+									'value' => 'Enabled',
+								),
+							),
+							'allorany' => 'all',
+						),
+						'default_value' => '',
+						'placeholder' => '',
+						'prepend' => '',
+						'append' => '',
+						'formatting' => 'none',
+						'maxlength' => '',
 					),
 					array (
 						'key' => 'field_5a14314fa1666',

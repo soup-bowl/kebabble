@@ -57,11 +57,12 @@ class publish extends process {
 			$response = json_decode( 
 				$slackMessage->postMessage( 
 					$fm->status(
+						$cfFields->food,
 						$cfFields->rolls, 
 						$cfFields->dishes, 
 						$cfFields->misc, 
-						get_the_date( 'jS F', $post_ID ),
 						$cfFields->driver,
+						Carbon::parse( get_the_date( 'Y-m-d H:i:s', $post_ID ) ),
 						$cfFields->payment
 					), 
 					$existingMessage, 
