@@ -2,8 +2,6 @@
 
 defined( 'ABSPATH' ) or die( 'Operation not permitted.' );
 
-include_once __DIR__ . '/../../advanced-custom-fields/acf.php';
-
 use kebabble\slack\message as slackmessage;
 use kebabble\slack\formatting;
 use kebabble\config\fields\fields;
