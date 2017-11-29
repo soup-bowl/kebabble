@@ -20,9 +20,9 @@ class hooks {
 	public function main() {
 		$this->settings();
 		$this->fields->orderOptions();
-
-		wp_enqueue_style( 'kebabble-orders-css', plugins_url('/../resource/orders.css', __FILE__), array(), '1.0' );
-
+		
+		add_action( 'admin_enqueue_scripts', function() { $this->enqueuedScripts(); });
+		
 		add_action( 'init', ['kebabble\config\taxonomy\orders', 'orders'],   0 );
 		
 		add_action( 'publish_kebabble_orders', array(&$this->publish, 'handlePublish'), 10, 2 );
@@ -33,6 +33,10 @@ class hooks {
 		$newSettings = new settings();
 		add_action( 'admin_menu', [&$this->settings, 'page'] );
 		add_action( 'admin_init', [&$this->settings, 'settings'] );
+	}
+	
+	private function enqueuedScripts() {
+		wp_enqueue_style( 'kebabble-orders-css', plugins_url('/../resource/orders.css', __FILE__), array(), '1.1' );
 	}
 	
 }

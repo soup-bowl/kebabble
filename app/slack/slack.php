@@ -6,7 +6,7 @@ class slack {
 	protected $token;
 	protected $channel;
 	public function __construct() {
-		$this->token   = get_option('kbfos_settings')["kbfos_botkey"]; // TODO - Env it.
+		$this->token   = get_option('kbfos_settings')["kbfos_botkey"];
 		$this->channel = get_option('kbfos_settings')["kbfos_botchannel"];
 	}
 

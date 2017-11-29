@@ -66,5 +66,18 @@ class settings {
 				'pluginPage', 
 				'kbfos_pluginPage_section' 
 			);
+		
+			add_settings_field( 
+				'kbfos_drivertax', 
+				__( 'Driver Tax', 'text_domain' ), 
+				function() {
+					$options = get_option( 'kbfos_settings' );
+					?>
+					<input type='text' name='kbfos_settings[kbfos_drivertax]' value='<?php echo $options['kbfos_drivertax']; ?>'>
+					<?php
+				}, 
+				'pluginPage', 
+				'kbfos_pluginPage_section' 
+			);
 	}
 }

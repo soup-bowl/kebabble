@@ -58,9 +58,7 @@ class publish extends process {
 				$slackMessage->postMessage( 
 					$fm->status(
 						$cfFields->food,
-						$cfFields->rolls, 
-						$cfFields->dishes, 
-						$cfFields->misc, 
+						$cfFields->order,
 						$cfFields->driver,
 						Carbon::parse( get_the_date( 'Y-m-d H:i:s', $post_ID ) ),
 						$cfFields->payment
@@ -84,7 +82,7 @@ class publish extends process {
 	 */
 	public function changeTitle($data, $postarr) {
 		if($data['post_type'] == 'kebabble_orders' && $data['post_status'] == 'publish') {
-			$data['post_title'] = "Kebab order # - " . Carbon::now()->format('d/m/Y'); 
+			$data['post_title'] = "Food order # - " . Carbon::now()->format('d/m/Y'); 
 		}
 
 		return $data;

@@ -13,9 +13,7 @@ class fields {
 		$format->override = $this->isChecked( $response["field_5a1446fb18a6c"] );
 		$format->message  = $response["field_5a14475e0c1ea"];
 		$format->food     = (empty($response["field_5a1c19fa8cc47"])) ? $response["field_5a1c16a61e789"] : $response["field_5a1c19fa8cc47"]; 
-		$format->rolls    = $response["field_5a14314fa1666"];
-		$format->dishes   = $response["field_5a1431b0a1667"];
-		$format->misc     = $response["field_5a1431bea1668"];
+		$format->order    = $response["field_5a14314fa1666"];
 		$format->driver   = $response["field_5a1565db084b6"];
 		$format->payment  = $response["field_5a158d7240fa8"];
 		return $format;
@@ -126,52 +124,8 @@ class fields {
 					),
 					array (
 						'key' => 'field_5a14314fa1666',
-						'label' => 'Rolls',
-						'name' => 'ordering_rolls',
-						'type' => 'textarea',
-						'conditional_logic' => array (
-							'status' => 1,
-							'rules' => array (
-								array (
-									'field' => 'field_5a1446fb18a6c',
-									'operator' => '!=',
-									'value' => 'Enabled',
-								),
-							),
-							'allorany' => 'all',
-						),
-						'default_value' => '',
-						'placeholder' => '',
-						'maxlength' => '',
-						'rows' => '',
-						'formatting' => 'br',
-					),
-					array (
-						'key' => 'field_5a1431b0a1667',
-						'label' => 'Dishes',
-						'name' => 'ordering_dishes',
-						'type' => 'textarea',
-						'conditional_logic' => array (
-							'status' => 1,
-							'rules' => array (
-								array (
-									'field' => 'field_5a1446fb18a6c',
-									'operator' => '!=',
-									'value' => 'Enabled',
-								),
-							),
-							'allorany' => 'all',
-						),
-						'default_value' => '',
-						'placeholder' => '',
-						'maxlength' => '',
-						'rows' => '',
-						'formatting' => 'br',
-					),
-					array (
-						'key' => 'field_5a1431bea1668',
-						'label' => 'Miscellaneous',
-						'name' => 'ordering_misc',
+						'label' => 'Orders',
+						'name' => 'ordering_orderlist',
 						'type' => 'textarea',
 						'conditional_logic' => array (
 							'status' => 1,
