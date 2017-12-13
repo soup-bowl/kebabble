@@ -3,7 +3,7 @@
 defined( 'ABSPATH' ) or die( 'Operation not permitted.' );
 
 use kebabble\processes\publish;
-use kebabble\settings\settings;
+use kebabble\settings;
 use kebabble\config\fields\fields;
 
 class hooks {
