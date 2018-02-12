@@ -1,6 +1,8 @@
 # kebabble
 ## Food order listing powered by WordPress, integrated with Slack.
 
+[![Join the chat at https://gitter.im/kebabble/Lobby](https://badges.gitter.im/kebabble/Lobby.svg)](https://gitter.im/kebabble/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Personal project to learn more about both WordPress and Slack APIs. The actual
 usage of this project is debatable, but is mostly intended as an educational
 project anyway.
