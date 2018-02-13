@@ -1,7 +1,7 @@
 # kebabble
 ## Food order listing powered by WordPress, integrated with Slack.
 
-[![Test Coverage](https://api.codeclimate.com/v1/badges/72396e46f9d30a97f877/test_coverage)](https://codeclimate.com/github/soup-bowl/kebabble/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/72396e46f9d30a97f877/maintainability)](https://codeclimate.com/github/soup-bowl/kebabble/maintainability)
 [![Join the chat at https://gitter.im/kebabble/Lobby](https://badges.gitter.im/kebabble/Lobby.svg)](https://gitter.im/kebabble/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Personal project to learn more about both WordPress and Slack APIs. The actual
