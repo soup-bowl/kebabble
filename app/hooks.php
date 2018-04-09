@@ -4,7 +4,7 @@ defined( 'ABSPATH' ) or die( 'Operation not permitted.' );
 
 use kebabble\processes\publish;
 use kebabble\settings;
-use kebabble\config\fields\fields;
+use kebabble\config\fields;
 
 class hooks {
 	protected $publish;
@@ -12,14 +12,16 @@ class hooks {
 	protected $fields;
 
 	public function __construct() {
-		$this->publish  = new publish();
-		$this->settings = new settings();
-		$this->fields   = new fields();
+		$this->publish       = new publish();
+		$this->settings      = new settings();
+		$this->fields        = new fields();
+		
 	}
 
 	public function main() {
 		$this->settings();
-		$this->fields->orderOptions();
+		
+		add_action( 'add_meta_boxes_kebabble_orders', [&$this->fields, 'orderOptionsSetup'] );
 		
 		add_action( 'admin_enqueue_scripts', function() { $this->enqueuedScripts(); });
 		

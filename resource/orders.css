@@ -2,3 +2,16 @@
 	font-family: monospace!important;
 	background-color: #f1f1f1 !important;
 }
+
+#kebabbleorderdetails textarea, #kebabbleorderdetails input[type=text], #kebabbleorderdetails select  {
+	width: 100%;
+}
+
+#kebabbleorderdetails textarea  {
+	height: 10em;
+}
+
+#kebabbleorderdetails .mono {
+	font-family: monospace!important;
+	background-color: #f1f1f1 !important;
+}
