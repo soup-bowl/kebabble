@@ -38,7 +38,10 @@ class hooks {
 	}
 	
 	private function enqueuedScripts() {
-		wp_enqueue_style( 'kebabble-orders-css', plugins_url('/../resource/orders.css', __FILE__), array(), '1.1' );
+		if(get_current_screen()->id == 'kebabble_orders') {
+			wp_enqueue_style( 'kebabble-orders-css', plugins_url('/../resource/orders.css', __FILE__), array(), '1.1' );
+			wp_enqueue_script('kebabble-orders-js', plugins_url('/../resource/orders.js', __FILE__), array('jquery'));
+		}
 	}
 	
 }

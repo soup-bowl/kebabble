@@ -31,7 +31,7 @@ class fields {
 		//echo "<pre>";var_dump( get_post_meta($post->ID, 'kebabble-order', true) );echo "</pre>";
 		?>
 		<div>
-			<p><input name="kebabbleCustomMessageEnabled" id="checkBox" type="checkbox" <?php echo $enabled; ?>> - Custom Message</p>
+			<p><input name="kebabbleCustomMessageEnabled" id="cmCheckBox" type="checkbox" <?php echo $enabled; ?>> - Custom Message</p>
 			<hr>
 			<div id="kebabbleCustomMessage">
 				<p class="label"><label for="kebabbleCustomMessageEntry">Custom Message</label></p>
