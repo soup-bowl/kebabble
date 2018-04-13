@@ -17,7 +17,6 @@ class publish extends process {
 	 * Hooks on to the order publish process.
 	 * @param integer $post_ID
 	 * @param WP_Post $post_obj
-	 * @todo improve calling ACF functions, requires an ACF update. See comment.
 	 * @return void
 	 */
 	public function handlePublish($post_ID, $post_obj) {
