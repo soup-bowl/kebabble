@@ -16,8 +16,8 @@ class fields {
 				echo $this->orderInput($post, $existing);
 				echo $this->driverInput($post, $existing);
 				echo $this->paymentOptions($post, $existing);
-				echo $this->pinStatus($post, $existing);
 				?></div><?php
+				echo $this->pinStatus($post, $existing);
 			}, 
 			'kebabble_orders', 
 			'normal', 

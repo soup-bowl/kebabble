@@ -37,7 +37,8 @@ class publish extends process {
 				$slackMessage->postMessage( 
 					$orderDetails['override']['message'], 
 					$existingMessage, 
-					$existingChannel 
+					$existingChannel,
+					$orderDetails['pin']
 				) 
 			);
 		} else {
