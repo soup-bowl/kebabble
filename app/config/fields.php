@@ -16,6 +16,7 @@ class fields {
 				echo $this->orderInput($post, $existing);
 				echo $this->driverInput($post, $existing);
 				echo $this->paymentOptions($post, $existing);
+				echo $this->pinStatus($post, $existing);
 				?></div><?php
 			}, 
 			'kebabble_orders', 
@@ -94,6 +95,18 @@ class fields {
 			<p class="label"><label for="kebabblePaymentOptions">Payment Options</label></p>
 			<ul>
 				<?php echo $lists; ?>
+			</ul>
+		</div>
+		<?php
+	}
+	
+	public function pinStatus($post, $existing) {
+		$existing = (!empty($existing)) ? $existing['pin'] : false;
+		?>
+		<div>
+			<p class="label"><label>Pin to Slack Channel</label></p>
+			<ul>
+				<input name='pinState' type='checkbox' <?php checked($existing); ?> value='1'>
 			</ul>
 		</div>
 		<?php

@@ -88,11 +88,11 @@ class settings {
 	function renderKebabbleConfig() {
 		add_settings_field( 
 			'kbfos_drivertax', 
-			__( 'Driver Tax', 'text_domain' ), 
+			__( 'Driver Tax (Pence)', 'text_domain' ), 
 			function() {
 				$options = get_option( 'kbfos_settings' );
 				?>
-				<input type="number" min="0.00" max="50.00" step="0.01" name='kbfos_settings[kbfos_drivertax]' value='<?php echo $options['kbfos_drivertax']; ?>'/>
+				<input type="number" min="0" name='kbfos_settings[kbfos_drivertax]' value='<?php echo $options['kbfos_drivertax']; ?>'/>
 				<?php
 			}, 
 			'pluginPage', 

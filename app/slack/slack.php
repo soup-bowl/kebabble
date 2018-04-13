@@ -16,19 +16,27 @@ class slack {
 	 * @param string $timestamp Existing message to overwrite, if desired
 	 * @param string $channel
 	 */
-	public function postMessage($message, $timestamp = false, $channel = false) {
+	public function postMessage($message, $timestamp = false, $channel = false, $pin = false) {
 		if ($timestamp) {
-			return $this->connection("https://slack.com/api/chat.update",[
+			$response = $this->connection("https://slack.com/api/chat.update",[
 				"text"    => $message,
 				"ts"      => $timestamp,
 				"channel" => $channel
 			]);
 		} else {
-			return $this->connection("https://slack.com/api/chat.postMessage",[
+			$response = $this->connection("https://slack.com/api/chat.postMessage",[
 				"text"    => $message,
 				"channel" => $this->channel
 			]);
-		}	
+			
+			$respDecode = json_decode($response);
+			$timestamp  = $respDecode->ts;
+			$channel    = $respDecode->channel;
+		}
+		
+		$this->pinMessage($pin, $timestamp, $channel);
+		
+		return $response;
 	}
 	
 	/**
@@ -46,6 +54,8 @@ class slack {
 				"ts"      => $timestamp,
 				"channel" => $channel
 			]);
+			
+			$this->pinMessage(false, $timestamp, $channel);
 		} else {
 			$result = $this->connection("https://slack.com/api/chat.delete",[
 				"ts"      => $timestamp,
@@ -63,6 +73,20 @@ class slack {
 			}
 			return false;
 		}
+	}
+	
+	/**
+	 * Pins the provided message to the Slack channel.
+	 * @param boolean $state
+	 * @param string $timestamp
+	 * @param string $channel
+	 */
+	public function pinMessage($state, $timestamp, $channel) {
+		$pinLabel = ($state) ? "add" : "remove";
+		$this->connection("https://slack.com/api/pins.{$pinLabel}",[
+			"timestamp" => $timestamp,
+			"channel"   => $channel
+		]);
 	}
 
 	private function connection($url, $data) {

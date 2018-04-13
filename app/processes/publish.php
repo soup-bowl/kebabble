@@ -55,7 +55,8 @@ class publish extends process {
 						$orderDetails['payment']
 					), 
 					$existingMessage, 
-					$existingChannel 
+					$existingChannel,
+					$orderDetails['pin']
 				) 
 			);
 		}
@@ -99,7 +100,8 @@ class publish extends process {
 			'food'    => $response['kebabbleOrderTypeSelection'],
 			'order'   => $response['kebabbleOrders'],
 			'driver'  => $response['kebabbleDriver'],
-			'payment' => $response['paymentOpts']
+			'payment' => $response['paymentOpts'],
+			'pin'     => empty($response['pinState']) ? false : true
 		];
 	}
 }

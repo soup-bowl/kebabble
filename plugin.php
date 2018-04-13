@@ -9,5 +9,4 @@ Version: 0.1.6 Alpha
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-$hookup = new kebabble\hooks();
-$hookup->main();
+$hookup = (new kebabble\hooks())->main();
