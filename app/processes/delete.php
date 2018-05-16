@@ -6,7 +6,7 @@ use SlackClient\botclient;
 
 use Carbon\Carbon;
 
-class delete extends process {
+class delete {
 	protected $slack;
 	public function __construct() {
 		$this->slack  = new botclient(

@@ -1,20 +1,10 @@
-<?php namespace kebabble\slack;
+<?php namespace kebabble\processes;
 
 defined( 'ABSPATH' ) or die( 'Operation not permitted.' );
 
 use Carbon\Carbon;
 
 class formatting {
-	protected $slogans;
-	
-	public function __construct() {
-		$tax = get_option('kbfos_settings')["kbfos_drivertax"];
-		$this->slogans = [
-			"*Additional {$tax}p per person* to fund the driver. Tax evaders will be taken to Crown court :crown:",
-			'Kebab\'o\'clock ~1pm, so orders in by 12pm :clock12: No mercy shown for missed orders.'
-		];
-	}
-	
 	/**
 	 * Makes a kebabble menu listing status.
 	 * @param string $food Dictates header. e.g. Kebab Mondays.
@@ -25,26 +15,24 @@ class formatting {
 	 * @return string
 	 */
 	public function status($food, $order, $driver, $date = false, $payments = ["Cash"]) {
-		$rolls    = ($rolls == "")    ? "N/A"         : $rolls;
-		$order    = ($order == "")    ? "N/A"         : $order;
+		$rolls    = ($rolls  == "")   ? "N/A"         : $rolls;
+		$order    = ($order  == "")   ? "N/A"         : $order;
+		$driver   = ($driver == "")   ? "unspecified" : $driver;
 		$date     = ($date == false)  ? Carbon::now() : $date;
 		$evMoji   = $this->emojiPicker($food);
 		
-		$formattedString = "";
+		$tax = get_option('kbfos_settings')["kbfos_drivertax"];
+		$taxSlogan = ($tax > 0) ? ":pound: *Additional {$tax}p per person* to fund the driver." : ""; 
+		
 		$formattedPosts = [
 			"{$evMoji} *{$food} {$date->format('l')} ({$date->format('jS F')})* {$evMoji}",
-			"*Orders*```{$order}```\n(MD = Meal Deal - see pinned)",
-			/*Order of *not implemented* pieces totalling *not implemented*, with a *not implemented* tax.*/ "Polling @channel for orders. Today's driver is *{$driver}* :car:",
-			$this->slogans[0],
-			$this->slogans[1],
+			"*Orders*```{$order}```",
+			"Polling @channel for orders. Today's driver is *{$driver}* :car:",
+			$taxSlogan,
 			$this->acceptsPaymentFormatter($payments)
 		];
-
-		foreach ($formattedPosts as $formattedPost) {
-			$formattedString .= $formattedPost . "\n\n";
-		}
 		
-		return $formattedString;
+		return implode("\n\n", $formattedPosts);
 	}
 
 	/**
@@ -53,8 +41,12 @@ class formatting {
 	 * @return string
 	 */
 	private function acceptsPaymentFormatter($acceptedPayments) {
+		if (count($acceptedPayments) == 0) {
+			return "";
+		}
+		
 		$formatString = "Driver accepts ";
-
+		
 		if (count($acceptedPayments) !== 1) {
 			for ($i = 0; $i < count($acceptedPayments); $i++) { 
 				if (($i + 1) == count($acceptedPayments)) {

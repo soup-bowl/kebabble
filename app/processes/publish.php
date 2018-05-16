@@ -2,14 +2,13 @@
 
 defined( 'ABSPATH' ) or die( 'Operation not permitted.' );
 
-use kebabble\slack\message as slackmessage;
-use kebabble\slack\formatting;
+use kebabble\processes\formatting;
 use kebabble\config\fields;
 use SlackClient\botclient;
 
 use Carbon\Carbon;
 
-class publish extends process {
+class publish {
 	protected $fields;
 	protected $slack;
 	public function __construct() {
