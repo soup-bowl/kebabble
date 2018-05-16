@@ -5,13 +5,19 @@ defined( 'ABSPATH' ) or die( 'Operation not permitted.' );
 use kebabble\slack\message as slackmessage;
 use kebabble\slack\formatting;
 use kebabble\config\fields;
+use SlackClient\botclient;
 
 use Carbon\Carbon;
 
 class publish extends process {
 	protected $fields;
+	protected $slack;
 	public function __construct() {
 		$this->fields = new fields();
+		$this->slack  = new botclient(
+			get_option('kbfos_settings')["kbfos_botkey"], 
+			get_option('kbfos_settings')["kbfos_botchannel"]
+		);
 	}
 	/**
 	 * Hooks on to the order publish process.
@@ -29,41 +35,33 @@ class publish extends process {
 		$existingMessage = ($existingMessage == "") ? false : $existingMessage;
 		$existingChannel = ($existingChannel == "") ? false : $existingChannel;
 		
-		$response = null;
+		$timestamp = null;
 		if ( $orderDetails['override']['enabled'] ) {
 			// Custom Message.
-			$slackMessage = new slackmessage;
-			$response = json_decode( 
-				$slackMessage->postMessage( 
-					$orderDetails['override']['message'], 
-					$existingMessage, 
-					$existingChannel,
-					$orderDetails['pin']
-				) 
-			);
+			$timestamp = $this->slack->message($orderDetails['override']['message'], $existingMessage);
 		} else {
 			// Generated message.
-
-			$fm = new formatting;
-			$slackMessage = new slackmessage;
-			$response = json_decode( 
-				$slackMessage->postMessage( 
-					$fm->status(
-						$orderDetails['food'],
-						$orderDetails['order'],
-						$orderDetails['driver'],
-						Carbon::parse( get_the_date( 'Y-m-d H:i:s', $post_ID ) ),
-						$orderDetails['payment']
-					), 
-					$existingMessage, 
-					$existingChannel,
-					$orderDetails['pin']
-				) 
+			$timestamp = $this->slack->message(
+				(new formatting)->status(
+					$orderDetails['food'],
+					$orderDetails['order'],
+					$orderDetails['driver'],
+					Carbon::parse( get_the_date( 'Y-m-d H:i:s', $post_ID ) ),
+					$orderDetails['payment']
+				),
+				$existingMessage
 			);
 		}
+		
+		if($orderDetails['pin']) {
+			$this->slack->pin($timestamp);
+		} else {
+			$this->slack->unpin($timestamp);
+		}
+		
 		if ($existingMessage == false) {
-			add_post_meta( $post_ID, 'kebabble-slack-ts', $response->ts, true );
-			add_post_meta( $post_ID, 'kebabble-slack-channel', $response->channel, true );
+			add_post_meta( $post_ID, 'kebabble-slack-ts', $timestamp, true );
+			add_post_meta( $post_ID, 'kebabble-slack-channel', get_option('kbfos_settings')["kbfos_botchannel"], true );
 		}
 	}
 

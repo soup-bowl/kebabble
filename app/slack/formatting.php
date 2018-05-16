@@ -4,9 +4,9 @@ defined( 'ABSPATH' ) or die( 'Operation not permitted.' );
 
 use Carbon\Carbon;
 
-class formatting extends slack {	
+class formatting {
 	protected $slogans;
-
+	
 	public function __construct() {
 		$tax = get_option('kbfos_settings')["kbfos_drivertax"];
 		$this->slogans = [

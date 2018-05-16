@@ -2,16 +2,17 @@
 
 defined( 'ABSPATH' ) or die( 'Operation not permitted.' );
 
-use kebabble\slack\message as slackmessage;
-use kebabble\slack\formatting;
-use kebabble\config\fields;
+use SlackClient\botclient;
 
 use Carbon\Carbon;
 
 class delete extends process {
-	protected $fields;
+	protected $slack;
 	public function __construct() {
-		$this->fields = new fields();
+		$this->slack  = new botclient(
+			get_option('kbfos_settings')["kbfos_botkey"], 
+			get_option('kbfos_settings')["kbfos_botchannel"]
+		);
 	}
 	/**
 	 * Hooks on to the order deletion process.
@@ -24,9 +25,7 @@ class delete extends process {
 		$existingChannel = get_post_meta( $post_ID, 'kebabble-slack-channel', true );
 		$existingMessage = ($existingMessage == "") ? false : $existingMessage;
 		$existingChannel = ($existingChannel == "") ? false : $existingChannel;
-        
-        $slackMessage = new slackmessage;
-        
-        $resp = $slackMessage->deleteMessage($existingMessage, $existingChannel);
+		
+		$this->slack->deleteMessage($existingMessage, $existingChannel);
 	}
 }
