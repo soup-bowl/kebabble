@@ -23,8 +23,6 @@ class delete {
 	public function handleDeletion($post_ID, $post_obj) {
 		$existingMessage = get_post_meta( $post_ID, 'kebabble-slack-ts', true );
 		$existingChannel = get_post_meta( $post_ID, 'kebabble-slack-channel', true );
-		$existingMessage = ($existingMessage == "") ? false : $existingMessage;
-		$existingChannel = ($existingChannel == "") ? false : $existingChannel;
 		
 		$this->slack->deleteMessage($existingMessage, $existingChannel);
 	}

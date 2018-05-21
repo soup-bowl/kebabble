@@ -31,8 +31,6 @@ class publish {
 		
 		$existingMessage = get_post_meta( $post_ID, 'kebabble-slack-ts', true );
 		$existingChannel = get_post_meta( $post_ID, 'kebabble-slack-channel', true );
-		$existingMessage = ($existingMessage == "") ? false : $existingMessage;
-		$existingChannel = ($existingChannel == "") ? false : $existingChannel;
 		
 		$timestamp = null;
 		if ( $orderDetails['override']['enabled'] ) {
