@@ -7,7 +7,8 @@
         "monolog/monolog": "^1.22",
         "nesbot/carbon": "^1.22",
         "twig/twig": "^2.4",
-		"soup-bowl/slack-client-php": "dev-master"
+		"soup-bowl/slack-client-php": "dev-master",
+        "php-di/php-di": "^6.0"
     },
 	"repositories": [
         {
