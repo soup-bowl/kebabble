@@ -4,7 +4,7 @@ defined( 'ABSPATH' ) or die( 'Operation not permitted.' );
 
 use Carbon\Carbon;
 
-class formatting {
+class formatting extends processes {
 	/**
 	 * Makes a kebabble menu listing status.
 	 * @param string $food Dictates header. e.g. Kebab Mondays.

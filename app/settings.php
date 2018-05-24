@@ -61,7 +61,7 @@ class settings {
 			function () {
 				$options = get_option( 'kbfos_settings' );
 				?>
-				<input type='text' name='kbfos_settings[kbfos_botkey]' value='<?php echo $options['kbfos_botkey']; ?>'>
+				<input type='text' class='regular-text' name='kbfos_settings[kbfos_botkey]' value='<?php echo $options['kbfos_botkey']; ?>'>
 				<?php
 			}, 
 			'pluginPage', 

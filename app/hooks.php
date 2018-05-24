@@ -39,7 +39,7 @@ class hooks {
 		add_action( 'publish_kebabble_orders', [&$this->publish, 'handlePublish'],    10, 2 );
 		add_filter( 'wp_insert_post_data',     [&$this->publish, 'changeTitle'],      99, 2 );
 		add_action( 'trash_kebabble_orders',   [&$this->delete,  'handleDeletion'],   10, 2 );
-		//add_action( 'untrash_kebabble_orders', [&$this->delete,  'handleUndeletion'], 10, 2 );
+		add_action( 'untrash_post', [&$this->delete,  'handleUndeletion'], 10, 2 );
 	}
 
 	private function settings() {
