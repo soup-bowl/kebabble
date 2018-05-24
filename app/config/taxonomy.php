@@ -25,7 +25,7 @@ class taxonomy {
 			'public'              => false,
 			'show_ui'             => true,
 			'show_in_menu'        => true,
-			'menu_icon'           => plugin_dir_url( __FILE__ ) . "../../resource/1f959.png",
+			'menu_icon'           => plugin_dir_url( __FILE__ ) . "../../resource/kebab-s.png",
 			'rewrite'             => [
 				'slug'                => 'kebabble_orders',
 				'with_front'          => true,
