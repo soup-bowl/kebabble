@@ -2,7 +2,7 @@
     "name": "soup-bowl/kebabble",
 	"type": "wordpress-plugin",
 	"license": "MIT",
-	"homepage": "https://github.com/soup-bowl/kebabble",
+	"homepage": "https://gitlab.com/soup-bowl/kebabble",
 	"require": {
         "monolog/monolog": "^1.22",
         "nesbot/carbon": "^1.22",
@@ -12,7 +12,7 @@
     },
 	"repositories": [
         {
-            "url": "https://github.com/soup-bowl/slack-client-php.git",
+            "url": "https://gitlab.com/soup-bowl/slack-client-php.git",
             "type": "git"
         }
     ],
