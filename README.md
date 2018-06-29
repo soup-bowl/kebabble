@@ -7,6 +7,10 @@ Personal project to learn more about both WordPress and Slack APIs. The actual
 usage of this project is debatable, but is mostly intended as an educational
 project anyway.
 
+[![forthebadge](https://forthebadge.com/images/badges/gluten-free.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/built-with-grammas-recipe.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/compatibility-club-penguin.svg)](https://forthebadge.com)
+
 ## Requirements
 * PHP 7+ (Pending 5.6 test).
 * WordPress 4+.
