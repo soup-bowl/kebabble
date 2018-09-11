@@ -1,7 +1,5 @@
 <?php namespace kebabble\processes;
 
-defined( 'ABSPATH' ) or die( 'Operation not permitted.' );
-
 use kebabble\processes\formatting;
 use kebabble\config\fields;
 use SlackClient\botclient;

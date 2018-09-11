@@ -1,7 +1,5 @@
 <?php namespace kebabble\processes;
 
-defined( 'ABSPATH' ) or die( 'Operation not permitted.' );
-
 use Carbon\Carbon;
 
 class formatting extends processes {
@@ -10,19 +8,22 @@ class formatting extends processes {
 	 * @param string $food Dictates header. e.g. Kebab Mondays.
 	 * @param string $orders Displayed monospaced.
 	 * @param string $driver Driver name.
+	 * @param integer $tax Additional charge for orders.
 	 * @param Carbon $date Date of order, typically today.
 	 * @param array[string] $payments Payment methods accepted.
 	 * @return string
 	 */
-	public function status($food, $order, $driver, $date = false, $payments = ["Cash"]) {
-		$rolls    = ($rolls  == "")   ? "N/A"         : $rolls;
-		$order    = ($order  == "")   ? "N/A"         : $order;
-		$driver   = ($driver == "")   ? "unspecified" : $driver;
-		$date     = ($date == false)  ? Carbon::now() : $date;
+	public function status($food, $order, $driver, $tax = 0, $date = false, $payments = ["Cash"]) {
+		$rolls    = ( $rolls  == "" )  ? "N/A"         : $rolls;
+		$order    = ( $order  == "" )  ? "N/A"         : $order;
+		$driver   = ( $driver == "" )  ? "unspecified" : $driver;
+		$date     = ( $date == false ) ? Carbon::now() : $date;
 		$evMoji   = $this->emojiPicker($food);
 		
-		$tax = get_option('kbfos_settings')["kbfos_drivertax"];
-		$taxSlogan = ($tax > 0) ? ":pound: *Additional {$tax}p per person* to fund the driver." : ""; 
+		//$taxCalc = ($tax > 0) ? $tax / 100 : false;
+		$taxCalc = money_format('%.2n', ( $tax / 100 ) );
+		
+		$taxSlogan = (false !== $taxCalc) ? ":pound: *Additional £{$taxCalc} per person* to fund the driver." : null; 
 		
 		$formattedPosts = [
 			"{$evMoji} *{$food} {$date->format('l')} ({$date->format('jS F')})* {$evMoji}",

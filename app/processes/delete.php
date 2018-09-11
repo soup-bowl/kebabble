@@ -1,7 +1,5 @@
 <?php namespace kebabble\processes;
 
-defined( 'ABSPATH' ) or die( 'Operation not permitted.' );
-
 use SlackClient\botclient;
 use Carbon\Carbon;
 

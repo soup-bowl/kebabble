@@ -1,7 +1,5 @@
 <?php namespace kebabble;
 
-defined( 'ABSPATH' ) or die( 'Operation not permitted.' );
-
 use kebabble\config\taxonomy;
 use kebabble\processes\delete;
 use kebabble\processes\publish;

@@ -1,7 +1,5 @@
 <?php namespace kebabble;
 
-defined( 'ABSPATH' ) or die( 'Operation not permitted.' );
-
 class settings {
 	public function page() {
 		add_options_page( 
@@ -34,7 +32,6 @@ class settings {
 		
 		$this->renderDescription();
 		$this->renderSlackConfig();
-		$this->renderKebabbleConfig();
 	}
 	
 	/**
@@ -75,24 +72,6 @@ class settings {
 				$options = get_option( 'kbfos_settings' );
 				?>
 				<input type='text' name='kbfos_settings[kbfos_botchannel]' value='<?php echo $options['kbfos_botchannel']; ?>'>
-				<?php
-			}, 
-			'pluginPage', 
-			'kbfos_pluginPage_section' 
-		);
-	}
-	
-	/**
-	 * Shows other settings relating to how Kebabble operates.
-	 */
-	function renderKebabbleConfig() {
-		add_settings_field( 
-			'kbfos_drivertax', 
-			__( 'Driver Tax (Pence)', 'text_domain' ), 
-			function() {
-				$options = get_option( 'kbfos_settings' );
-				?>
-				<input type="number" min="0" name='kbfos_settings[kbfos_drivertax]' value='<?php echo $options['kbfos_drivertax']; ?>'/>
 				<?php
 			}, 
 			'pluginPage', 

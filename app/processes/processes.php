@@ -1,7 +1,5 @@
 <?php namespace kebabble\processes;
 
-defined( 'ABSPATH' ) or die( 'Operation not permitted.' );
-
 use SlackClient\botclient;
 use Carbon\Carbon;
 
@@ -28,6 +26,7 @@ class processes {
 				'food'    => $response['kebabbleOrderTypeSelection'],
 				'order'   => $response['kebabbleOrders'],
 				'driver'  => $response['kebabbleDriver'],
+				'tax'     => $response['kebabbleDriverTax'],
 				'payment' => $response['paymentOpts'],
 				'pin'     => empty($response['pinState']) ? false : true
 			];
@@ -51,6 +50,7 @@ class processes {
 					$foResponse['food'],
 					$foResponse['order'],
 					$foResponse['driver'],
+					$foResponse['tax'],
 					Carbon::parse( get_the_date( 'Y-m-d H:i:s', $id ) ),
 					$foResponse['payment']
 				),

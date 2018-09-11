@@ -1,7 +1,5 @@
 <?php namespace kebabble\config;
 
-defined( 'ABSPATH' ) or die( 'Operation not permitted.' );
-
 class fields {
 	public function orderOptionsSetup( $post ) {
 		add_meta_box( 
@@ -10,14 +8,15 @@ class fields {
 			function($post) { 
 				$existing = get_post_meta( $post->ID, 'kebabble-order', true );
 				//wp_nonce_field( basename( __FILE__ ) ); 
-				echo $this->customMessageRenderer($post, $existing);
+				echo $this->customMessageRenderer( $post, $existing );
 				?><div id="kebabbleOrder"><?php
-				echo $this->foodSelection($post, $existing);
-				echo $this->orderInput($post, $existing);
-				echo $this->driverInput($post, $existing);
-				echo $this->paymentOptions($post, $existing);
+				echo $this->foodSelection(  $post, $existing );
+				echo $this->orderInput(     $post, $existing );
+				echo $this->driverInput(    $post, $existing );
+				echo $this->driverTaxInput( $post, $existing );
+				echo $this->paymentOptions( $post, $existing );
 				?></div><?php
-				echo $this->pinStatus($post, $existing);
+				echo $this->pinStatus( $post, $existing );
 			}, 
 			'kebabble_orders', 
 			'normal', 
@@ -76,6 +75,16 @@ class fields {
 		<div>
 			<p class="label"><label for="kebabbleDriver">Driver</label></p>
 			<input type="text" name="kebabbleDriver" id="kebabbleDriver" value="<?php echo $existing; ?>">
+		</div>
+		<?php
+	}
+	
+	public function driverTaxInput($post, $existing) {
+		$existing = (!empty($existing)) ? $existing['tax'] : "";
+		?>
+		<div>
+			<p class="label"><label for="kebabbleDriverTax">Driver Charge (in pence)</label></p>
+			<input type="text" name="kebabbleDriverTax" id="kebabbleDriverTax" value="<?php echo $existing; ?>">
 		</div>
 		<?php
 	}

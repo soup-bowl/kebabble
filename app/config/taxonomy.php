@@ -1,7 +1,5 @@
 <?php namespace kebabble\config;
 
-defined( 'ABSPATH' ) or die( 'Operation not permitted.' );
-
 class taxonomy {
 	/**
 	 * Creates a new custom post type for orders.
