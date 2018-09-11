@@ -1,14 +1,16 @@
 <?php namespace kebabble\processes;
 
 use kebabble\processes\formatting;
+use kebabble\slack;
 use kebabble\config\fields;
 use SlackClient\botclient;
 use Carbon\Carbon;
 
-class publish extends processes {
+class publish {
+	protected $slack;
 	protected $fields;
-	public function __construct(fields $fields) {
-		parent::__construct();
+	public function __construct( slack $slack, fields $fields ) {
+		$this->slack  = $slack;
 		$this->fields = $fields;
 	}
 	/**
@@ -20,18 +22,18 @@ class publish extends processes {
 	public function handlePublish($post_ID, $post_obj) {
 		// I'm sure there's a million better ways to do this, but for now it suffices.
 		if (empty( get_post_meta( $post_ID, 'kebabble-slack-deleted', true ) )) {
-			update_post_meta( $post_ID, 'kebabble-order', $this->formatOrderResponse( $_POST ) );
+			update_post_meta( $post_ID, 'kebabble-order', $this->slack->formatOrderResponse( $_POST ) );
 			$orderDetails = get_post_meta( $post_ID, 'kebabble-order', true );
 			
 			$existingMessage = get_post_meta( $post_ID, 'kebabble-slack-ts', true );
 			$existingChannel = get_post_meta( $post_ID, 'kebabble-slack-channel', true );
 			
-			$timestamp = $this->sendToSlack($post_ID, $orderDetails, $existingMessage);
+			$timestamp = $this->slack->sendToSlack($post_ID, $orderDetails, $existingMessage);
 			
 			if($orderDetails['pin']) {
-				$this->slack->pin($timestamp);
+				$this->slack->slack->pin($timestamp);
 			} else {
-				$this->slack->unpin($timestamp);
+				$this->slack->slack->unpin($timestamp);
 			}
 			
 			if ($existingMessage == false) {
@@ -51,7 +53,7 @@ class publish extends processes {
 	 */
 	public function changeTitle($data, $postarr) {	
 		if($data['post_type'] == 'kebabble_orders' && $data['post_status'] == 'publish') {
-			$contents = $this->formatOrderResponse($_POST);
+			$contents = $this->slack->formatOrderResponse($_POST);
 			
 			if ($contents !== false) {
 				if ( $contents['override']['enabled'] ) {

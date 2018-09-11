@@ -1,12 +1,18 @@
 <?php namespace kebabble\processes;
 
+use kebabble\slack;
+use kebabble\config\fields;
 use SlackClient\botclient;
 use Carbon\Carbon;
 
-class delete extends processes {
-	public function __construct() {
-		parent::__construct();
+class delete {
+	protected $slack;
+	protected $fields;
+	public function __construct( slack $slack, fields $fields ) {
+		$this->slack  = $slack;
+		$this->fields = $fields;
 	}
+	
 	/**
 	 * Hooks on to the order deletion process.
 	 * @param integer $post_ID
@@ -17,7 +23,7 @@ class delete extends processes {
 		$existingMessage = get_post_meta( $post_ID, 'kebabble-slack-ts', true );
 		$existingChannel = get_post_meta( $post_ID, 'kebabble-slack-channel', true );
 		
-		$this->slack->deleteMessage($existingMessage, $existingChannel);
+		$this->slack->slack->deleteMessage($existingMessage, $existingChannel);
 		
 		add_post_meta( $post_ID, 'kebabble-slack-deleted', true, true );
 	}
@@ -26,14 +32,14 @@ class delete extends processes {
 		$post_obj = get_post($post_ID);
 		$post_adt = unserialize(get_metadata('post', $post_ID)["kebabble-order"][0]);
 		
-		$timestamp = $this->sendToSlack($post_ID, $post_adt);
+		$timestamp = $this->slack->sendToSlack($post_ID, $post_adt);
 		
 		update_post_meta( $post_ID, 'kebabble-slack-ts', $timestamp );
 		
 		if($post_adt['pin']) {
-			$this->slack->pin($timestamp);
+			$this->slack->slack->pin($timestamp);
 		} else {
-			$this->slack->unpin($timestamp);
+			$this->slack->slack->unpin($timestamp);
 		}
 	}
 }

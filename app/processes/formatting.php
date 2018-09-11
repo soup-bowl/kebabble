@@ -2,7 +2,7 @@
 
 use Carbon\Carbon;
 
-class formatting extends processes {
+class formatting {
 	/**
 	 * Makes a kebabble menu listing status.
 	 * @param string $food Dictates header. e.g. Kebab Mondays.

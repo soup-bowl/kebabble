@@ -1,16 +1,21 @@
-<?php namespace kebabble\processes;
+<?php namespace kebabble;
+
+use kebabble\processes\formatting;
 
 use SlackClient\botclient;
 use Carbon\Carbon;
 
-class processes {
+class slack {
+    public $formatting;
 	public $slack;
-	public function __construct() {
-		$this->slack = new botclient(
+	public function __construct( formatting $formatting ) {
+	    $this->formatting = $formatting;
+		$this->slack      = new botclient(
 			get_option('kbfos_settings')["kbfos_botkey"], 
 			get_option('kbfos_settings')["kbfos_botchannel"]
 		);
 	}
+	
 	/**
 	 * Formats the POST outcome into an array for storage.
 	 * @param array $response Input the outcome of the return (aka, $_POST).
@@ -46,7 +51,7 @@ class processes {
 		} else {
 			// Generated message.
 			$timestamp = $this->slack->message(
-				(new formatting)->status(
+				$this->formatting->status(
 					$foResponse['food'],
 					$foResponse['order'],
 					$foResponse['driver'],
