@@ -104,5 +104,19 @@ class settings {
 			'pluginPage',
 			'kbfos_pluginPage_section'
 		);
+
+		add_settings_field(
+			'kbfos_pullthrough',
+			__( 'Use Existing', 'text_domain' ),
+			function() {
+				$options = get_option( 'kbfos_settings' );
+				?>
+				<input type='checkbox' name='kbfos_settings[kbfos_pullthrough]' <?php checked( $options['kbfos_pullthrough'], 1 ); ?> value='1'>
+				<p class="description">Pulls through the previously used values, excluding the order.</p>
+				<?php
+			},
+			'pluginPage',
+			'kbfos_pluginPage_section'
+		);
 	}
 }

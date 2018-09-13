@@ -24,6 +24,16 @@ class fields {
 			'Order',
 			function( $post ) {
 				$existing = get_post_meta( $post->ID, 'kebabble-order', true );
+
+				// Non-strict comparison needed here, until checkbox sanitization on meta is done.
+				if ( empty( $existing ) && 1 == get_option( 'kbfos_settings' )['kbfos_pullthrough'] ) {
+					$existing          = get_post_meta( get_previous_post()->ID, 'kebabble-order', true );
+					$existing['order'] = '';
+
+					$existing['override']['enabled'] = false;
+					$existing['override']['message'] = '';
+				}
+
 				// wp_nonce_field( basename( __FILE__ ) );
 				echo $this->customMessageRenderer( $post, $existing );
 				?><div id="kebabbleOrder">
