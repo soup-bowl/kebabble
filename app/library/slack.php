@@ -38,10 +38,7 @@ class slack {
 	 */
 	public function __construct( formatting $formatting ) {
 		$this->formatting = $formatting;
-		$this->slack      = new botclient(
-			get_option( 'kbfos_settings' )['kbfos_botkey'],
-			get_option( 'kbfos_settings' )['kbfos_botchannel']
-		);
+		$this->slack      = $this->generateSlackbot();
 	}
 
 	/**
@@ -72,19 +69,25 @@ class slack {
 	/**
 	 * Sends contents over to the Slack message API.
 	 *
-	 * @param integer $id         Not sure...
-	 * @param array   $foResponse Message array to be displayed on Slack.
+	 * @param integer $id                Not sure...
+	 * @param array   $foResponse        Message array to be displayed on Slack.
 	 * @param boolean $existingTimestamp If an existing timestamp is passed, that message is modified.
+	 * @param string  $overrideChannel   Change the Slack channel, if desired.
 	 * @return string Unique timestamp of the message, used for editing.
 	 */
-	public function sendToSlack( $id, $foResponse, $existingTimestamp = false ) {
+	public function sendToSlack( $id, $foResponse, $existingTimestamp = false, $overrideChannel = '' ) {
+		$so = $this->slack;
+		if ( ! empty( $overrideChannel ) ) {
+			$so = $this->generateSlackbot( $overrideChannel );
+		}
+
 		$timestamp = null;
 		if ( $foResponse['override']['enabled'] ) {
 			// Custom Message.
-			$timestamp = $this->slack->message( $foResponse['override']['message'], $existingTimestamp );
+			$timestamp = $so->message( $foResponse['override']['message'], $existingTimestamp );
 		} else {
 			// Generated message.
-			$timestamp = $this->slack->message(
+			$timestamp = $so->message(
 				$this->formatting->status(
 					$foResponse['food'],
 					$foResponse['order'],
@@ -98,5 +101,12 @@ class slack {
 		}
 
 		return $timestamp;
+	}
+
+	private function generateSlackbot( string $customChannel = '' ):botclient {
+		return new botclient(
+			get_option( 'kbfos_settings' )['kbfos_botkey'],
+			( empty( $customChannel ) ) ? get_option( 'kbfos_settings' )['kbfos_botchannel'] : $customChannel
+		);
 	}
 }

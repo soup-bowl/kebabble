@@ -52,6 +52,24 @@ class fields {
 			'normal',
 			'high'
 		);
+
+		add_meta_box(
+			'kebabbleorderoverrides',
+			'Slack',
+			function( $post ) {
+				 $cOutput = get_post_meta( $post->ID, 'kebabble-slack-channel', true );
+				 $channel = ( empty( $cOutput ) ) ? 'N/A' : $cOutput;
+				?>
+				 <div>
+					<p class="label"><label for="kebabbleOverrideChannel">Channel</label></p>
+					<input type="text" name="kebabbleOverrideChannel" id="kebabbleOverrideChannel" value="<?php echo $channel; ?>" readonly>
+				</div>
+				<?php
+			},
+			'kebabble_orders',
+			'side',
+			'low'
+		);
 	}
 
 	/**

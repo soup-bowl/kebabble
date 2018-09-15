@@ -59,7 +59,7 @@ class publish {
 			$existingMessage = get_post_meta( $post_ID, 'kebabble-slack-ts', true );
 			$existingChannel = get_post_meta( $post_ID, 'kebabble-slack-channel', true );
 
-			$timestamp = $this->slack->sendToSlack( $post_ID, $orderDetails, $existingMessage );
+			$timestamp = $this->slack->sendToSlack( $post_ID, $orderDetails, $existingMessage, $existingChannel );
 
 			if ( $orderDetails['pin'] ) {
 				$this->slack->slack->pin( $timestamp );
