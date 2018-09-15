@@ -8,12 +8,17 @@
 
 namespace kebabble\processes;
 
+use kebabble\library\money;
 use Carbon\Carbon;
 
 /**
  * Handles order form formatting prior to sending.
  */
 class formatting {
+	protected $money;
+	public function __construct( money $money ) {
+		$this->money = $money;
+	}
 	/**
 	 * Makes a kebabble menu listing status.
 	 *
@@ -32,9 +37,9 @@ class formatting {
 		$date   = ( false === $date ) ? Carbon::now() : $date;
 		$evMoji = $this->emojiPicker( $food );
 
-		$taxCalc = money_format( '%.2n', ( $tax / 100 ) );
+		$taxCalc = $this->money->output( $tax );
 
-		$taxSlogan = ( false !== $taxCalc ) ? ":pound: *Additional £{$taxCalc} per person* to fund the driver." : null;
+		$taxSlogan = ( false !== $taxCalc ) ? ":pound: *Additional {$taxCalc} per person* to fund the driver." : null;
 
 		$formattedPosts = [
 			"{$evMoji} *{$food} {$date->format('l')} ({$date->format('jS F')})* {$evMoji}",
