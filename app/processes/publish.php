@@ -89,7 +89,10 @@ class publish {
 
 			if ( false !== $contents ) {
 				if ( $contents['override']['enabled'] ) {
-					$data['post_title'] = 'Custom message';
+					$message             = $contents['override']['message'];
+					$data['post_title']  = 'Custom message - "';
+					$data['post_title'] .= ( strlen( $message ) > 25 ) ? substr( $message, 0, 25 ) . '...' : $message;
+					$data['post_title'] .= '"';
 				} else {
 					$data['post_title'] = "{$contents['food']} order - " . Carbon::now()->format( 'd/m/Y' );
 				}
