@@ -6,7 +6,7 @@
  * @author soup-bowl
  */
 
-namespace kebabble;
+namespace kebabble\library;
 
 use kebabble\processes\formatting;
 

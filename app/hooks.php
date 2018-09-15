@@ -12,7 +12,7 @@ namespace kebabble;
 use kebabble\config\taxonomy;
 use kebabble\processes\delete;
 use kebabble\processes\publish;
-use kebabble\settings;
+use kebabble\config\settings;
 use kebabble\config\fields;
 
 /**

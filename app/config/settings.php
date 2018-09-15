@@ -6,7 +6,7 @@
  * @author soup-bowl
  */
 
-namespace kebabble;
+namespace kebabble\config;
 
 /**
  * Displays the configuration options in the WordPress admin options.

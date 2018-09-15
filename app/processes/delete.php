@@ -8,7 +8,7 @@
 
 namespace kebabble\processes;
 
-use kebabble\slack;
+use kebabble\library\slack;
 use kebabble\config\fields;
 use SlackClient\botclient;
 use Carbon\Carbon;
