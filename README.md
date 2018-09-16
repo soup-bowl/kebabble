@@ -14,7 +14,6 @@ project anyway.
 ## Requirements
 * PHP 7+ (Pending 5.6 test).
 * WordPress 4+.
-* Advanced Custom Fields.
 * Slack (admin needed for setup).
 
 ## Installation
@@ -22,10 +21,6 @@ Grab a build zip, and use WordPress plugin 'add new' to add to your WordPress.
 
 Alternatively, if you wish to compile the project yourself, you will need to
 use Composer. Use `composer install` to set up the project dependencies.
-
-Optionally, you can grab a copy of the advanced-custom-fields plugin, and
-store it in the root directory of the project. Otherwise, you can instll it
-seperately in your WordPress installation.
 
 ## Usage
 For the bot to integrate with slack, it needs to be given a Bot user and
