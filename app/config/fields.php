@@ -180,13 +180,18 @@ class fields {
 	 * @return void Constructs on page where called.
 	 */
 	public function paymentOptions( $post, $existing ) {
-		$existing = ( ! empty( $existing ) ) ? $existing['payment'] : '';
-		$options  = [ 'Cash', 'PayPal', 'Monzo' ];
+		$existingPM = ( ! empty( $existing ) ) ? $existing['payment'] : '';
+		$existingPL = ( ! empty( $existing ) ) ? $existing['paymentLink'] : [];
+		$opts       = get_option( 'kbfos_settings' );
+		$options    = ( empty( $opts['kbfos_payopts'] ) ) ? [ 'Cash' ] : explode( ',', $opts['kbfos_payopts'] );
 
 		$lists = '';
-		foreach ( $options as $option ) {
-			$markSelect = ( ! empty( $existing ) && in_array( $option, $existing ) ) ? 'checked' : '';
-			$lists     .= "<li><label><input name='paymentOpts[]' type='checkbox' value='{$option}' {$markSelect}> {$option}</label></li>";
+		for ( $i = 0; $i < count( $options ); $i++ ) {
+			$option     = $options[ $i ];
+			$markSelect = ( ! empty( $existingPM ) && in_array( $option, $existingPM ) ) ? 'checked' : '';
+			$lists     .= "<li><label><input name='paymentOpts[]' type='checkbox' value='{$option}' {$markSelect}> {$option}</label>";
+			$lists     .= ' - ';
+			$lists     .= "<input type='text' class='subtext' name='kopt{$option}' id='kopt{$option}' value='{$existingPL[$option]}'></li>";
 		}
 
 		?>

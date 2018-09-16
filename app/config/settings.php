@@ -118,5 +118,19 @@ class settings {
 			'pluginPage',
 			'kbfos_pluginPage_section'
 		);
+
+		add_settings_field(
+			'kbfos_payopts',
+			__( 'Payment Formats', 'text_domain' ),
+			function() {
+				$options = get_option( 'kbfos_settings' );
+				?>
+				<input type='text' class='regular-text'  name='kbfos_settings[kbfos_payopts]' value='<?php echo $options['kbfos_payopts']; ?>'>
+				<p class="description">Comma-seperated values accepted.</p>
+				<?php
+			},
+			'pluginPage',
+			'kbfos_pluginPage_section'
+		);
 	}
 }

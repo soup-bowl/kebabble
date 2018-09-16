@@ -49,18 +49,28 @@ class slack {
 	 */
 	public function formatOrderResponse( $response ) {
 		if ( ! empty( $response ) ) {
-			return [
-				'override' => [
+			$confArray = [
+				'override'    => [
 					'enabled' => empty( $response['kebabbleCustomMessageEnabled'] ) ? false : true,
 					'message' => $response['kebabbleCustomMessageEntry'],
 				],
-				'food'     => $response['kebabbleOrderTypeSelection'],
-				'order'    => $response['kebabbleOrders'],
-				'driver'   => $response['kebabbleDriver'],
-				'tax'      => $response['kebabbleDriverTax'],
-				'payment'  => $response['paymentOpts'],
-				'pin'      => empty( $response['pinState'] ) ? false : true,
+				'food'        => $response['kebabbleOrderTypeSelection'],
+				'order'       => $response['kebabbleOrders'],
+				'driver'      => $response['kebabbleDriver'],
+				'tax'         => $response['kebabbleDriverTax'],
+				'payment'     => $response['paymentOpts'],
+				'paymentLink' => [],
+				'pin'         => empty( $response['pinState'] ) ? false : true,
 			];
+
+			$opts    = get_option( 'kbfos_settings' );
+			$options = ( empty( $opts['kbfos_payopts'] ) ) ? [ 'Cash' ] : explode( ',', $opts['kbfos_payopts'] );
+
+			foreach ( $options as $option ) {
+				$confArray['paymentLink'][ $option ] = $response[ "kopt{$option}" ];
+			}
+
+			return $confArray;
 		} else {
 			return false;
 		}
@@ -94,7 +104,8 @@ class slack {
 					$foResponse['driver'],
 					$foResponse['tax'],
 					Carbon::parse( get_the_date( 'Y-m-d H:i:s', $id ) ),
-					( is_array( $foResponse['payment'] ) ) ? $foResponse['payment'] : [ $foResponse['payment'] ]
+					( is_array( $foResponse['payment'] ) ) ? $foResponse['payment'] : [ $foResponse['payment'] ],
+					$foResponse['paymentLink']
 				),
 				$existingTimestamp
 			);
@@ -103,6 +114,12 @@ class slack {
 		return $timestamp;
 	}
 
+	/**
+	 * Sets up the Slack bot client object.
+	 *
+	 * @param string $customChannel Override the default option channel.
+	 * @return botclient
+	 */
 	private function generateSlackbot( string $customChannel = '' ):botclient {
 		return new botclient(
 			get_option( 'kbfos_settings' )['kbfos_botkey'],

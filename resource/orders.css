@@ -15,3 +15,7 @@
 	font-family: monospace!important;
 	background-color: #f1f1f1 !important;
 }
+
+#kebabbleorderdetails .subtext {
+	width: 16em!important;
+}

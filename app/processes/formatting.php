@@ -28,9 +28,10 @@ class formatting {
 	 * @param integer $tax      Additional charge for orders.
 	 * @param Carbon  $date     Date of order, typically today.
 	 * @param array   $payments Payment methods accepted.
+	 * @param array   $pOpts    URL links for the above (matched by array key to payment type).
 	 * @return string
 	 */
-	public function status( $food, $order, $driver, $tax = 0, $date = false, $payments = [ 'Cash' ] ) {
+	public function status( $food, $order, $driver, $tax = 0, $date = false, $payments = [ 'Cash' ], $pOpts = [] ) {
 		$rolls  = ( '' === $rolls ) ? 'N/A' : $rolls;
 		$order  = ( '' === $order ) ? 'N/A' : $order;
 		$driver = ( '' === $driver ) ? 'unspecified' : $driver;
@@ -46,7 +47,7 @@ class formatting {
 			"*Orders*```{$order}```",
 			"Polling @channel for orders. Today's driver is *{$driver}* :car:",
 			$taxSlogan,
-			$this->acceptsPaymentFormatter( $payments ),
+			$this->acceptsPaymentFormatter( $payments, $pOpts ),
 		];
 
 		return implode( "\n\n", $formattedPosts );
@@ -56,9 +57,10 @@ class formatting {
 	 * Returns a 'Driver accepts...' string with the given array displayed.
 	 *
 	 * @param array $acceptedPayments String array of accepted payment labels.
+	 * @param array $pOpts            URL links for the above (matched by array key to payment type).
 	 * @return string
 	 */
-	private function acceptsPaymentFormatter( $acceptedPayments ) {
+	private function acceptsPaymentFormatter( $acceptedPayments, $pOpts = [] ) {
 		$apCount = count( $acceptedPayments );
 
 		if ( 0 === $apCount ) {
@@ -69,14 +71,20 @@ class formatting {
 
 		if ( 1 !== $apCount ) {
 			for ( $i = 0; $i < $apCount; $i++ ) {
+				$aOption  = ( empty( $pOpts[ $acceptedPayments[ $i ] ] ) ) ? false : $pOpts[ $acceptedPayments[ $i ] ];
+				$aPayment = ( false !== $aOption ) ? "<{$aOption}|{$acceptedPayments[$i]}>" : $acceptedPayments[ $i ];
+
 				if ( ( $i + 1 ) === $apCount ) {
-					$formatString .= "& {$acceptedPayments[$i]}.";
+					$formatString .= "& {$aPayment}.";
 				} else {
-					$formatString .= "{$acceptedPayments[$i]}, ";
+					$formatString .= "{$aPayment}, ";
 				}
 			}
 		} else {
-			$formatString .= "{$acceptedPayments[0]}.";
+			$aOption  = ( empty( $pOpts[ $acceptedPayments[0] ] ) ) ? false : $pOpts[ $acceptedPayments[0] ];
+			$aPayment = ( false !== $aOption ) ? "<{$aOption}|{$acceptedPayments[0]}>" : $acceptedPayments[0];
+
+			$formatString .= "{$aPayment}.";
 		}
 		return $formatString;
 	}
