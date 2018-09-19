@@ -50,17 +50,18 @@ class slack {
 	public function formatOrderResponse( $response ) {
 		if ( ! empty( $response ) ) {
 			$confArray = [
-				'override'    => [
+				'override'      => [
 					'enabled' => empty( $response['kebabbleCustomMessageEnabled'] ) ? false : true,
 					'message' => $response['kebabbleCustomMessageEntry'],
 				],
-				'food'        => $response['kebabbleOrderTypeSelection'],
-				'order'       => $response['kebabbleOrders'],
-				'driver'      => $response['kebabbleDriver'],
-				'tax'         => $response['kebabbleDriverTax'],
-				'payment'     => $response['paymentOpts'],
-				'paymentLink' => [],
-				'pin'         => empty( $response['pinState'] ) ? false : true,
+				'food'          => $response['kebabbleOrderTypeSelection'],
+				'order'         => $this->orderListCollator( $response['korder_name'], $response['korder_food'] ),
+				'order_classic' => $response['kebabbleOrders'],
+				'driver'        => $response['kebabbleDriver'],
+				'tax'           => $response['kebabbleDriverTax'],
+				'payment'       => $response['paymentOpts'],
+				'paymentLink'   => [],
+				'pin'           => empty( $response['pinState'] ) ? false : true,
 			];
 
 			$opts    = get_option( 'kbfos_settings' );
@@ -125,5 +126,30 @@ class slack {
 			get_option( 'kbfos_settings' )['kbfos_botkey'],
 			( empty( $customChannel ) ) ? get_option( 'kbfos_settings' )['kbfos_botchannel'] : $customChannel
 		);
+	}
+
+	/**
+	 * Collates the dizzying array of values from the order page into easier to handle values.
+	 *
+	 * @param array $names The name list array.
+	 * @param array $food  The food order array.
+	 * @return array
+	 */
+	private function orderListCollator( array $names, array $food ):array {
+		$orderlist = [];
+		$counter   = count( $names );
+
+		for ( $i = 0; $i < $counter; $i++ ) {
+			if ( empty( $names[ $i ] ) ) {
+				continue;
+			}
+
+			$orderlist[] = [
+				'person' => $names[ $i ],
+				'food'   => $food[ $i ],
+			];
+		}
+
+		return $orderlist;
 	}
 }

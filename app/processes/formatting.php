@@ -33,7 +33,7 @@ class formatting {
 	 */
 	public function status( $food, $order, $driver, $tax = 0, $date = false, $payments = [ 'Cash' ], $pOpts = [] ) {
 		$rolls  = ( '' === $rolls ) ? 'N/A' : $rolls;
-		$order  = ( '' === $order ) ? 'N/A' : $order;
+		$order  = ( '' === $order ) ? 'N/A' : $this->orderFormatter( $order );
 		$driver = ( '' === $driver ) ? 'unspecified' : $driver;
 		$date   = ( false === $date ) ? Carbon::now() : $date;
 		$evMoji = $this->emojiPicker( $food );
@@ -44,13 +44,55 @@ class formatting {
 
 		$formattedPosts = [
 			"{$evMoji} *{$food} {$date->format('l')} ({$date->format('jS F')})* {$evMoji}",
-			"*Orders*```{$order}```",
+			"*Orders*\n\n{$order}",
 			"Polling @channel for orders. Today's driver is *{$driver}* :car:",
 			$taxSlogan,
 			$this->acceptsPaymentFormatter( $payments, $pOpts ),
 		];
 
 		return implode( "\n\n", $formattedPosts );
+	}
+
+	/**
+	 * New-style formatter, ditches the monospace style.
+	 *
+	 * @param array $orders Array of order inputs.
+	 * @return string
+	 */
+	private function orderFormatter( array $orders ):string {
+		$content   = '';
+		$foodItems = $items = [];
+		foreach ( $orders as $order ) {
+			if ( ! in_array( $order['food'], $foodItems ) ) {
+				$foodItems[] = $order['food'];
+			}
+		}
+
+		foreach ( $foodItems as $foodItem ) {
+			$obj = [
+				'food'   => $foodItem,
+				'people' => [],
+			];
+
+			foreach ( $orders as $order ) {
+				if ( $order['food'] === $obj['food'] ) {
+					$obj['people'][] = $order['person'];
+				}
+			}
+
+			$items[] = $obj;
+		}
+
+		foreach ( $items as $item ) {
+			$content .= "*{$item['food']}* \n>";
+			foreach ( $item['people'] as $person ) {
+				$content .= "{$person}, ";
+			}
+			$content  = substr( $content, 0, -2 );
+			$content .= ".\n\n";
+		}
+
+		return substr( $content, 0, -2 );
 	}
 
 	/**

@@ -34,7 +34,7 @@ class fields {
 					$existing['override']['message'] = '';
 				}
 
-				// wp_nonce_field( basename( __FILE__ ) );
+				// wp_nonce_field( 'kebabble-order-form' );
 				echo $this->customMessageRenderer( $post, $existing );
 				?><div id="kebabbleOrder">
 				<?php
@@ -124,16 +124,38 @@ class fields {
 	/**
 	 * Creates a monospaced order input form.
 	 *
-	 * @param WP_Post $post     The post object being created/edited.
-	 * @param string  $existing Existing value in the database.
+	 * @param WP_Post $post      The post object being created/edited.
+	 * @param string  $existings Existing values in the database.
 	 * @return void Constructs on page where called.
 	 */
-	public function orderInput( $post, $existing ) {
-		$existing = ( ! empty( $existing ) ) ? $existing['order'] : '';
+	public function orderInput( $post, $existings ) {
+		$existings = ( ! empty( $existings ) ) ? $existings['order'] : '';
 		?>
 		<div>
 			<p class="label"><label for="kebabbleOrders">Orders</label></p>
-			<textarea name="kebabbleOrders" id="kebabbleOrders" class="mono"><?php echo $existing; ?></textarea>
+			<table>
+				<thead>
+					<tr>
+						<th>Person</th>
+						<th>Order</th>
+						<th>Options</th>
+					</tr>
+				</thead>
+				<tbody id="korder_tablelist">
+					<?php
+					$this->orderSnippet( 'korder_examplerow', 'hidden' );
+					if ( empty( $existings ) ) {
+						$this->orderSnippet();
+					} else {
+						foreach ( $existings as $existing ) {
+							$this->orderSnippet( '', '', $existing['person'], $existing['food'] );
+						}
+					}
+					?>
+				</tbody>
+			</table>
+			<a class="btnAddkorder" href="#">Add</a>
+			<input type=hidden value="" />
 		</div>
 		<?php
 	}
@@ -220,6 +242,24 @@ class fields {
 				<input name='pinState' type='checkbox' <?php checked( $existing ); ?> value='1'>
 			</ul>
 		</div>
+		<?php
+	}
+
+	/**
+	 * Snippet of the repeated order segment.
+	 *
+	 * @param string $id    TR elment ID.
+	 * @param string $class TR element class.
+	 * @param string $name  Existing name entry.
+	 * @param string $food  Existing food entry.
+	 */
+	private function orderSnippet( $id = '', $class = '', $name = '', $food = '' ) {
+		?>
+		<tr id="<?php echo $id; ?>" class="<?php echo $class; ?>">
+			<td><input type="text" name="korder_name[]" id="korder_name[]" value="<?php echo $name; ?>"></td>
+			<td><input type="text" name="korder_food[]" id="korder_food[]" value="<?php echo $food; ?>"></td>
+			<td><a class="btnRemkorder" href="#">Remove</a></td>
+		</tr>
 		<?php
 	}
 }
