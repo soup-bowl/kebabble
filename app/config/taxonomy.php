@@ -33,7 +33,7 @@ class taxonomy {
 					'search_items'  => __( 'Search orders', 'text_domain' ),
 				],
 				'supports'     => false,
-				'taxonomies'   => [ 'kebabble_orders' ],
+				'taxonomies'   => [ 'kebabble_company' ],
 				'public'       => false,
 				'show_ui'      => true,
 				'show_in_menu' => true,
@@ -44,6 +44,28 @@ class taxonomy {
 					'pages'      => true,
 					'feeds'      => true,
 				],
+			]
+		);
+
+		register_taxonomy(
+			'kebabble_company',
+			[ 'kebabble_orders' ],
+			[
+				'label'        => __( 'Company', 'text_domain' ),
+				'description'  => __( 'Company list', 'text_domain' ),
+				'labels'       => [
+					'name'          => _x( 'Company', 'Post Type General Name', 'text_domain' ),
+					'singular_name' => _x( 'Company', 'Post Type Singular Name', 'text_domain' ),
+					'add_new_item'  => __( 'Add new company', 'text_domain' ),
+					'edit_item'     => __( 'Edit company', 'text_domain' ),
+					'update_item'   => __( 'Update company', 'text_domain' ),
+					'view_item'     => __( 'View company', 'text_domain' ),
+					'search_items'  => __( 'Search all companies', 'text_domain' ),
+				],
+				'supports'     => false,
+				'public'       => false,
+				'show_ui'      => true,
+				'show_in_menu' => true,
 			]
 		);
 	}

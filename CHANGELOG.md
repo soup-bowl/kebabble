@@ -1,6 +1,12 @@
 # Changelog
 Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Added
+- Taxonomy representing company, with additional field for food options and pricing.
+### Changed
+- Dynamic order form, replacing legacy monospace style (#9).
+
 ## [0.1.8] - 2018-09-16
 ### Fixed
 - Fixed an issue where Windows-based installations would crash upon posting (Issue #16).

@@ -12,8 +12,11 @@ namespace kebabble;
 use kebabble\config\taxonomy;
 use kebabble\processes\delete;
 use kebabble\processes\publish;
+use kebabble\processes\term\save;
 use kebabble\config\settings;
 use kebabble\config\fields;
+
+use WP_Term;
 
 /**
  * Handles and translates the hooks into kebabble class functions.
@@ -54,6 +57,8 @@ class hooks {
 	 */
 	protected $fields;
 
+	protected $save;
+
 	/**
 	 * Constructor.
 	 *
@@ -63,12 +68,13 @@ class hooks {
 	 * @param settings $settings Settings page handler.
 	 * @param fields   $fields   Field display class.
 	 */
-	public function __construct( taxonomy $taxonomy, publish $publish, delete $delete, settings $settings, fields $fields ) {
+	public function __construct( taxonomy $taxonomy, publish $publish, delete $delete, settings $settings, fields $fields, save $save ) {
 		$this->taxonomy = $taxonomy;
 		$this->publish  = $publish;
 		$this->delete   = $delete;
 		$this->settings = $settings;
 		$this->fields   = $fields;
+		$this->save     = $save;
 	}
 
 	/**
@@ -82,6 +88,19 @@ class hooks {
 		// Register post type and data entries.
 		add_action( 'init', [ &$this->taxonomy, 'orders' ], 0 );
 		add_action( 'add_meta_boxes_kebabble_orders', [ &$this->fields, 'orderOptionsSetup' ] );
+		add_action(
+			'kebabble_company_add_form_fields',
+			function() {
+				$this->fields->companyOptionsSetup();
+			}
+		);
+		add_action(
+			'kebabble_company_edit_form_fields',
+			function( WP_Term $term ) {
+				$this->fields->companyOptionsSetup( $term->term_id );
+			}
+		);
+		add_action( 'quick_edit_custom_box', [ &$this->fields, 'companyOptionsQuickSetup' ], 10, 2 );
 
 		// Resource queue.
 		add_action(
@@ -91,11 +110,15 @@ class hooks {
 			}
 		);
 
-		// Order functionalities.
+		// Order functionality.
 		add_action( 'publish_kebabble_orders', [ &$this->publish, 'handlePublish' ], 10, 2 );
 		add_filter( 'wp_insert_post_data', [ &$this->publish, 'changeTitle' ], 99, 2 );
 		add_action( 'trash_kebabble_orders', [ &$this->delete, 'handleDeletion' ], 10, 2 );
 		add_action( 'untrash_post', [ &$this->delete, 'handleUndeletion' ], 10, 2 );
+
+		// Company functionality.
+		add_action( 'created_kebabble_company', [ &$this->save, 'saveCustomCompanyDetails' ] );
+		add_action( 'edited_kebabble_company', [ &$this->save, 'saveCustomCompanyDetails' ] );
 	}
 
 	/**

@@ -38,19 +38,16 @@ class formatting {
 		$date   = ( false === $date ) ? Carbon::now() : $date;
 		$evMoji = $this->emojiPicker( $food );
 
-		$taxCalc = $this->money->output( $tax );
-
-		$taxSlogan = ( false !== $taxCalc ) ? ":pound: *Additional {$taxCalc} per person* to fund the driver." : null;
-
 		$formattedPosts = [
 			"{$evMoji} *{$food} {$date->format('l')} ({$date->format('jS F')})* {$evMoji}",
-			"*Orders*\n\n{$order}",
+			'*Orders*',
+			$order,
 			"Polling @channel for orders. Today's driver is *{$driver}* :car:",
-			$taxSlogan,
+			( $tax > 0 ) ? ':pound: *Additional ' . $this->money->output( $tax ) . ' per person* to fund the driver.' : null,
 			$this->acceptsPaymentFormatter( $payments, $pOpts ),
 		];
 
-		return implode( "\n\n", $formattedPosts );
+		return str_replace( "\n\n\n\n", "\n\n", implode( "\n\n", $formattedPosts ) );
 	}
 
 	/**

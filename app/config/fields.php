@@ -73,6 +73,23 @@ class fields {
 	}
 
 	/**
+	 * Adds custom input fields for the company taxonomy.
+	 *
+	 * @param string $slug Custom taxonomy term.
+	 * return void
+	 */
+	public function companyOptionsSetup( int $term_id = 0 ) {
+		$existing = get_term_meta( $term_id, 'kebabble_ordpri_org', true );
+		?>
+		<div class="form-field">
+			<label for="tag-kebabble-pricing">Options & Pricing</label>
+			<input name="ctOrderPricing" id="tag-kebabble-pricing" value="<?php echo $existing; ?>" size="40" type="text" placeholder="food|price,food|price...">
+			<p>Comma-separated list of menu items, with a pipe-separated option of a price.</p>
+		</div>
+		<?php
+	}
+
+	/**
 	 * Input block for a custom override message.
 	 *
 	 * @param WP_Post $post     The post object being created/edited.
