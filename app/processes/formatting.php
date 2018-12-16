@@ -31,15 +31,17 @@ class formatting {
 	 * @param array   $pOpts    URL links for the above (matched by array key to payment type).
 	 * @return string
 	 */
-	public function status( $food, $order, $driver, $tax = 0, $date = false, $payments = [ 'Cash' ], $pOpts = [] ) {
-		$rolls  = ( '' === $rolls ) ? 'N/A' : $rolls;
-		$order  = ( '' === $order ) ? 'N/A' : $this->orderFormatter( $order );
-		$driver = ( '' === $driver ) ? 'unspecified' : $driver;
-		$date   = ( false === $date ) ? Carbon::now() : $date;
-		$evMoji = $this->emojiPicker( $food );
+	public function status( $food, $order, $driver, $tax = 0, $date = false, $payments = [ 'Cash' ], $pOpts = [], $place = 0 ) {
+		$rolls    = ( '' === $rolls ) ? 'N/A' : $rolls;
+		$location = get_term( $place, 'kebabble_company' );
+		$loc_str  = ( ! is_wp_error( $location ) ) ? " at {$location->name}" : '';
+		$order    = ( '' === $order ) ? 'N/A' : $this->orderFormatter( $order, $place );
+		$driver   = ( '' === $driver ) ? 'unspecified' : $driver;
+		$date     = ( false === $date ) ? Carbon::now() : $date;
+		$evMoji   = $this->emojiPicker( $food );
 
 		$formattedPosts = [
-			"{$evMoji} *{$food} {$date->format('l')} ({$date->format('jS F')})* {$evMoji}",
+			"{$evMoji} *{$food} {$date->format('l')}{$loc_str} ({$date->format('jS F')})* {$evMoji}",
 			'*Orders*',
 			$order,
 			"Polling @channel for orders. Today's driver is *{$driver}* :car:",
@@ -53,12 +55,15 @@ class formatting {
 	/**
 	 * New-style formatter, ditches the monospace style.
 	 *
-	 * @param array $orders Array of order inputs.
+	 * @param array   $orders Array of order inputs.
+	 * @param integer $place  Term ID of place. Blank disables this additional feature.
 	 * @return string
 	 */
-	private function orderFormatter( array $orders ):string {
+	private function orderFormatter( array $orders, int $place = 0 ):string {
 		$content   = '';
 		$foodItems = $items = [];
+		$place     = get_term_meta( $place, 'kebabble_ordpri', true ); 
+		
 		foreach ( $orders as $order ) {
 			if ( ! in_array( $order['food'], $foodItems ) ) {
 				$foodItems[] = $order['food'];
@@ -81,7 +86,12 @@ class formatting {
 		}
 
 		foreach ( $items as $item ) {
-			$content .= "*{$item['food']}* \n>";
+			$cost = '';
+			if ( $place !== false ) {
+				$cost_item = ! empty( $place[ $item['food'] ] ) ? $place[ $item['food'] ]['Price'] : '';
+				$cost      = ! empty( $cost_item ) ? " ({$this->money->output($cost_item)} each)" : '';
+			}
+			$content .= "*{$item['food']}{$cost}* \n>";
 			foreach ( $item['people'] as $person ) {
 				$content .= "{$person}, ";
 			}

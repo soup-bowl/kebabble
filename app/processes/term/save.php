@@ -28,14 +28,13 @@ class save {
 	 * @param string $input The string formatted like above.
 	 * @return array
 	 */
-	private function parseFoodOptions( string $input ):array {
+	public function parseFoodOptions( string $input ):array {
 		$options    = [];
 		$collection = explode( ',', $input );
 
 		foreach ( $collection as $item ) {
 			$decy      = explode( '|', $item );
-			$options[] = [
-				'Item'  => $decy[0],
+			$options[ $decy[0] ] = [
 				'Price' => isset( $decy[1] ) ? $decy[1] : 0,
 			];
 		}

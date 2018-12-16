@@ -38,6 +38,7 @@ class fields {
 				echo $this->customMessageRenderer( $post, $existing );
 				?><div id="kebabbleOrder">
 				<?php
+				echo $this->companyMenuSelector( $post, $existing );
 				echo $this->foodSelection( $post, $existing );
 				echo $this->orderInput( $post, $existing );
 				echo $this->driverInput( $post, $existing );
@@ -108,6 +109,36 @@ class fields {
 				<p class="label"><label for="kebabbleCustomMessageEntry">Custom Message</label></p>
 				<textarea name="kebabbleCustomMessageEntry"><?php echo $message; ?></textarea>
 			</div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Select what resturant you're ordering from, if stored. Allows for price and
+	 * location information pullthroughs.
+	 *
+	 * @param WP_Post $post
+	 * @param mixed $existing
+	 * @return void
+	 */
+	public function companyMenuSelector( $post, $existing ) {
+		$selected = ( ! empty( $existing ) ) ? (int) $existing['TEMP_complink'] : 0;
+		$options_available = get_terms([
+			'taxonomy'   => 'kebabble_company',
+			'hide_empty' => false,
+		]);
+
+		$select = '<option value=\'0\'>None</option>';
+		foreach ( $options_available as $option ) {
+			$markSelected = ( $option->term_id === $selected ) ? 'selected' : '';
+			$select      .= "<option value='{$option->term_id}' {$markSelected}>{$option->name}</option>";
+		}
+		?>
+		<div>
+			<p class="label"><label for="kebabbleCompanySelection">Company</label></p>
+			<select name="kebabbleCompanySelection">
+				<?php echo $select; ?>
+			</select>
 		</div>
 		<?php
 	}

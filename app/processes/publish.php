@@ -8,6 +8,7 @@
 
 namespace kebabble\processes;
 
+use kebabble\processes\term\save;
 use kebabble\processes\formatting;
 use kebabble\library\slack;
 use kebabble\config\fields;
@@ -37,10 +38,11 @@ class publish {
 	 *
 	 * @param slack  $slack  Slack API communication handler.
 	 * @param fields $fields Field display class.
+	 * @param save   $company_save 
 	 */
 	public function __construct( slack $slack, fields $fields ) {
-		$this->slack  = $slack;
-		$this->fields = $fields;
+		$this->slack        = $slack;
+		$this->fields       = $fields;
 	}
 
 	/**

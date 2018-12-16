@@ -54,6 +54,7 @@ class slack {
 					'enabled' => empty( $response['kebabbleCustomMessageEnabled'] ) ? false : true,
 					'message' => $response['kebabbleCustomMessageEntry'],
 				],
+				'TEMP_complink' => $response['kebabbleCompanySelection'],
 				'food'          => $response['kebabbleOrderTypeSelection'],
 				'order'         => $this->orderListCollator( $response['korder_name'], $response['korder_food'] ),
 				'order_classic' => $response['kebabbleOrders'],
@@ -106,7 +107,8 @@ class slack {
 					$foResponse['tax'],
 					Carbon::parse( get_the_date( 'Y-m-d H:i:s', $id ) ),
 					( is_array( $foResponse['payment'] ) ) ? $foResponse['payment'] : [ $foResponse['payment'] ],
-					$foResponse['paymentLink']
+					$foResponse['paymentLink'],
+					$foResponse['TEMP_complink']
 				),
 				$existingTimestamp
 			);
