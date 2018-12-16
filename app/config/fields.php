@@ -23,12 +23,13 @@ class fields {
 			'kebabbleorderdetails',
 			'Order',
 			function( $post ) {
-				$existing = get_post_meta( $post->ID, 'kebabble-order', true );
+				$existing         = get_post_meta( $post->ID, 'kebabble-order', true );
+				$existing_company = wp_get_post_terms( $post->ID, 'kebabble_company' );
 
 				// Non-strict comparison needed here, until checkbox sanitization on meta is done.
 				if ( empty( $existing ) && 1 == get_option( 'kbfos_settings' )['kbfos_pullthrough'] ) {
 					$existing          = get_post_meta( get_previous_post()->ID, 'kebabble-order', true );
-					$existing['order'] = '';
+					$existing_company  = wp_get_post_terms( get_previous_post()->ID, 'kebabble_company' );
 
 					$existing['override']['enabled'] = false;
 					$existing['override']['message'] = '';
@@ -38,7 +39,7 @@ class fields {
 				echo $this->customMessageRenderer( $post, $existing );
 				?><div id="kebabbleOrder">
 				<?php
-				echo $this->companyMenuSelector( $post );
+				echo $this->companyMenuSelector( $post, $existing_company );
 				echo $this->foodSelection( $post, $existing );
 				echo $this->orderInput( $post, $existing );
 				echo $this->driverInput( $post, $existing );
@@ -120,8 +121,7 @@ class fields {
 	 * @param WP_Post $post
 	 * @return void
 	 */
-	public function companyMenuSelector( $post ) {
-		$existing = wp_get_post_terms( $post->ID, 'kebabble_company' );
+	public function companyMenuSelector( $post, $existing ) {
 		$selected = ( ! empty( $existing ) ) ? $existing[0]->term_id : 0;
 		$options_available = get_terms([
 			'taxonomy'   => 'kebabble_company',

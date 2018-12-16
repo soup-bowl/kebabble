@@ -4,7 +4,7 @@
  * Description: Office food management system.
  * Author: soup-bowl
  * Author URI: https://github.com/soup-bowl/kebabble
- * Version: 0.2-Alpha
+ * Version: 0.2.1-Alpha
  *
  * @package kebabble
  */
