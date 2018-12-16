@@ -49,12 +49,21 @@ class slack {
 	 */
 	public function formatOrderResponse( $response ) {
 		if ( ! empty( $response ) ) {
+			if ( $response['kebabbleCompanySelection'] > 0 ) {
+				wp_set_object_terms(
+					$response['post_ID'],
+					(int) $response['kebabbleCompanySelection'],
+					'kebabble_company'
+				);
+			} else {
+				wp_delete_object_term_relationships( $response['post_ID'], 'kebabble_company' );
+			}
+
 			$confArray = [
 				'override'      => [
 					'enabled' => empty( $response['kebabbleCustomMessageEnabled'] ) ? false : true,
 					'message' => $response['kebabbleCustomMessageEntry'],
 				],
-				'TEMP_complink' => $response['kebabbleCompanySelection'],
 				'food'          => $response['kebabbleOrderTypeSelection'],
 				'order'         => $this->orderListCollator( $response['korder_name'], $response['korder_food'] ),
 				'order_classic' => $response['kebabbleOrders'],
@@ -81,7 +90,7 @@ class slack {
 	/**
 	 * Sends contents over to the Slack message API.
 	 *
-	 * @param integer $id                Not sure...
+	 * @param integer $id                Post ID.
 	 * @param array   $foResponse        Message array to be displayed on Slack.
 	 * @param boolean $existingTimestamp If an existing timestamp is passed, that message is modified.
 	 * @param string  $overrideChannel   Change the Slack channel, if desired.
@@ -101,14 +110,14 @@ class slack {
 			// Generated message.
 			$timestamp = $so->message(
 				$this->formatting->status(
+					$id,
 					$foResponse['food'],
 					$foResponse['order'],
 					$foResponse['driver'],
 					$foResponse['tax'],
 					Carbon::parse( get_the_date( 'Y-m-d H:i:s', $id ) ),
 					( is_array( $foResponse['payment'] ) ) ? $foResponse['payment'] : [ $foResponse['payment'] ],
-					$foResponse['paymentLink'],
-					$foResponse['TEMP_complink']
+					$foResponse['paymentLink']
 				),
 				$existingTimestamp
 			);

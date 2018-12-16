@@ -38,7 +38,7 @@ class fields {
 				echo $this->customMessageRenderer( $post, $existing );
 				?><div id="kebabbleOrder">
 				<?php
-				echo $this->companyMenuSelector( $post, $existing );
+				echo $this->companyMenuSelector( $post );
 				echo $this->foodSelection( $post, $existing );
 				echo $this->orderInput( $post, $existing );
 				echo $this->driverInput( $post, $existing );
@@ -118,11 +118,11 @@ class fields {
 	 * location information pullthroughs.
 	 *
 	 * @param WP_Post $post
-	 * @param mixed $existing
 	 * @return void
 	 */
-	public function companyMenuSelector( $post, $existing ) {
-		$selected = ( ! empty( $existing ) ) ? (int) $existing['TEMP_complink'] : 0;
+	public function companyMenuSelector( $post ) {
+		$existing = wp_get_post_terms( $post->ID, 'kebabble_company' );
+		$selected = ( ! empty( $existing ) ) ? $existing[0]->term_id : 0;
 		$options_available = get_terms([
 			'taxonomy'   => 'kebabble_company',
 			'hide_empty' => false,

@@ -22,6 +22,7 @@ class formatting {
 	/**
 	 * Makes a kebabble menu listing status.
 	 *
+	 * @param integer $id       ID of the post in question.
 	 * @param string  $food     Dictates header. e.g. Kebab Mondays.
 	 * @param string  $order    Displayed monospaced.
 	 * @param string  $driver   Driver name.
@@ -31,14 +32,15 @@ class formatting {
 	 * @param array   $pOpts    URL links for the above (matched by array key to payment type).
 	 * @return string
 	 */
-	public function status( $food, $order, $driver, $tax = 0, $date = false, $payments = [ 'Cash' ], $pOpts = [], $place = 0 ) {
-		$rolls    = ( '' === $rolls ) ? 'N/A' : $rolls;
-		$location = get_term( $place, 'kebabble_company' );
-		$loc_str  = ( ! is_wp_error( $location ) ) ? " at {$location->name}" : '';
-		$order    = ( '' === $order ) ? 'N/A' : $this->orderFormatter( $order, $place, $tax );
-		$driver   = ( '' === $driver ) ? 'unspecified' : $driver;
-		$date     = ( false === $date ) ? Carbon::now() : $date;
-		$evMoji   = $this->emojiPicker( $food );
+	public function status( $id, $food, $order, $driver, $tax = 0, $date = false, $payments = [ 'Cash' ], $pOpts = [] ) {
+		$rolls       = ( '' === $rolls ) ? 'N/A' : $rolls;
+		$location    = wp_get_object_terms($id, 'kebabble_company')[0];
+		$location_id = ( ! empty( $location ) ) ? $location->term_id : 0;
+		$loc_str     = ( ! empty( $location ) ) ? " at {$location->name}" : '';
+		$order       = ( '' === $order ) ? 'N/A' : $this->orderFormatter( $order, $location_id, $tax );
+		$driver      = ( '' === $driver ) ? 'unspecified' : $driver;
+		$date        = ( false === $date ) ? Carbon::now() : $date;
+		$evMoji      = $this->emojiPicker( $food );
 
 		$formattedPosts = [
 			"{$evMoji} *{$food} {$date->format('l')}{$loc_str} ({$date->format('jS F')})* {$evMoji}",
