@@ -35,7 +35,7 @@ class formatting {
 		$rolls    = ( '' === $rolls ) ? 'N/A' : $rolls;
 		$location = get_term( $place, 'kebabble_company' );
 		$loc_str  = ( ! is_wp_error( $location ) ) ? " at {$location->name}" : '';
-		$order    = ( '' === $order ) ? 'N/A' : $this->orderFormatter( $order, $place );
+		$order    = ( '' === $order ) ? 'N/A' : $this->orderFormatter( $order, $place, $tax );
 		$driver   = ( '' === $driver ) ? 'unspecified' : $driver;
 		$date     = ( false === $date ) ? Carbon::now() : $date;
 		$evMoji   = $this->emojiPicker( $food );
@@ -59,7 +59,7 @@ class formatting {
 	 * @param integer $place  Term ID of place. Blank disables this additional feature.
 	 * @return string
 	 */
-	private function orderFormatter( array $orders, int $place = 0 ):string {
+	private function orderFormatter( array $orders, int $place = 0, int $tax = 0 ):string {
 		$content   = '';
 		$foodItems = $items = [];
 		$place     = get_term_meta( $place, 'kebabble_ordpri', true ); 
@@ -85,21 +85,32 @@ class formatting {
 			$items[] = $obj;
 		}
 
+		$cost_overall = $cost_tax = 0;		
 		foreach ( $items as $item ) {
-			$cost = '';
+			$cost_item = 0;
+			$cost      = '';
 			if ( $place !== false ) {
-				$cost_item = ! empty( $place[ $item['food'] ] ) ? $place[ $item['food'] ]['Price'] : '';
+				$cost_item = ! empty( $place[ $item['food'] ] ) ? (int) $place[ $item['food'] ]['Price'] : 0;
 				$cost      = ! empty( $cost_item ) ? " ({$this->money->output($cost_item)} each)" : '';
 			}
 			$content .= "*{$item['food']}{$cost}* \n>";
 			foreach ( $item['people'] as $person ) {
 				$content .= "{$person}, ";
+				$cost_overall = $cost_overall + $cost_item;
+				$cost_tax     = $cost_tax + $tax;
 			}
 			$content  = substr( $content, 0, -2 );
 			$content .= ".\n\n";
 		}
 
-		return substr( $content, 0, -2 );
+		$cost_box = '';
+		if ( $cost_overall > 0 ) {
+			$cost_box = "\n\n";
+			$cost_box .= "*Cost*: {$this->money->output($cost_overall)} _for priced orders_.\n";
+			$cost_box .= "*Tax*: {$this->money->output($cost_tax)}.";
+		}
+
+		return substr( $content, 0, -2 ) . $cost_box;
 	}
 
 	/**
