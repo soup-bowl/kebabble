@@ -202,7 +202,7 @@ class fields {
 					?>
 				</tbody>
 			</table>
-			<a class="btnAddkorder" href="#">Add</a>
+			<a class="btnAddkorder button" href="#">Add</a>
 			<input type=hidden value="" />
 		</div>
 		<?php
@@ -306,7 +306,7 @@ class fields {
 		<tr id="<?php echo $id; ?>" class="<?php echo $class; ?>">
 			<td><input type="text" name="korder_name[]" id="korder_name[]" value="<?php echo $name; ?>"></td>
 			<td><input type="text" name="korder_food[]" id="korder_food[]" value="<?php echo $food; ?>"></td>
-			<td><a class="btnRemkorder" href="#">Remove</a></td>
+			<td><a class="btnRemkorder button" href="#">Remove</a></td>
 		</tr>
 		<?php
 	}
