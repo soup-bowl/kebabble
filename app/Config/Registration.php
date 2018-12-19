@@ -7,12 +7,12 @@
  * @license MIT
  */
 
-namespace kebabble\config;
+namespace Kebabble\Config;
 
 /**
  * Configures the objects and terms with WordPress.
  */
-class registration {
+class Registration {
 	/**
 	 * Creates a new custom post type for orders, and a accompanying company tax.
 	 *

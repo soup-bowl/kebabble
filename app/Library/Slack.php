@@ -7,9 +7,9 @@
  * @license MIT
  */
 
-namespace kebabble\library;
+namespace Kebabble\Library;
 
-use kebabble\processes\formatting;
+use Kebabble\Processes\Formatting;
 
 use SlackClient\botclient;
 use Carbon\Carbon;
@@ -17,27 +17,27 @@ use Carbon\Carbon;
 /**
  * Intermediary between Kebabble WP and Slack.
  */
-class slack {
+class Slack {
 	/**
 	 * Pre-processing before publishing.
 	 *
-	 * @var formatting
+	 * @var Formatting
 	 */
 	public $formatting;
 
 	/**
 	 * Slack API communication handler.
 	 *
-	 * @var slack
+	 * @var Slack
 	 */
 	public $slack;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param formatting $formatting Pre-processing before publishing.
+	 * @param Formatting $formatting Pre-processing before publishing.
 	 */
-	public function __construct( formatting $formatting ) {
+	public function __construct( Formatting $formatting ) {
 		$this->formatting = $formatting;
 		$this->slack      = $this->generateSlackbot();
 	}

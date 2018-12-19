@@ -7,12 +7,12 @@
  * @license MIT
  */
 
-namespace kebabble\config;
+namespace Kebabble\Config;
 
 /**
  * Displays the configuration options in the WordPress admin options.
  */
-class settings {
+class Settings {
 	/**
 	 * Tells WordPress about Kebabble settngs, and adds them to as a submenu.
 	 *

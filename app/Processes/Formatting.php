@@ -7,28 +7,28 @@
  * @license MIT
  */
 
-namespace kebabble\processes;
+namespace Kebabble\Processes;
 
-use kebabble\library\money;
+use Kebabble\Library\Money;
 use Carbon\Carbon;
 
 /**
  * Handles order form formatting prior to sending.
  */
-class formatting {
+class Formatting {
 	/**
 	 * Handles monetary-based string formatting.
 	 *
-	 * @var money
+	 * @var Money
 	 */
 	protected $money;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param money $money Handles monetary-based string formatting.
+	 * @param Money $money Handles monetary-based string formatting.
 	 */
-	public function __construct( money $money ) {
+	public function __construct( Money $money ) {
 		$this->money = $money;
 	}
 	/**

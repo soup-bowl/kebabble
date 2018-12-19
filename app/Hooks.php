@@ -7,83 +7,83 @@
  * @license MIT
  */
 
-namespace kebabble;
+namespace Kebabble;
 
-use kebabble\config\registration;
-use kebabble\processes\delete;
-use kebabble\processes\publish;
-use kebabble\processes\term\save;
-use kebabble\config\settings;
-use kebabble\config\order_fields;
-use kebabble\config\company_fields;
+use Kebabble\Processes\Delete;
+use Kebabble\Processes\Publish;
+use Kebabble\Processes\Term\Save;
+use Kebabble\Config\Registration;
+use Kebabble\Config\Settings;
+use Kebabble\Config\OrderFields;
+use Kebabble\Config\CompanyFields;
 
 use WP_Term;
 
 /**
  * Handles and translates the hooks into kebabble class functions.
  */
-class hooks {
+class Hooks {
 	/**
 	 * Connects with the system required objects.
 	 *
-	 * @var registration
+	 * @var Registration
 	 */
 	protected $registration;
 
 	/**
 	 * Publish processes for order posts.
 	 *
-	 * @var publish
+	 * @var Publish
 	 */
 	protected $publish;
 
 	/**
 	 * Handles deletion of posted orders.
 	 *
-	 * @var delete
+	 * @var Delete
 	 */
 	protected $delete;
 
 	/**
 	 * Settings page handler.
 	 *
-	 * @var settings
+	 * @var Settings
 	 */
 	protected $settings;
 
 	/**
 	 * Fields for the order form.
 	 *
-	 * @var order_fields
+	 * @var OrderFields
 	 */
 	protected $order_fields;
 
 	/**
 	 * Fields for the company taxonomy.
 	 *
-	 * @var company_fields
+	 * @var CompanyFields
 	 */
 	protected $company_fields;
 
 	/**
 	 * Storage processing for saved term items.
 	 *
-	 * @var save
+	 * @var Save
 	 */
 	protected $save;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param registration   $registration   Connects with the system required objects.
-	 * @param publish        $publish        Publish processes for order posts.
-	 * @param delete         $delete         Handles deletion of posted orders.
-	 * @param settings       $settings       Settings page handler.
-	 * @param order_fields   $order_fields   Fields for the order form.
-	 * @param company_fields $company_fields Fields for the company taxonomy.
-	 * @param save           $save           Storage processing for saved term items.
+	 * @param Registration  $registration   Connects with the system required objects.
+	 * @param Publish       $publish        Publish processes for order posts.
+	 * @param Delete        $delete         Handles deletion of posted orders.
+	 * @param Settings      $settings       Settings page handler.
+	 * @param OrderFields   $order_fields   Fields for the order form.
+	 * @param CompanyFields $company_fields Fields for the company taxonomy.
+	 * @param Save          $save           Storage processing for saved term items.
 	 */
-	public function __construct( registration $registration, publish $publish, delete $delete, settings $settings, order_fields $order_fields, company_fields $company_fields, save $save ) {
+	public function __construct( Registration $registration, Publish $publish, Delete $delete, Settings $settings, OrderFields $order_fields, CompanyFields $company_fields, Save $save ) {
 		$this->registration   = $registration;
 		$this->publish        = $publish;
 		$this->delete         = $delete;
@@ -110,7 +110,7 @@ class hooks {
 		add_action( 'kebabble_company_edit_form_fields', [ &$this->company_fields, 'company_options' ] );
 
 		// Resource queue.
-		add_action( 'admin_enqueue_scripts', [ &$this, 'enqueuedScripts' ] );
+		add_action( 'admin_enqueue_scripts', [ &$this, 'enqueued_scripts' ] );
 
 		// Order functionality.
 		add_action( 'publish_kebabble_orders', [ &$this->publish, 'handlePublish' ], 10, 2 );
@@ -128,7 +128,7 @@ class hooks {
 	 *
 	 * @return void
 	 */
-	public function enqueuedScripts():void {
+	public function enqueued_scripts():void {
 		if ( 'kebabble_orders' === get_current_screen()->id ) {
 			wp_enqueue_style( 'kebabble-orders-css', plugins_url( '/../resource/orders.css', __FILE__ ), [], '1.1' );
 			wp_enqueue_script( 'kebabble-orders-js', plugins_url( '/../resource/orders.js', __FILE__ ), [ 'jquery' ], '1.0', true );

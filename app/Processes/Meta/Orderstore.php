@@ -7,12 +7,12 @@
  * @license MIT
  */
 
-namespace kebabble\processes\meta;
+namespace Kebabble\Processes\Meta;
 
 /**
  * Stores and retrieves the order field data.
  */
-class orderstore {
+class Orderstore {
 	/**
 	 * Obtains the order details stored with the post, or none if unavailable.
 	 *

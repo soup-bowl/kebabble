@@ -20,4 +20,4 @@ defined( 'ABSPATH' ) || die( 'Operation not permitted.' );
  */
 require_once __DIR__ . '/vendor/autoload.php';
 
-( new DI\Container() )->get( 'kebabble\hooks' )->main();
+( new DI\Container() )->get( 'Kebabble\Hooks' )->main();

@@ -7,14 +7,14 @@
  * @license MIT
  */
 
-namespace kebabble\config;
+namespace Kebabble\Config;
 
 use WP_Term;
 
 /**
  * Display formatting on the kebabble company taxonomy.
  */
-class company_fields {
+class CompanyFields {
 	/**
 	 * Runs company_options without arguments, for hook purposes.
 	 *

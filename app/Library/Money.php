@@ -7,12 +7,12 @@
  * @license MIT
  */
 
-namespace kebabble\library;
+namespace Kebabble\Library;
 
 /**
  * Handles currency formatting.
  */
-class money {
+class Money {
 	/**
 	 * Formats the integer input into a currency string.
 	 *

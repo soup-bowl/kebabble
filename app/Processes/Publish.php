@@ -7,12 +7,12 @@
  * @license MIT
  */
 
-namespace kebabble\processes;
+namespace Kebabble\Processes;
 
-use kebabble\processes\meta\orderstore;
-use kebabble\processes\term\save;
-use kebabble\processes\formatting;
-use kebabble\library\slack;
+use Kebabble\Processes\Meta\Orderstore;
+use Kebabble\Processes\Term\Save;
+use Kebabble\Processes\Formatting;
+use Kebabble\Library\Slack;
 use SlackClient\botclient;
 use Carbon\Carbon;
 
@@ -21,28 +21,28 @@ use WP_Post;
 /**
  * Publishes authored orders to the Slack channel.
  */
-class publish {
+class Publish {
 	/**
 	 * Slack API communication handler.
 	 *
-	 * @var slack
+	 * @var Slack
 	 */
 	protected $slack;
 
 	/**
 	 * Stores and retrieves order data.
 	 *
-	 * @var orderstore
+	 * @var Orderstore
 	 */
 	protected $orderstore;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param slack      $slack      Slack API communication handler.
-	 * @param orderstore $orderstore Stores and retrieves order data.
+	 * @param Slack      $slack      Slack API communication handler.
+	 * @param Orderstore $orderstore Stores and retrieves order data.
 	 */
-	public function __construct( slack $slack, orderstore $orderstore ) {
+	public function __construct( Slack $slack, Orderstore $orderstore ) {
 		$this->slack      = $slack;
 		$this->orderstore = $orderstore;
 	}

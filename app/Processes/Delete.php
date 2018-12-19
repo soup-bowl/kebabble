@@ -7,10 +7,10 @@
  * @license MIT
  */
 
-namespace kebabble\processes;
+namespace Kebabble\Processes;
 
-use kebabble\processes\meta\orderstore;
-use kebabble\library\slack;
+use Kebabble\Processes\Meta\Orderstore;
+use Kebabble\Library\Slack;
 use SlackClient\botclient;
 use Carbon\Carbon;
 
@@ -19,28 +19,28 @@ use WP_Post;
 /**
  * Removes the message from the Slack channel.
  */
-class delete {
+class Delete {
 	/**
 	 * Slack API communication handler.
 	 *
-	 * @var slack
+	 * @var Slack
 	 */
 	protected $slack;
 
 	/**
 	 * Stores and retrieves order data.
 	 *
-	 * @var orderstore
+	 * @var Orderstore
 	 */
 	protected $orderstore;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param slack      $slack      Slack API communication handler.
-	 * @param orderstore $orderstore Stores and retrieves order data.
+	 * @param Slack      $slack      Slack API communication handler.
+	 * @param Orderstore $orderstore Stores and retrieves order data.
 	 */
-	public function __construct( slack $slack, orderstore $orderstore ) {
+	public function __construct( Slack $slack, Orderstore $orderstore ) {
 		$this->slack      = $slack;
 		$this->orderstore = $orderstore;
 	}

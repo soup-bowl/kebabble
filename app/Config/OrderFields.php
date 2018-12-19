@@ -7,9 +7,9 @@
  * @license MIT
  */
 
-namespace kebabble\config;
+namespace Kebabble\Config;
 
-use kebabble\processes\meta\orderstore;
+use Kebabble\Processes\Meta\Orderstore;
 
 use WP_Post;
 use WP_Term;
@@ -19,20 +19,20 @@ use WP_Term;
  *
  * @todo Refactor the messy 'existing' inputs. Maybe consider object-splitting?
  */
-class order_fields {
+class OrderFields {
 	/**
 	 * Stores and retrieves order data.
 	 *
-	 * @var orderstore
+	 * @var Orderstore
 	 */
 	protected $orderstore;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param orderstore $orderstore Stores and retrieves order data.
+	 * @param Orderstore $orderstore Stores and retrieves order data.
 	 */
-	public function __construct( orderstore $orderstore ) {
+	public function __construct( Orderstore $orderstore ) {
 		$this->orderstore = $orderstore;
 	}
 

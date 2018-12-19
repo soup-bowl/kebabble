@@ -7,12 +7,12 @@
  * @license MIT
  */
 
-namespace kebabble\processes\term;
+namespace Kebabble\Processes\Term;
 
 /**
  * Handles processing of term data.
  */
-class save {
+class Save {
 	/**
 	 * Saves the current custom company fields.
 	 *
