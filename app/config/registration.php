@@ -1,23 +1,24 @@
 <?php
 /**
- * Configures the terms with WordPress.
+ * Food ordering management system for WordPress.
  *
  * @package kebabble
- * @author soup-bowl
+ * @author soup-bowl <code@revive.today>
+ * @license MIT
  */
 
 namespace kebabble\config;
 
 /**
- * Configures the terms with WordPress.
+ * Configures the objects and terms with WordPress.
  */
-class taxonomy {
+class registration {
 	/**
-	 * Creates a new custom post type for orders.
+	 * Creates a new custom post type for orders, and a accompanying company tax.
 	 *
-	 * @return void
+	 * @return void Registers with the WordPress CPT/Tax API.
 	 */
-	public function orders() {
+	public function orders():void {
 		register_post_type(
 			'kebabble_orders',
 			[

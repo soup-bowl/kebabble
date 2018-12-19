@@ -1,9 +1,10 @@
 <?php
 /**
- * Displays the configuration options in the WordPress admin options.
+ * Food ordering management system for WordPress.
  *
  * @package kebabble
- * @author soup-bowl
+ * @author soup-bowl <code@revive.today>
+ * @license MIT
  */
 
 namespace kebabble\config;
@@ -15,9 +16,9 @@ class settings {
 	/**
 	 * Tells WordPress about Kebabble settngs, and adds them to as a submenu.
 	 *
-	 * @return void
+	 * @return void Prints on page.
 	 */
-	public function page() {
+	public function page():void {
 		add_options_page(
 			'Kebabble',
 			'Kebabble',
@@ -30,9 +31,9 @@ class settings {
 	/**
 	 * Defines the skeleton of the configuration screen.
 	 *
-	 * @return void
+	 * @return void Prints on page.
 	 */
-	public function optionsPage() {
+	public function optionsPage():void {
 		?>
 		<form action='options.php' method='post'>
 			<h2>kebabble</h2>
@@ -48,9 +49,9 @@ class settings {
 	/**
 	 * Constructs the Kebabble WordPress settings page.
 	 *
-	 * @return void
+	 * @return void Prints on page.
 	 */
-	public function settings() {
+	public function settings():void {
 		register_setting( 'pluginPage', 'kbfos_settings' );
 
 		$this->renderDescription();
@@ -60,9 +61,9 @@ class settings {
 	/**
 	 * Shows a settings page description.
 	 *
-	 * @return void
+	 * @return void Prints on page.
 	 */
-	public function renderDescription() {
+	public function renderDescription():void {
 		add_settings_section(
 			'kbfos_pluginPage_section',
 			__( 'Slack Configuration', 'text_domain' ),
@@ -76,9 +77,9 @@ class settings {
 	/**
 	 * Shows Slack-related communication configurations.
 	 *
-	 * @return void
+	 * @return void Prints on page.
 	 */
-	public function renderSlackConfig() {
+	public function renderSlackConfig():void {
 		add_settings_field(
 			'kbfos_botkey',
 			__( 'Slack Bot Auth key', 'text_domain' ),

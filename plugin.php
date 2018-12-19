@@ -1,12 +1,16 @@
 <?php
 /**
+ * Food ordering management system for WordPress.
+ *
+ * @package kebabble
+ * @author soup-bowl <code@revive.today>
+ * @license MIT
+ *
  * Plugin Name: Kebabble
  * Description: Office food management system.
  * Author: soup-bowl
  * Author URI: https://github.com/soup-bowl/kebabble
  * Version: 0.2.1-Alpha
- *
- * @package kebabble
  */
 
 defined( 'ABSPATH' ) || die( 'Operation not permitted.' );

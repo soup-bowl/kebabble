@@ -1,9 +1,10 @@
 <?php
 /**
- * Handles processing of term data.
+ * Food ordering management system for WordPress.
  *
  * @package kebabble
- * @author soup-bowl
+ * @author soup-bowl <code@revive.today>
+ * @license MIT
  */
 
 namespace kebabble\processes\term;
@@ -16,8 +17,9 @@ class save {
 	 * Saves the current custom company fields.
 	 *
 	 * @param integer $term_id The current term being processed.
+	 * @return void Stores the expected data (got from POST) in the database.
 	 */
-	public function saveCustomCompanyDetails( int $term_id ) {
+	public function saveCustomCompanyDetails( int $term_id ):void {
 		update_term_meta( $term_id, 'kebabble_ordpri_org', $_POST['ctOrderPricing'] );
 		update_term_meta( $term_id, 'kebabble_ordpri', $this->parseFoodOptions( $_POST['ctOrderPricing'] ) );
 	}
@@ -26,7 +28,7 @@ class save {
 	 * Parses the food|option,food|option input.
 	 *
 	 * @param string $input The string formatted like above.
-	 * @return array
+	 * @return array Returns the serialised string as an array.
 	 */
 	public function parseFoodOptions( string $input ):array {
 		$options    = [];

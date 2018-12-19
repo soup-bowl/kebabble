@@ -1,9 +1,10 @@
 <?php
 /**
- * Handles currency formatting.
+ * Food ordering management system for WordPress.
  *
  * @package kebabble
- * @author soup-bowl
+ * @author soup-bowl <code@revive.today>
+ * @license MIT
  */
 
 namespace kebabble\library;
@@ -15,28 +16,28 @@ class money {
 	/**
 	 * Formats the integer input into a currency string.
 	 *
-	 * @param integer $value      Non-decimal representation of the currency (e.g. 100p for £1.00).
-	 * @param string  $highSymbol Symbol for the highest decimal format (defaults to £).
-	 * @param string  $lowSymbol  Symbol for low format (defaults to p).
+	 * @param integer $value       Non-decimal representation of the currency (e.g. 100p for £1.00).
+	 * @param string  $high_symbol Symbol for the highest decimal format (defaults to £).
+	 * @param string  $low_symbol  Symbol for low format (defaults to p).
 	 * @return string Formatted display version of the currency input.
 	 */
-	public function output( int $value, string $highSymbol = '£', string $lowSymbol = 'p' ):string {
-		$moneyString = strval( $value / 100 );
-		$expl        = explode( '.', $moneyString );
+	public function output( int $value, string $high_symbol = '£', string $low_symbol = 'p' ):string {
+		$money_string = strval( $value / 100 );
+		$expl        = explode( '.', $money_string );
 
 		$dec = ( strlen( $expl[1] ) == 1 ) ? $expl[1] . '0' : $expl[1];
 
 		if ( 0 == $expl[0] ) {
 			if ( $value < 10 ) {
-				return $value . $lowSymbol;
+				return $value . $low_symbol;
 			} else {
-				return $dec . $lowSymbol;
+				return $dec . $low_symbol;
 			}
 		} else {
 			if ( empty( $expl[1] ) ) {
-				return $highSymbol . $expl[0] . '.00';
+				return $high_symbol . $expl[0] . '.00';
 			} else {
-				return $highSymbol . $expl[0] . '.' . $dec;
+				return $high_symbol . $expl[0] . '.' . $dec;
 			}
 		}
 	}

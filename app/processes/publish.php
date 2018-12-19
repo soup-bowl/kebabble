@@ -1,9 +1,10 @@
 <?php
 /**
- * Publishes authored orders to the Slack channel.
+ * Food ordering management system for WordPress.
  *
  * @package kebabble
- * @author soup-bowl
+ * @author soup-bowl <code@revive.today>
+ * @license MIT
  */
 
 namespace kebabble\processes;
@@ -14,6 +15,8 @@ use kebabble\processes\formatting;
 use kebabble\library\slack;
 use SlackClient\botclient;
 use Carbon\Carbon;
+
+use WP_Post;
 
 /**
  * Publishes authored orders to the Slack channel.
@@ -26,13 +29,18 @@ class publish {
 	 */
 	protected $slack;
 
+	/**
+	 * Stores and retrieves order data.
+	 *
+	 * @var orderstore
+	 */
 	protected $orderstore;
 
 	/**
 	 * Constructor.
 	 *
 	 * @param slack      $slack      Slack API communication handler.
-	 * @param orderstore $orderstore Aaaaa.
+	 * @param orderstore $orderstore Stores and retrieves order data.
 	 */
 	public function __construct( slack $slack, orderstore $orderstore ) {
 		$this->slack      = $slack;
@@ -46,7 +54,7 @@ class publish {
 	 * @param WP_Post $post_obj Whole post object.
 	 * @return void
 	 */
-	public function handlePublish( $post_ID, $post_obj ) {
+	public function handlePublish( int $post_ID, WP_Post $post_obj ):void {
 		// I'm sure there's a million better ways to do this, but for now it suffices.
 		if ( empty( get_post_meta( $post_ID, 'kebabble-slack-deleted', true ) ) ) {
 			$orderDetails = $this->orderstore->set( $post_ID );
@@ -78,7 +86,7 @@ class publish {
 	 * @param array $postarr Unclean return, apparently.
 	 * @return array $data
 	 */
-	public function changeTitle( $data, $postarr ) {
+	public function changeTitle( array $data, array $postarr ):array {
 		if ( 'kebabble_orders' === $data['post_type'] && 'publish' === $data['post_status'] ) {
 			$contents = $this->orderstore->set( $_POST['post_ID'] );
 

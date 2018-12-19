@@ -1,9 +1,10 @@
 <?php
 /**
- * Intermediary between Kebabble WP and Slack.
+ * Food ordering management system for WordPress.
  *
  * @package kebabble
- * @author soup-bowl
+ * @author soup-bowl <code@revive.today>
+ * @license MIT
  */
 
 namespace kebabble\library;
@@ -44,36 +45,36 @@ class slack {
 	/**
 	 * Sends contents over to the Slack message API.
 	 *
-	 * @param integer $id                Post ID.
-	 * @param array   $foResponse        Message array to be displayed on Slack.
-	 * @param boolean $existingTimestamp If an existing timestamp is passed, that message is modified.
-	 * @param string  $overrideChannel   Change the Slack channel, if desired.
+	 * @param integer $id                 Post ID.
+	 * @param array   $order              Order array to be displayed on Slack.
+	 * @param boolean $existing_timestamp If an existing timestamp is passed, that message is modified.
+	 * @param string  $override_channel   Change the Slack channel, if desired.
 	 * @return string Unique timestamp of the message, used for editing.
 	 */
-	public function sendToSlack( $id, $foResponse, $existingTimestamp = false, $overrideChannel = '' ) {
+	public function sendToSlack( int $id, array $order, ?string $existing_timestamp = null, ?string $override_channel = null ):string {
 		$so = $this->slack;
-		if ( ! empty( $overrideChannel ) ) {
-			$so = $this->generateSlackbot( $overrideChannel );
+		if ( ! empty( $override_channel ) ) {
+			$so = $this->generateSlackbot( $override_channel );
 		}
 
 		$timestamp = null;
-		if ( $foResponse['override']['enabled'] ) {
+		if ( $order['override']['enabled'] ) {
 			// Custom Message.
-			$timestamp = $so->message( $foResponse['override']['message'], $existingTimestamp );
+			$timestamp = $so->message( $order['override']['message'], ( ! empty( $existing_timestamp ) ) ? $existing_timestamp : false );
 		} else {
 			// Generated message.
 			$timestamp = $so->message(
 				$this->formatting->status(
 					$id,
-					$foResponse['food'],
-					$foResponse['order'],
-					$foResponse['driver'],
-					$foResponse['tax'],
+					$order['food'],
+					$order['order'],
+					$order['driver'],
+					(int) $order['tax'],
 					Carbon::parse( get_the_date( 'Y-m-d H:i:s', $id ) ),
-					( is_array( $foResponse['payment'] ) ) ? $foResponse['payment'] : [ $foResponse['payment'] ],
-					$foResponse['paymentLink']
+					( is_array( $order['payment'] ) ) ? $order['payment'] : [ $order['payment'] ],
+					$order['paymentLink']
 				),
-				$existingTimestamp
+				( ! empty( $existing_timestamp ) ) ? $existing_timestamp : false
 			);
 		}
 

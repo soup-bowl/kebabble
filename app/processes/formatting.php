@@ -1,9 +1,10 @@
 <?php
 /**
- * Handles order form formatting prior to sending.
+ * Food ordering management system for WordPress.
  *
  * @package kebabble
- * @author soup-bowl
+ * @author soup-bowl <code@revive.today>
+ * @license MIT
  */
 
 namespace kebabble\processes;
@@ -15,7 +16,18 @@ use Carbon\Carbon;
  * Handles order form formatting prior to sending.
  */
 class formatting {
+	/**
+	 * Handles monetary-based string formatting.
+	 *
+	 * @var money
+	 */
 	protected $money;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param money $money Handles monetary-based string formatting.
+	 */
 	public function __construct( money $money ) {
 		$this->money = $money;
 	}
@@ -24,31 +36,31 @@ class formatting {
 	 *
 	 * @param integer $id       ID of the post in question.
 	 * @param string  $food     Dictates header. e.g. Kebab Mondays.
-	 * @param string  $order    Displayed monospaced.
+	 * @param array   $order    Array of people and their orders ('person' and 'food' collection).
 	 * @param string  $driver   Driver name.
 	 * @param integer $tax      Additional charge for orders.
 	 * @param Carbon  $date     Date of order, typically today.
 	 * @param array   $payments Payment methods accepted.
-	 * @param array   $pOpts    URL links for the above (matched by array key to payment type).
+	 * @param array   $pay_opts URL links for the above (matched by array key to payment type).
 	 * @return string
 	 */
-	public function status( $id, $food, $order, $driver, $tax = 0, $date = false, $payments = [ 'Cash' ], $pOpts = [] ) {
+	public function status( int $id, string $food, array $order, string $driver, int $tax = 0, ?Carbon $date = null, array $payments = [ 'Cash' ], array $pay_opts = [] ):string {
 		$rolls       = ( '' === $rolls ) ? 'N/A' : $rolls;
 		$location    = wp_get_object_terms($id, 'kebabble_company')[0];
 		$location_id = ( ! empty( $location ) ) ? $location->term_id : 0;
 		$loc_str     = ( ! empty( $location ) ) ? " at {$location->name}" : '';
-		$order       = ( '' === $order ) ? 'N/A' : $this->orderFormatter( $order, $location_id, $tax );
+		$order       = ( empty( $order ) ) ? '_None yet!_' : $this->orderFormatter( $order, $location_id, $tax );
 		$driver      = ( '' === $driver ) ? 'unspecified' : $driver;
-		$date        = ( false === $date ) ? Carbon::now() : $date;
-		$evMoji      = $this->emojiPicker( $food );
+		$date        = ( empty( $date ) ) ? Carbon::now() : $date;
+		$slack_emoji = $this->emojiPicker( $food );
 
 		$formattedPosts = [
-			"{$evMoji} *{$food} {$date->format('l')}{$loc_str} ({$date->format('jS F')})* {$evMoji}",
+			"{$slack_emoji} *{$food} {$date->format('l')}{$loc_str} ({$date->format('jS F')})* {$slack_emoji}",
 			'*Orders*',
 			$order,
 			"Polling @channel for orders. Today's driver is *{$driver}* :car:",
 			( $tax > 0 ) ? ':pound: *Additional ' . $this->money->output( $tax ) . ' per person* to fund the driver.' : null,
-			$this->acceptsPaymentFormatter( $payments, $pOpts ),
+			$this->acceptsPaymentFormatter( $payments, $pay_opts ),
 		];
 
 		return str_replace( "\n\n\n\n", "\n\n", implode( "\n\n", $formattedPosts ) );
@@ -118,37 +130,37 @@ class formatting {
 	/**
 	 * Returns a 'Driver accepts...' string with the given array displayed.
 	 *
-	 * @param array $acceptedPayments String array of accepted payment labels.
-	 * @param array $pOpts            URL links for the above (matched by array key to payment type).
+	 * @param array $accepted_payments String array of accepted payment labels.
+	 * @param array $option_payments   URL links for the above (matched by array key to payment type).
 	 * @return string
 	 */
-	private function acceptsPaymentFormatter( $acceptedPayments, $pOpts = [] ) {
-		$apCount = count( $acceptedPayments );
+	private function acceptsPaymentFormatter( array $accepted_payments, array $option_payments = [] ):string {
+		$ap_count = count( $accepted_payments );
 
-		if ( 0 === $apCount ) {
+		if ( 0 === $ap_count ) {
 			return '';
 		}
 
-		$formatString = 'Driver accepts ';
+		$format_string = 'Driver accepts ';
 
-		if ( 1 !== $apCount ) {
-			for ( $i = 0; $i < $apCount; $i++ ) {
-				$aOption  = ( empty( $pOpts[ $acceptedPayments[ $i ] ] ) ) ? false : $pOpts[ $acceptedPayments[ $i ] ];
-				$aPayment = ( false !== $aOption ) ? "<{$aOption}|{$acceptedPayments[$i]}>" : $acceptedPayments[ $i ];
+		if ( 1 !== $ap_count ) {
+			for ( $i = 0; $i < $ap_count; $i++ ) {
+				$indv_option = ( empty( $option_payments[ $accepted_payments[ $i ] ] ) ) ? false : $option_payments[ $accepted_payments[ $i ] ];
+				$indv_paym   = ( false !== $indv_option ) ? "<{$indv_option}|{$accepted_payments[$i]}>" : $accepted_payments[ $i ];
 
-				if ( ( $i + 1 ) === $apCount ) {
-					$formatString .= "& {$aPayment}.";
+				if ( ( $i + 1 ) === $ap_count ) {
+					$format_string .= "& {$indv_paym}.";
 				} else {
-					$formatString .= "{$aPayment}, ";
+					$format_string .= "{$indv_paym}, ";
 				}
 			}
 		} else {
-			$aOption  = ( empty( $pOpts[ $acceptedPayments[0] ] ) ) ? false : $pOpts[ $acceptedPayments[0] ];
-			$aPayment = ( false !== $aOption ) ? "<{$aOption}|{$acceptedPayments[0]}>" : $acceptedPayments[0];
+			$indv_option = ( empty( $option_payments[ $accepted_payments[0] ] ) ) ? false : $option_payments[ $accepted_payments[0] ];
+			$indv_paym   = ( false !== $indv_option ) ? "<{$indv_option}|{$accepted_payments[0]}>" : $accepted_payments[0];
 
-			$formatString .= "{$aPayment}.";
+			$format_string .= "{$indv_paym}.";
 		}
-		return $formatString;
+		return $format_string;
 	}
 
 	/**
@@ -157,7 +169,7 @@ class formatting {
 	 * @param string $food Label of the order type.
 	 * @return string colon-surrounded emoji format.
 	 */
-	private function emojiPicker( $food ) {
+	private function emojiPicker( string $food ):string {
 		switch ( strtolower( $food ) ) {
 			case 'burger':
 				return ':hamburger:';

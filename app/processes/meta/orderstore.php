@@ -1,9 +1,10 @@
 <?php
 /**
- * Handles currency formatting.
+ * Food ordering management system for WordPress.
  *
  * @package kebabble
- * @author soup-bowl
+ * @author soup-bowl <code@revive.today>
+ * @license MIT
  */
 
 namespace kebabble\processes\meta;
@@ -12,7 +13,13 @@ namespace kebabble\processes\meta;
  * Stores and retrieves the order field data.
  */
 class orderstore {
-	public function get( int $post_id ) {
+	/**
+	 * Obtains the order details stored with the post, or none if unavailable.
+	 *
+	 * @param integer $post_id WordPress Post ID.
+	 * @return array|null
+	 */
+	public function get( int $post_id ):?array {
 		return json_decode( get_post_meta( $post_id, 'kebabble-order', true ), true );
 	}
 
@@ -21,9 +28,9 @@ class orderstore {
 	 *
 	 * @param integer $post_id  ID of the post.
 	 * @param array   $response Overrides the POST scrape.
-	 * @return array
+	 * @return array The information stored in the database.
 	 */
-	public function set( int $post_id, array $response = null ) {
+	public function set( int $post_id, array $response = null ):array {
 		if ( empty( $response ) ) {
 			$response = $_POST;
 
@@ -32,14 +39,14 @@ class orderstore {
 			}
 		}
 
-		if ( $response['kebabbleCompanySelection'] > 0 ) {
+		if ( (int) $response['kebabbleCompanySelection'] > 0 ) {
 			wp_set_object_terms(
-				$response[ $post_id ],
+				$post_id,
 				(int) $response['kebabbleCompanySelection'],
 				'kebabble_company'
 			);
 		} else {
-			wp_delete_object_term_relationships( $response[ $post_id ], 'kebabble_company' );
+			wp_delete_object_term_relationships( $post_id, 'kebabble_company' );
 		}
 
 		$confArray = [

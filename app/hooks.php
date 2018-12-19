@@ -1,15 +1,16 @@
 <?php
 /**
- * Handles and translates the hooks into kebabble class functions.
+ * Food ordering management system for WordPress.
  *
  * @todo Still some hook functionality embedded within, which needs work.
  * @package kebabble
- * @author soup-bowl
+ * @author soup-bowl <code@revive.today>
+ * @license MIT
  */
 
 namespace kebabble;
 
-use kebabble\config\taxonomy;
+use kebabble\config\registration;
 use kebabble\processes\delete;
 use kebabble\processes\publish;
 use kebabble\processes\term\save;
@@ -24,11 +25,11 @@ use WP_Term;
  */
 class hooks {
 	/**
-	 * Connects with the system required taxonomies.
+	 * Connects with the system required objects.
 	 *
-	 * @var taxonomy
+	 * @var registration
 	 */
-	protected $taxonomy;
+	protected $registration;
 
 	/**
 	 * Publish processes for order posts.
@@ -75,7 +76,7 @@ class hooks {
 	/**
 	 * Constructor.
 	 *
-	 * @param taxonomy       $taxonomy       Connects with the system required taxonomies.
+	 * @param registration   $registration   Connects with the system required objects.
 	 * @param publish        $publish        Publish processes for order posts.
 	 * @param delete         $delete         Handles deletion of posted orders.
 	 * @param settings       $settings       Settings page handler.
@@ -83,8 +84,8 @@ class hooks {
 	 * @param company_fields $company_fields Fields for the company taxonomy.
 	 * @param save           $save           Storage processing for saved term items.
 	 */
-	public function __construct( taxonomy $taxonomy, publish $publish, delete $delete, settings $settings, order_fields $order_fields, company_fields $company_fields, save $save ) {
-		$this->taxonomy       = $taxonomy;
+	public function __construct( registration $registration, publish $publish, delete $delete, settings $settings, order_fields $order_fields, company_fields $company_fields, save $save ) {
+		$this->registration   = $registration;
 		$this->publish        = $publish;
 		$this->delete         = $delete;
 		$this->settings       = $settings;
@@ -98,11 +99,11 @@ class hooks {
 	 *
 	 * @return void
 	 */
-	public function main() {
+	public function main():void {
 		$this->settings();
 
 		// Register post type and data entries.
-		add_action( 'init', [ &$this->taxonomy, 'orders' ], 0 );
+		add_action( 'init', [ &$this->registration, 'orders' ], 0 );
 		add_action( 'add_meta_boxes_kebabble_orders', [ &$this->order_fields, 'orderOptionsSetup' ] );
 		add_action(
 			'kebabble_company_add_form_fields',
@@ -141,7 +142,7 @@ class hooks {
 	 *
 	 * @return void
 	 */
-	private function settings() {
+	private function settings():void {
 		add_action( 'admin_menu', [ &$this->settings, 'page' ] );
 		add_action( 'admin_init', [ &$this->settings, 'settings' ] );
 	}
@@ -151,7 +152,7 @@ class hooks {
 	 *
 	 * @return void
 	 */
-	private function enqueuedScripts() {
+	private function enqueuedScripts():void {
 		if ( 'kebabble_orders' === get_current_screen()->id ) {
 			wp_enqueue_style( 'kebabble-orders-css', plugins_url( '/../resource/orders.css', __FILE__ ), [], '1.1' );
 			wp_enqueue_script( 'kebabble-orders-js', plugins_url( '/../resource/orders.js', __FILE__ ), [ 'jquery' ], '1.0', true );

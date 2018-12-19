@@ -1,9 +1,10 @@
 <?php
 /**
- * Display formatting on the kebabble company taxonomy.
+ * Food ordering management system for WordPress.
  *
  * @package kebabble
- * @author soup-bowl
+ * @author soup-bowl <code@revive.today>
+ * @license MIT
  */
 
 namespace kebabble\config;
@@ -16,9 +17,9 @@ class company_fields {
 	 * Shows the menu specification input field.
 	 *
 	 * @param int $term_id ID of the term being edited, if already existing.
-	 * return void
+	 * @return void Prints return on the page.
 	 */
-	public function companyOptionsSetup( int $term_id = 0 ) {
+	public function companyOptionsSetup( int $term_id = 0 ):void {
 		$existing = get_term_meta( $term_id, 'kebabble_ordpri_org', true );
 		?>
 		<div class="form-field">
