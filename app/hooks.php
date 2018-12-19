@@ -2,7 +2,6 @@
 /**
  * Food ordering management system for WordPress.
  *
- * @todo Still some hook functionality embedded within, which needs work.
  * @package kebabble
  * @author soup-bowl <code@revive.today>
  * @license MIT
@@ -100,31 +99,18 @@ class hooks {
 	 * @return void
 	 */
 	public function main():void {
-		$this->settings();
+		// Settings API hooks.
+		add_action( 'admin_menu', [ &$this->settings, 'page' ] );
+		add_action( 'admin_init', [ &$this->settings, 'settings' ] );
 
 		// Register post type and data entries.
 		add_action( 'init', [ &$this->registration, 'orders' ], 0 );
 		add_action( 'add_meta_boxes_kebabble_orders', [ &$this->order_fields, 'orderOptionsSetup' ] );
-		add_action(
-			'kebabble_company_add_form_fields',
-			function() {
-				$this->company_fields->companyOptionsSetup();
-			}
-		);
-		add_action(
-			'kebabble_company_edit_form_fields',
-			function( WP_Term $term ) {
-				$this->company_fields->companyOptionsSetup( $term->term_id );
-			}
-		);
+		add_action( 'kebabble_company_add_form_fields', [ &$this->company_fields, 'company_options_empty' ] );
+		add_action( 'kebabble_company_edit_form_fields', [ &$this->company_fields, 'company_options' ] );
 
 		// Resource queue.
-		add_action(
-			'admin_enqueue_scripts',
-			function() {
-				$this->enqueuedScripts();
-			}
-		);
+		add_action( 'admin_enqueue_scripts', [ &$this, 'enqueuedScripts' ] );
 
 		// Order functionality.
 		add_action( 'publish_kebabble_orders', [ &$this->publish, 'handlePublish' ], 10, 2 );
@@ -138,21 +124,11 @@ class hooks {
 	}
 
 	/**
-	 * Settings-related hook manager.
-	 *
-	 * @return void
-	 */
-	private function settings():void {
-		add_action( 'admin_menu', [ &$this->settings, 'page' ] );
-		add_action( 'admin_init', [ &$this->settings, 'settings' ] );
-	}
-
-	/**
 	 * JavaSript and style loader used for plugin operation.
 	 *
 	 * @return void
 	 */
-	private function enqueuedScripts():void {
+	public function enqueuedScripts():void {
 		if ( 'kebabble_orders' === get_current_screen()->id ) {
 			wp_enqueue_style( 'kebabble-orders-css', plugins_url( '/../resource/orders.css', __FILE__ ), [], '1.1' );
 			wp_enqueue_script( 'kebabble-orders-js', plugins_url( '/../resource/orders.js', __FILE__ ), [ 'jquery' ], '1.0', true );

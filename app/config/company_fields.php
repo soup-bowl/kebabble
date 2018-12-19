@@ -9,18 +9,29 @@
 
 namespace kebabble\config;
 
+use WP_Term;
+
 /**
  * Display formatting on the kebabble company taxonomy.
  */
 class company_fields {
 	/**
-	 * Shows the menu specification input field.
+	 * Runs company_options without arguments, for hook purposes.
 	 *
-	 * @param int $term_id ID of the term being edited, if already existing.
 	 * @return void Prints return on the page.
 	 */
-	public function companyOptionsSetup( int $term_id = 0 ):void {
-		$existing = get_term_meta( $term_id, 'kebabble_ordpri_org', true );
+	public function company_options_empty() {
+		$this->company_options();
+	}
+	
+	/**
+	 * Shows the menu specification input field.
+	 *
+	 * @param WP_Term|null $term ID of the term being edited, if already existing.
+	 * @return void Prints return on the page.
+	 */
+	public function company_options( ?WP_Term $term = null ):void {
+		$existing = ( ! empty( $term ) ) ? get_term_meta( $term->term_id, 'kebabble_ordpri_org', true ) : '';
 		?>
 		<div class="form-field">
 			<label for="tag-kebabble-pricing">Options & Pricing</label>
