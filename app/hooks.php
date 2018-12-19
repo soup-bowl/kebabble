@@ -14,7 +14,8 @@ use kebabble\processes\delete;
 use kebabble\processes\publish;
 use kebabble\processes\term\save;
 use kebabble\config\settings;
-use kebabble\config\fields;
+use kebabble\config\order_fields;
+use kebabble\config\company_fields;
 
 use WP_Term;
 
@@ -51,30 +52,45 @@ class hooks {
 	protected $settings;
 
 	/**
-	 * Field display class.
+	 * Fields for the order form.
 	 *
-	 * @var fields
+	 * @var order_fields
 	 */
-	protected $fields;
+	protected $order_fields;
 
+	/**
+	 * Fields for the company taxonomy.
+	 *
+	 * @var company_fields
+	 */
+	protected $company_fields;
+
+	/**
+	 * Storage processing for saved term items.
+	 *
+	 * @var save
+	 */
 	protected $save;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param taxonomy $taxonomy Connects with the system required taxonomies.
-	 * @param publish  $publish  Publish processes for order posts.
-	 * @param delete   $delete   Handles deletion of posted orders.
-	 * @param settings $settings Settings page handler.
-	 * @param fields   $fields   Field display class.
+	 * @param taxonomy       $taxonomy       Connects with the system required taxonomies.
+	 * @param publish        $publish        Publish processes for order posts.
+	 * @param delete         $delete         Handles deletion of posted orders.
+	 * @param settings       $settings       Settings page handler.
+	 * @param order_fields   $order_fields   Fields for the order form.
+	 * @param company_fields $company_fields Fields for the company taxonomy.
+	 * @param save           $save           Storage processing for saved term items.
 	 */
-	public function __construct( taxonomy $taxonomy, publish $publish, delete $delete, settings $settings, fields $fields, save $save ) {
-		$this->taxonomy = $taxonomy;
-		$this->publish  = $publish;
-		$this->delete   = $delete;
-		$this->settings = $settings;
-		$this->fields   = $fields;
-		$this->save     = $save;
+	public function __construct( taxonomy $taxonomy, publish $publish, delete $delete, settings $settings, order_fields $order_fields, company_fields $company_fields, save $save ) {
+		$this->taxonomy       = $taxonomy;
+		$this->publish        = $publish;
+		$this->delete         = $delete;
+		$this->settings       = $settings;
+		$this->order_fields   = $order_fields;
+		$this->company_fields = $company_fields;
+		$this->save           = $save;
 	}
 
 	/**
@@ -87,20 +103,19 @@ class hooks {
 
 		// Register post type and data entries.
 		add_action( 'init', [ &$this->taxonomy, 'orders' ], 0 );
-		add_action( 'add_meta_boxes_kebabble_orders', [ &$this->fields, 'orderOptionsSetup' ] );
+		add_action( 'add_meta_boxes_kebabble_orders', [ &$this->order_fields, 'orderOptionsSetup' ] );
 		add_action(
 			'kebabble_company_add_form_fields',
 			function() {
-				$this->fields->companyOptionsSetup();
+				$this->company_fields->companyOptionsSetup();
 			}
 		);
 		add_action(
 			'kebabble_company_edit_form_fields',
 			function( WP_Term $term ) {
-				$this->fields->companyOptionsSetup( $term->term_id );
+				$this->company_fields->companyOptionsSetup( $term->term_id );
 			}
 		);
-		add_action( 'quick_edit_custom_box', [ &$this->fields, 'companyOptionsQuickSetup' ], 10, 2 );
 
 		// Resource queue.
 		add_action(

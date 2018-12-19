@@ -1,6 +1,6 @@
 <?php
 /**
- * Display formatting on the kebabble Custom Post Type.
+ * Display formatting on the kebabble order form.
  *
  * @package kebabble
  * @author soup-bowl
@@ -8,10 +8,17 @@
 
 namespace kebabble\config;
 
+use kebabble\processes\meta\orderstore;
+
 /**
- * Display formatting on the kebabble Custom Post Type.
+ * Display formatting on the kebabble order form.
  */
-class fields {
+class order_fields {
+	protected $orderstore;
+	public function __construct( orderstore $orderstore ) {
+		$this->orderstore = $orderstore;
+	}
+
 	/**
 	 * Calls add_meta_box for kebabble order to display the custom form.
 	 *
@@ -23,12 +30,12 @@ class fields {
 			'kebabbleorderdetails',
 			'Order',
 			function( $post ) {
-				$existing         = get_post_meta( $post->ID, 'kebabble-order', true );
+				$existing         = $this->orderstore->get( $post->ID );
 				$existing_company = wp_get_post_terms( $post->ID, 'kebabble_company' );
 
 				// Non-strict comparison needed here, until checkbox sanitization on meta is done.
 				if ( empty( $existing ) && 1 == get_option( 'kbfos_settings' )['kbfos_pullthrough'] ) {
-					$existing          = get_post_meta( get_previous_post()->ID, 'kebabble-order', true );
+					$existing          = $this->orderstore->get( get_previous_post()->ID );
 					$existing_company  = wp_get_post_terms( get_previous_post()->ID, 'kebabble_company' );
 
 					$existing['override']['enabled'] = false;
@@ -72,23 +79,6 @@ class fields {
 			'side',
 			'low'
 		);
-	}
-
-	/**
-	 * Adds custom input fields for the company taxonomy.
-	 *
-	 * @param string $slug Custom taxonomy term.
-	 * return void
-	 */
-	public function companyOptionsSetup( int $term_id = 0 ) {
-		$existing = get_term_meta( $term_id, 'kebabble_ordpri_org', true );
-		?>
-		<div class="form-field">
-			<label for="tag-kebabble-pricing">Options & Pricing</label>
-			<input name="ctOrderPricing" id="tag-kebabble-pricing" value="<?php echo $existing; ?>" size="40" type="text" placeholder="food|price,food|price...">
-			<p>Comma-separated list of menu items, with a pipe-separated option of a price.</p>
-		</div>
-		<?php
 	}
 
 	/**

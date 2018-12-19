@@ -8,8 +8,8 @@
 
 namespace kebabble\processes;
 
+use kebabble\processes\meta\orderstore;
 use kebabble\library\slack;
-use kebabble\config\fields;
 use SlackClient\botclient;
 use Carbon\Carbon;
 
@@ -24,22 +24,16 @@ class delete {
 	 */
 	protected $slack;
 
-	/**
-	 * Field display class.
-	 *
-	 * @var fields
-	 */
-	protected $fields;
+	protected $orderstore;
 
 	/**
 	 * Constructor.
 	 *
 	 * @param slack  $slack  Slack API communication handler.
-	 * @param fields $fields Field display class.
 	 */
-	public function __construct( slack $slack, fields $fields ) {
-		$this->slack  = $slack;
-		$this->fields = $fields;
+	public function __construct( slack $slack, orderstore $orderstore ) {
+		$this->slack      = $slack;
+		$this->orderstore = $orderstore;
 	}
 
 	/**
@@ -66,7 +60,7 @@ class delete {
 	 */
 	public function handleUndeletion( $post_ID ) {
 		$post_obj = get_post( $post_ID );
-		$post_adt = get_post_meta( $post_ID, 'kebabble-order', true );
+		$post_adt = $this->orderstore->get( $post_ID );
 
 		$timestamp = $this->slack->sendToSlack( $post_ID, $post_adt );
 

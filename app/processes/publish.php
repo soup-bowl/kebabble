@@ -8,10 +8,10 @@
 
 namespace kebabble\processes;
 
+use kebabble\processes\meta\orderstore;
 use kebabble\processes\term\save;
 use kebabble\processes\formatting;
 use kebabble\library\slack;
-use kebabble\config\fields;
 use SlackClient\botclient;
 use Carbon\Carbon;
 
@@ -26,23 +26,17 @@ class publish {
 	 */
 	protected $slack;
 
-	/**
-	 * Field display class.
-	 *
-	 * @var fields
-	 */
-	protected $fields;
+	protected $orderstore;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param slack  $slack  Slack API communication handler.
-	 * @param fields $fields Field display class.
-	 * @param save   $company_save 
+	 * @param slack      $slack      Slack API communication handler.
+	 * @param orderstore $orderstore Aaaaa.
 	 */
-	public function __construct( slack $slack, fields $fields ) {
-		$this->slack        = $slack;
-		$this->fields       = $fields;
+	public function __construct( slack $slack, orderstore $orderstore ) {
+		$this->slack      = $slack;
+		$this->orderstore = $orderstore;
 	}
 
 	/**
@@ -55,8 +49,7 @@ class publish {
 	public function handlePublish( $post_ID, $post_obj ) {
 		// I'm sure there's a million better ways to do this, but for now it suffices.
 		if ( empty( get_post_meta( $post_ID, 'kebabble-slack-deleted', true ) ) ) {
-			update_post_meta( $post_ID, 'kebabble-order', $this->slack->formatOrderResponse( $_POST ) );
-			$orderDetails = get_post_meta( $post_ID, 'kebabble-order', true );
+			$orderDetails = $this->orderstore->set( $post_ID );
 
 			$existingMessage = get_post_meta( $post_ID, 'kebabble-slack-ts', true );
 			$existingChannel = get_post_meta( $post_ID, 'kebabble-slack-channel', true );
@@ -87,7 +80,7 @@ class publish {
 	 */
 	public function changeTitle( $data, $postarr ) {
 		if ( 'kebabble_orders' === $data['post_type'] && 'publish' === $data['post_status'] ) {
-			$contents = $this->slack->formatOrderResponse( $_POST );
+			$contents = $this->orderstore->set( $_POST['post_ID'] );
 
 			if ( false !== $contents ) {
 				if ( $contents['override']['enabled'] ) {
