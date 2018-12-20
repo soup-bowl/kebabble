@@ -10,7 +10,7 @@
  * Description: Office food management system.
  * Author: soup-bowl
  * Author URI: https://github.com/soup-bowl/kebabble
- * Version: 0.2.1-Alpha
+ * Version: 0.2.2-Alpha
  */
 
 defined( 'ABSPATH' ) || die( 'Operation not permitted.' );
