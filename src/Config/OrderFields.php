@@ -253,7 +253,7 @@ class OrderFields {
 		?>
 		<div>
 			<p class="label"><label for="kebabbleDriverTax">Driver Charge (in pence)</label></p>
-			<input type="text" name="kebabbleDriverTax" id="kebabbleDriverTax" value="<?php echo esc_attr( $existing ); ?>">
+			<input type="number" name="kebabbleDriverTax" id="kebabbleDriverTax" value="<?php echo intval( $existing ); ?>">
 		</div>
 		<?php
 	}
