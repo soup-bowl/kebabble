@@ -1,11 +1,18 @@
 # Changelog
 Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.2.2] - 2018-12-20
+(Due to human error, 0.2.1 was skipped).
+### Fixed
+- Fixed non-numeric tax bug (#17).
+- Quality improvements (#18).
+- Tax is assigned per person, not per order (#19).
+
+## [0.2.0] - 2018-12-16
 ### Added
-- Taxonomy representing company, with additional field for food options and pricing.
-### Changed
-- Dynamic order form, replacing legacy monospace style (#9).
+- Fixed-width order form replaced in favour of a JSON-operated field repeater (#9).
+- Frequent resturants can be codified to pull in costs of items (#3).
+- If above is used, then the cost and tax is calculated and displayed.
 
 ## [0.1.8] - 2018-09-16
 ### Fixed
@@ -26,3 +33,5 @@ Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versio
 [0.1.8]: https://gitlab.com/soup-bowl/kebabble/tags/v0.1.8-alpha
 [0.1.7]: https://gitlab.com/soup-bowl/kebabble/tags/v0.1.7-alpha
 [0.1.5]: https://gitlab.com/soup-bowl/kebabble/tags/v0.1.5-alpha
+[0.2.0]: https://gitlab.com/soup-bowl/kebabble/tags/v0.2-alpha
+[0.2.2]: https://gitlab.com/soup-bowl/kebabble/tags/v0.2.2-alpha
