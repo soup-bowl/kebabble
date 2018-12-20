@@ -87,7 +87,12 @@ class Publish {
 	 * @return array $data
 	 */
 	public function change_title( array $data, array $postarr ):array {
-		if ( isset( $_POST['post_ID'] ) && 'kebabble_orders' === $data['post_type'] && 'publish' === $data['post_status'] ) {
+		if (
+			isset( $_POST['post_ID'], $_POST['kebabbleNonce'] ) &&
+			false !== wp_verify_nonce( sanitize_key( $_POST['kebabbleNonce'] ), 'kebabble_nonce' ) &&
+			'kebabble_orders' === $data['post_type'] &&
+			'publish' === $data['post_status']
+			) {
 			$post_id  = intval( wp_unslash( $_POST['post_ID'] ) );
 			$contents = $this->orderstore->set( $post_id );
 

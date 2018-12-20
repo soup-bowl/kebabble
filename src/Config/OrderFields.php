@@ -61,6 +61,7 @@ class OrderFields {
 
 				$this->custom_message_renderer( $post, $existing );
 				?><div id="kebabbleOrder">
+				<input type="hidden" name="kebabbleNonce" value="<?php echo esc_attr( wp_create_nonce( 'kebabble_nonce' ) ); ?>">
 				<?php
 				$this->company_menu_selector( $post, ( ! empty( $existing_company ) ) ? $existing_company[0] : null );
 				$this->food_selection( $post, $existing );

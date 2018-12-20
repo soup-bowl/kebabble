@@ -26,6 +26,7 @@ class Orderstore {
 	/**
 	 * Sets the configuration details stored per-post.
 	 *
+	 * @todo Refactor due to $_POST hijack. Either accept no override, or an intermediary.
 	 * @param integer $post_id  ID of the post.
 	 * @param array   $response Overrides the POST scrape.
 	 * @throws Exception If no valid response could be scraped.
@@ -33,11 +34,13 @@ class Orderstore {
 	 */
 	public function set( int $post_id, array $response = null ):array {
 		if ( empty( $response ) ) {
-			$response = $_POST;
-
-			if ( empty( $response ) ) {
+			// phpcs:disable WordPress.Security.ValidatedSanitizedInput
+			if ( isset( $_POST ) && false !== wp_verify_nonce( sanitize_key( $_POST['kebabbleNonce'] ), 'kebabble_nonce' ) ) {
+				$response = $_POST;
+			} else {
 				throw new Exception( 'Invalid input - Response and POST empty.' );
 			}
+			//phpcs:enable
 		}
 
 		if ( (int) $response['kebabbleCompanySelection'] > 0 ) {
