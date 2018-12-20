@@ -17,7 +17,8 @@ project anyway.
 * Slack (admin needed for setup).
 
 ## Installation
-Grab a build zip, and use WordPress plugin 'add new' to add to your WordPress.
+[Visit the tags section][2] and click 'Plugin Download' on the latest release, 
+and use WordPress plugin 'add new' to add to your WordPress.
 
 Alternatively, if you wish to compile the project yourself, you will need to
 use Composer. Use `composer install` to set up the project dependencies.
@@ -38,3 +39,4 @@ you wish to operate on. Give it a quick test and you should be good to go.
 
 
 [1]: https://api.slack.com/apps
+[2]: https://gitlab.com/soup-bowl/kebabble/tags
