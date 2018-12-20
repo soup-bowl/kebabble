@@ -103,6 +103,7 @@ class Formatting {
 
 		$cost_overall = 0;
 		$cost_tax     = 0;
+		$people_taxed = [];
 		foreach ( $items as $item ) {
 			$cost_item = 0;
 			$cost      = '';
@@ -112,9 +113,12 @@ class Formatting {
 			}
 			$content .= "*{$item['food']}{$cost}* \n>";
 			foreach ( $item['people'] as $person ) {
+				if ( ! in_array( $person, $people_taxed, true ) ) {
+					$cost_tax = $cost_tax + $tax;
+					$people_taxed[] = $person;
+				}
 				$content     .= "{$person}, ";
 				$cost_overall = $cost_overall + $cost_item;
-				$cost_tax     = $cost_tax + $tax;
 			}
 			$content  = substr( $content, 0, -2 );
 			$content .= ".\n\n";
