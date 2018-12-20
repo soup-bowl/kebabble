@@ -54,23 +54,23 @@ class Publish {
 	 * @param WP_Post $post_obj Whole post object.
 	 * @return void
 	 */
-	public function handlePublish( int $post_ID, WP_Post $post_obj ):void {
+	public function handle_publish( int $post_ID, WP_Post $post_obj ):void {
 		// I'm sure there's a million better ways to do this, but for now it suffices.
 		if ( empty( get_post_meta( $post_ID, 'kebabble-slack-deleted', true ) ) ) {
-			$orderDetails = $this->orderstore->set( $post_ID );
+			$order_details = $this->orderstore->set( $post_ID );
 
-			$existingMessage = get_post_meta( $post_ID, 'kebabble-slack-ts', true );
-			$existingChannel = get_post_meta( $post_ID, 'kebabble-slack-channel', true );
+			$existing_message = get_post_meta( $post_ID, 'kebabble-slack-ts', true );
+			$existing_channel = get_post_meta( $post_ID, 'kebabble-slack-channel', true );
 
-			$timestamp = $this->slack->sendToSlack( $post_ID, $orderDetails, $existingMessage, $existingChannel );
+			$timestamp = $this->slack->send_to_slack( $post_ID, $order_details, $existing_message, $existing_channel );
 
-			if ( $orderDetails['pin'] ) {
+			if ( $order_details['pin'] ) {
 				$this->slack->slack->pin( $timestamp );
 			} else {
 				$this->slack->slack->unpin( $timestamp );
 			}
 
-			if ( false == $existingMessage ) {
+			if ( false === $existing_message ) {
 				add_post_meta( $post_ID, 'kebabble-slack-ts', $timestamp, true );
 				add_post_meta( $post_ID, 'kebabble-slack-channel', get_option( 'kbfos_settings' )['kbfos_botchannel'], true );
 			}
@@ -86,9 +86,10 @@ class Publish {
 	 * @param array $postarr Unclean return, apparently.
 	 * @return array $data
 	 */
-	public function changeTitle( array $data, array $postarr ):array {
-		if ( 'kebabble_orders' === $data['post_type'] && 'publish' === $data['post_status'] ) {
-			$contents = $this->orderstore->set( $_POST['post_ID'] );
+	public function change_title( array $data, array $postarr ):array {
+		if ( isset( $_POST['post_ID'] ) && 'kebabble_orders' === $data['post_type'] && 'publish' === $data['post_status'] ) {
+			$post_id  = intval( wp_unslash( $_POST['post_ID'] ) );
+			$contents = $this->orderstore->set( $post_id );
 
 			if ( false !== $contents ) {
 				if ( $contents['override']['enabled'] ) {

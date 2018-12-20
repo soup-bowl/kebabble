@@ -28,6 +28,7 @@ class Orderstore {
 	 *
 	 * @param integer $post_id  ID of the post.
 	 * @param array   $response Overrides the POST scrape.
+	 * @throws Exception If no valid response could be scraped.
 	 * @return array The information stored in the database.
 	 */
 	public function set( int $post_id, array $response = null ):array {
@@ -49,13 +50,13 @@ class Orderstore {
 			wp_delete_object_term_relationships( $post_id, 'kebabble_company' );
 		}
 
-		$confArray = [
+		$conf_array = [
 			'override'      => [
 				'enabled' => empty( $response['kebabbleCustomMessageEnabled'] ) ? false : true,
 				'message' => $response['kebabbleCustomMessageEntry'],
 			],
 			'food'          => $response['kebabbleOrderTypeSelection'],
-			'order'         => $this->orderListCollator( $response['korder_name'], $response['korder_food'] ),
+			'order'         => $this->order_list_collator( $response['korder_name'], $response['korder_food'] ),
 			'order_classic' => $response['kebabbleOrders'],
 			'driver'        => $response['kebabbleDriver'],
 			'tax'           => $response['kebabbleDriverTax'],
@@ -68,10 +69,10 @@ class Orderstore {
 		$options = ( empty( $opts['kbfos_payopts'] ) ) ? [ 'Cash' ] : explode( ',', $opts['kbfos_payopts'] );
 
 		foreach ( $options as $option ) {
-			$confArray['paymentLink'][ $option ] = $response[ "kopt{$option}" ];
+			$conf_array['paymentLink'][ $option ] = $response[ "kopt{$option}" ];
 		}
 
-		update_post_meta( $post_id, 'kebabble-order', json_encode( $confArray ) );
+		update_post_meta( $post_id, 'kebabble-order', wp_json_encode( $conf_array ) );
 
 		return $this->get( $post_id );
 	}
@@ -83,7 +84,7 @@ class Orderstore {
 	 * @param array $food  The food order array.
 	 * @return array
 	 */
-	private function orderListCollator( array $names, array $food ):array {
+	private function order_list_collator( array $names, array $food ):array {
 		$orderlist = [];
 		$counter   = count( $names );
 

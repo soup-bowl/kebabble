@@ -105,7 +105,7 @@ class Hooks {
 
 		// Register post type and data entries.
 		add_action( 'init', [ &$this->registration, 'orders' ], 0 );
-		add_action( 'add_meta_boxes_kebabble_orders', [ &$this->order_fields, 'orderOptionsSetup' ] );
+		add_action( 'add_meta_boxes_kebabble_orders', [ &$this->order_fields, 'order_options_setup' ] );
 		add_action( 'kebabble_company_add_form_fields', [ &$this->company_fields, 'company_options_empty' ] );
 		add_action( 'kebabble_company_edit_form_fields', [ &$this->company_fields, 'company_options' ] );
 
@@ -113,14 +113,14 @@ class Hooks {
 		add_action( 'admin_enqueue_scripts', [ &$this, 'enqueued_scripts' ] );
 
 		// Order functionality.
-		add_action( 'publish_kebabble_orders', [ &$this->publish, 'handlePublish' ], 10, 2 );
-		add_filter( 'wp_insert_post_data', [ &$this->publish, 'changeTitle' ], 99, 2 );
-		add_action( 'trash_kebabble_orders', [ &$this->delete, 'handleDeletion' ], 10, 2 );
-		add_action( 'untrash_post', [ &$this->delete, 'handleUndeletion' ], 10, 2 );
+		add_action( 'publish_kebabble_orders', [ &$this->publish, 'handle_publish' ], 10, 2 );
+		add_filter( 'wp_insert_post_data', [ &$this->publish, 'change_title' ], 99, 2 );
+		add_action( 'trash_kebabble_orders', [ &$this->delete, 'handle_deletion' ], 10, 2 );
+		add_action( 'untrash_post', [ &$this->delete, 'handle_undeletion' ], 10, 2 );
 
 		// Company functionality.
-		add_action( 'created_kebabble_company', [ &$this->save, 'saveCustomCompanyDetails' ] );
-		add_action( 'edited_kebabble_company', [ &$this->save, 'saveCustomCompanyDetails' ] );
+		add_action( 'created_kebabble_company', [ &$this->save, 'save_custom_company_details' ] );
+		add_action( 'edited_kebabble_company', [ &$this->save, 'save_custom_company_details' ] );
 	}
 
 	/**

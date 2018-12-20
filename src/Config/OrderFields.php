@@ -42,7 +42,7 @@ class OrderFields {
 	 * @param WP_Post $post The post object being created/edited.
 	 * @return void Prints on the page.
 	 */
-	public function orderOptionsSetup( WP_Post $post ):void {
+	public function order_options_setup( WP_Post $post ):void {
 		add_meta_box(
 			'kebabbleorderdetails',
 			'Order',
@@ -52,27 +52,26 @@ class OrderFields {
 
 				// Non-strict comparison needed here, until checkbox sanitization on meta is done.
 				if ( empty( $existing ) && 1 == get_option( 'kbfos_settings' )['kbfos_pullthrough'] ) {
-					$existing          = $this->orderstore->get( get_previous_post()->ID );
-					$existing_company  = wp_get_post_terms( get_previous_post()->ID, 'kebabble_company' );
+					$existing         = $this->orderstore->get( get_previous_post()->ID );
+					$existing_company = wp_get_post_terms( get_previous_post()->ID, 'kebabble_company' );
 
 					$existing['override']['enabled'] = false;
 					$existing['override']['message'] = '';
 				}
 
-				// wp_nonce_field( 'kebabble-order-form' );
-				echo $this->customMessageRenderer( $post, $existing );
+				$this->custom_message_renderer( $post, $existing );
 				?><div id="kebabbleOrder">
 				<?php
-				echo $this->companyMenuSelector( $post, ( ! empty( $existing_company ) ) ? $existing_company[0] : null );
-				echo $this->foodSelection( $post, $existing );
-				echo $this->orderInput( $post, $existing );
-				echo $this->driverInput( $post, $existing );
-				echo $this->driverTaxInput( $post, $existing );
-				echo $this->paymentOptions( $post, $existing );
+				$this->company_menu_selector( $post, ( ! empty( $existing_company ) ) ? $existing_company[0] : null );
+				$this->food_selection( $post, $existing );
+				$this->order_input( $post, $existing );
+				$this->driver_input( $post, $existing );
+				$this->driver_tax_input( $post, $existing );
+				$this->payment_options( $post, $existing );
 				?>
 				</div>
 				<?php
-				echo $this->pinStatus( $post, $existing );
+				$this->pin_status( $post, $existing );
 			},
 			'kebabble_orders',
 			'normal',
@@ -83,12 +82,12 @@ class OrderFields {
 			'kebabbleorderoverrides',
 			'Slack',
 			function( $post ) {
-				 $cOutput = get_post_meta( $post->ID, 'kebabble-slack-channel', true );
-				 $channel = ( empty( $cOutput ) ) ? 'N/A' : $cOutput;
+				$c_output = get_post_meta( $post->ID, 'kebabble-slack-channel', true );
+				$channel  = ( empty( $c_output ) ) ? 'N/A' : $c_output;
 				?>
-				 <div>
+				<div>
 					<p class="label"><label for="kebabbleOverrideChannel">Channel</label></p>
-					<input type="text" name="kebabbleOverrideChannel" id="kebabbleOverrideChannel" value="<?php echo $channel; ?>" readonly>
+					<input type="text" name="kebabbleOverrideChannel" id="kebabbleOverrideChannel" value="<?php echo esc_attr( $channel ); ?>" readonly>
 				</div>
 				<?php
 			},
@@ -105,17 +104,17 @@ class OrderFields {
 	 * @param array|null $existing Existing value (from orderstore) in the database.
 	 * @return void Constructs on page where called.
 	 */
-	public function customMessageRenderer( WP_Post $post, ?array $existing = null ):void {
-		$existingContents = ( ! empty( $existing ) ) ? (object) $existing['override'] : false;
-		$enabled          = ( false !== $existingContents && $existingContents->enabled ) ? 'checked' : '';
-		$message          = ( ! empty( $existingContents->message ) ) ? $existingContents->message : '';
+	public function custom_message_renderer( WP_Post $post, ?array $existing = null ):void {
+		$existing_contents = ( ! empty( $existing ) ) ? (object) $existing['override'] : false;
+		$enabled           = ( false !== $existing_contents && $existing_contents->enabled ) ? 'checked' : '';
+		$message           = ( ! empty( $existing_contents->message ) ) ? $existing_contents->message : '';
 		?>
 		<div>
-			<p><input name="kebabbleCustomMessageEnabled" id="cmCheckBox" type="checkbox" <?php echo $enabled; ?>> - Custom Message</p>
+			<p><input name="kebabbleCustomMessageEnabled" id="cmCheckBox" type="checkbox" <?php echo esc_attr( $enabled ); ?>> - Custom Message</p>
 			<hr>
 			<div id="kebabbleCustomMessage">
 				<p class="label"><label for="kebabbleCustomMessageEntry">Custom Message</label></p>
-				<textarea name="kebabbleCustomMessageEntry"><?php echo $message; ?></textarea>
+				<textarea name="kebabbleCustomMessageEntry"><?php echo esc_textarea( $message ); ?></textarea>
 			</div>
 		</div>
 		<?php
@@ -129,18 +128,22 @@ class OrderFields {
 	 * @param WP_Term|null $existing Existing values in the database.
 	 * @return void Prints on the page.
 	 */
-	public function companyMenuSelector( WP_Post $post, ?WP_Term $existing = null ):void {
-		$selected = ( ! empty( $existing ) ) ? $existing->term_id : 0;
-		$options_available = get_terms([
-			'taxonomy'   => 'kebabble_company',
-			'hide_empty' => false,
-		]);
+	public function company_menu_selector( WP_Post $post, ?WP_Term $existing = null ):void {
+		$selected          = ( ! empty( $existing ) ) ? $existing->term_id : 0;
+		$options_available = get_terms(
+			[
+				'taxonomy'   => 'kebabble_company',
+				'hide_empty' => false,
+			]
+		);
 
 		$select = '<option value=\'0\'>None</option>';
 		foreach ( $options_available as $option ) {
-			$markSelected = ( $option->term_id === $selected ) ? 'selected' : '';
-			$select      .= "<option value='{$option->term_id}' {$markSelected}>{$option->name}</option>";
+			$mark_selected = ( $option->term_id === $selected ) ? 'selected' : '';
+			$select       .= "<option value='{$option->term_id}' {$mark_selected}>{$option->name}</option>";
 		}
+
+		// phpcs:disable WordPress.Security.EscapeOutput
 		?>
 		<div>
 			<p class="label"><label for="kebabbleCompanySelection">Company</label></p>
@@ -149,6 +152,7 @@ class OrderFields {
 			</select>
 		</div>
 		<?php
+		// phpcs:enable
 	}
 
 	/**
@@ -158,15 +162,17 @@ class OrderFields {
 	 * @param array|null $existing Existing value (from orderstore) in the database.
 	 * @return void Constructs on page where called.
 	 */
-	public function foodSelection( WP_Post $post, ?array $existing = null ):void {
+	public function food_selection( WP_Post $post, ?array $existing = null ):void {
 		$selected = ( ! empty( $existing ) ) ? $existing['food'] : '';
 		$options  = [ 'Kebab', 'Pizza', 'Burger', 'Resturant', 'Event', 'Other' ];
 
 		$select = '';
 		foreach ( $options as $option ) {
-			$markSelected = ( $option === $selected ) ? 'selected' : '';
-			$select      .= "<option value='{$option}' {$markSelected}>{$option}</option>";
+			$mark_selected = ( $option === $selected ) ? 'selected' : '';
+			$select       .= "<option value='{$option}' {$mark_selected}>{$option}</option>";
 		}
+
+		// phpcs:disable WordPress.Security.EscapeOutput
 		?>
 		<div>
 			<p class="label"><label for="kebabbleOrderTypeSelection">Food</label></p>
@@ -175,6 +181,7 @@ class OrderFields {
 			</select>
 		</div>
 		<?php
+		// phpcs:enable
 	}
 
 	/**
@@ -184,7 +191,7 @@ class OrderFields {
 	 * @param array|null $existings Existing value (from orderstore) in the database.
 	 * @return void Constructs on page where called.
 	 */
-	public function orderInput( WP_Post $post, ?array $existings = null ):void {
+	public function order_input( WP_Post $post, ?array $existings = null ):void {
 		$existings = ( ! empty( $existings ) ) ? $existings['order'] : '';
 		?>
 		<div>
@@ -199,12 +206,12 @@ class OrderFields {
 				</thead>
 				<tbody id="korder_tablelist">
 					<?php
-					$this->orderSnippet( 'korder_examplerow', 'hidden' );
+					$this->order_snippet( 'korder_examplerow', 'hidden' );
 					if ( empty( $existings ) ) {
-						$this->orderSnippet();
+						$this->order_snippet();
 					} else {
 						foreach ( $existings as $existing ) {
-							$this->orderSnippet( '', '', $existing['person'], $existing['food'] );
+							$this->order_snippet( '', '', $existing['person'], $existing['food'] );
 						}
 					}
 					?>
@@ -223,12 +230,12 @@ class OrderFields {
 	 * @param array|null $existing Existing value (from orderstore) in the database.
 	 * @return void Constructs on page where called.
 	 */
-	public function driverInput( WP_Post $post, ?array $existing = null ) {
+	public function driver_input( WP_Post $post, ?array $existing = null ) {
 		$existing = ( ! empty( $existing ) ) ? $existing['driver'] : '';
 		?>
 		<div>
 			<p class="label"><label for="kebabbleDriver">Driver</label></p>
-			<input type="text" name="kebabbleDriver" id="kebabbleDriver" value="<?php echo $existing; ?>">
+			<input type="text" name="kebabbleDriver" id="kebabbleDriver" value="<?php echo esc_attr( $existing ); ?>">
 		</div>
 		<?php
 	}
@@ -240,12 +247,12 @@ class OrderFields {
 	 * @param array|null $existing Existing value (from orderstore) in the database.
 	 * @return void Constructs on page where called.
 	 */
-	public function driverTaxInput( WP_Post $post, ?array $existing = null ):void {
+	public function driver_tax_input( WP_Post $post, ?array $existing = null ):void {
 		$existing = ( ! empty( $existing ) ) ? $existing['tax'] : '';
 		?>
 		<div>
 			<p class="label"><label for="kebabbleDriverTax">Driver Charge (in pence)</label></p>
-			<input type="text" name="kebabbleDriverTax" id="kebabbleDriverTax" value="<?php echo $existing; ?>">
+			<input type="text" name="kebabbleDriverTax" id="kebabbleDriverTax" value="<?php echo esc_attr( $existing ); ?>">
 		</div>
 		<?php
 	}
@@ -257,21 +264,23 @@ class OrderFields {
 	 * @param array|null $existing Existing value (from orderstore) in the database.
 	 * @return void Constructs on page where called.
 	 */
-	public function paymentOptions( WP_Post $post, ?array $existing = null ):void {
-		$existingPM = ( ! empty( $existing ) ) ? $existing['payment'] : '';
-		$existingPL = ( ! empty( $existing ) ) ? $existing['paymentLink'] : [];
-		$opts       = get_option( 'kbfos_settings' );
-		$options    = ( empty( $opts['kbfos_payopts'] ) ) ? [ 'Cash' ] : explode( ',', $opts['kbfos_payopts'] );
+	public function payment_options( WP_Post $post, ?array $existing = null ):void {
+		$existing_pm = ( ! empty( $existing ) ) ? $existing['payment'] : '';
+		$existing_pl = ( ! empty( $existing ) ) ? $existing['paymentLink'] : [];
+		$opts        = get_option( 'kbfos_settings' );
+		$options     = ( empty( $opts['kbfos_payopts'] ) ) ? [ 'Cash' ] : explode( ',', $opts['kbfos_payopts'] );
 
-		$lists = '';
-		for ( $i = 0; $i < count( $options ); $i++ ) {
-			$option     = $options[ $i ];
-			$markSelect = ( ! empty( $existingPM ) && in_array( $option, $existingPM ) ) ? 'checked' : '';
-			$lists     .= "<li><label><input name='paymentOpts[]' type='checkbox' value='{$option}' {$markSelect}> {$option}</label>";
-			$lists     .= ' - ';
-			$lists     .= "<input type='text' class='subtext' name='kopt{$option}' id='kopt{$option}' value='{$existingPL[$option]}'></li>";
+		$lists         = '';
+		$options_count = count( $options );
+		for ( $i = 0; $i < $options_count; $i++ ) {
+			$option      = $options[ $i ];
+			$mark_select = ( ! empty( $existing_pm ) && in_array( $option, $existing_pm, true ) ) ? 'checked' : '';
+			$lists      .= "<li><label><input name='paymentOpts[]' type='checkbox' value='{$option}' {$mark_select}> {$option}</label>";
+			$lists      .= ' - ';
+			$lists      .= "<input type='text' class='subtext' name='kopt{$option}' id='kopt{$option}' value='{$existing_pl[$option]}'></li>";
 		}
 
+		// phpcs:disable WordPress.Security.EscapeOutput
 		?>
 		<div>
 			<p class="label"><label for="kebabblePaymentOptions">Payment Options</label></p>
@@ -280,6 +289,7 @@ class OrderFields {
 			</ul>
 		</div>
 		<?php
+		// phpcs:enable
 	}
 
 	/**
@@ -289,7 +299,7 @@ class OrderFields {
 	 * @param array|null $existing Existing value (from orderstore) in the database.
 	 * @return void Constructs on page where called.
 	 */
-	public function pinStatus( WP_Post $post, ?array $existing = null ):void {
+	public function pin_status( WP_Post $post, ?array $existing = null ):void {
 		$existing = ( ! empty( $existing ) ) ? $existing['pin'] : false;
 		?>
 		<div>
@@ -310,11 +320,11 @@ class OrderFields {
 	 * @param string $food  Existing food entry.
 	 * @return void Constructs on page where called.
 	 */
-	private function orderSnippet( string $id = '', string $class = '', string $name = '', string $food = '' ):void {
+	private function order_snippet( string $id = '', string $class = '', string $name = '', string $food = '' ):void {
 		?>
-		<tr id="<?php echo $id; ?>" class="<?php echo $class; ?>">
-			<td><input type="text" name="korder_name[]" id="korder_name[]" value="<?php echo $name; ?>"></td>
-			<td><input type="text" name="korder_food[]" id="korder_food[]" value="<?php echo $food; ?>"></td>
+		<tr id="<?php echo esc_attr( $id ); ?>" class="<?php echo esc_attr( $class ); ?>">
+			<td><input type="text" name="korder_name[]" id="korder_name[]" value="<?php echo esc_attr( $name ); ?>"></td>
+			<td><input type="text" name="korder_food[]" id="korder_food[]" value="<?php echo esc_attr( $food ); ?>"></td>
 			<td><a class="btnRemkorder button" href="#">Remove</a></td>
 		</tr>
 		<?php

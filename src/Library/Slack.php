@@ -39,22 +39,22 @@ class Slack {
 	 */
 	public function __construct( Formatting $formatting ) {
 		$this->formatting = $formatting;
-		$this->slack      = $this->generateSlackbot();
+		$this->slack      = $this->generate_slackbot();
 	}
 
 	/**
 	 * Sends contents over to the Slack message API.
 	 *
-	 * @param integer $id                 Post ID.
-	 * @param array   $order              Order array to be displayed on Slack.
-	 * @param boolean $existing_timestamp If an existing timestamp is passed, that message is modified.
-	 * @param string  $override_channel   Change the Slack channel, if desired.
+	 * @param integer     $id                 Post ID.
+	 * @param array       $order              Order array to be displayed on Slack.
+	 * @param string|null $existing_timestamp If an existing timestamp is passed, that message is modified.
+	 * @param string|null $override_channel   Change the Slack channel, if desired.
 	 * @return string Unique timestamp of the message, used for editing.
 	 */
-	public function sendToSlack( int $id, array $order, ?string $existing_timestamp = null, ?string $override_channel = null ):string {
+	public function send_to_slack( int $id, array $order, ?string $existing_timestamp = null, ?string $override_channel = null ):string {
 		$so = $this->slack;
 		if ( ! empty( $override_channel ) ) {
-			$so = $this->generateSlackbot( $override_channel );
+			$so = $this->generate_slackbot( $override_channel );
 		}
 
 		$timestamp = null;
@@ -84,13 +84,13 @@ class Slack {
 	/**
 	 * Sets up the Slack bot client object.
 	 *
-	 * @param string $customChannel Override the default option channel.
+	 * @param string $custom_channel Override the default option channel.
 	 * @return botclient
 	 */
-	private function generateSlackbot( string $customChannel = '' ):botclient {
+	private function generate_slackbot( string $custom_channel = '' ):botclient {
 		return new botclient(
 			get_option( 'kbfos_settings' )['kbfos_botkey'],
-			( empty( $customChannel ) ) ? get_option( 'kbfos_settings' )['kbfos_botchannel'] : $customChannel
+			( empty( $custom_channel ) ) ? get_option( 'kbfos_settings' )['kbfos_botchannel'] : $custom_channel
 		);
 	}
 }

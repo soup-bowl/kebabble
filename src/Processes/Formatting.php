@@ -46,24 +46,24 @@ class Formatting {
 	 */
 	public function status( int $id, string $food, array $order, string $driver, int $tax = 0, ?Carbon $date = null, array $payments = [ 'Cash' ], array $pay_opts = [] ):string {
 		$rolls       = ( '' === $rolls ) ? 'N/A' : $rolls;
-		$location    = wp_get_object_terms($id, 'kebabble_company')[0];
+		$location    = wp_get_object_terms( $id, 'kebabble_company' )[0];
 		$location_id = ( ! empty( $location ) ) ? $location->term_id : 0;
 		$loc_str     = ( ! empty( $location ) ) ? " at {$location->name}" : '';
-		$order       = ( empty( $order ) ) ? '_None yet!_' : $this->orderFormatter( $order, $location_id, $tax );
+		$order       = ( empty( $order ) ) ? '_None yet!_' : $this->order_formatter( $order, $location_id, $tax );
 		$driver      = ( '' === $driver ) ? 'unspecified' : $driver;
 		$date        = ( empty( $date ) ) ? Carbon::now() : $date;
-		$slack_emoji = $this->emojiPicker( $food );
+		$slack_emoji = $this->emoji_picker( $food );
 
-		$formattedPosts = [
+		$formatted_posts = [
 			"{$slack_emoji} *{$food} {$date->format('l')}{$loc_str} ({$date->format('jS F')})* {$slack_emoji}",
 			'*Orders*',
 			$order,
 			"Polling @channel for orders. Today's driver is *{$driver}* :car:",
 			( $tax > 0 ) ? ':pound: *Additional ' . $this->money->output( $tax ) . ' per person* to fund the driver.' : null,
-			$this->acceptsPaymentFormatter( $payments, $pay_opts ),
+			$this->accepts_payment_formatter( $payments, $pay_opts ),
 		];
 
-		return str_replace( "\n\n\n\n", "\n\n", implode( "\n\n", $formattedPosts ) );
+		return str_replace( "\n\n\n\n", "\n\n", implode( "\n\n", $formatted_posts ) );
 	}
 
 	/**
@@ -71,22 +71,24 @@ class Formatting {
 	 *
 	 * @param array   $orders Array of order inputs.
 	 * @param integer $place  Term ID of place. Blank disables this additional feature.
+	 * @param integer $tax    Set tax value for calculation purposes.
 	 * @return string
 	 */
-	private function orderFormatter( array $orders, int $place = 0, int $tax = 0 ):string {
-		$content   = '';
-		$foodItems = $items = [];
-		$place     = get_term_meta( $place, 'kebabble_ordpri', true ); 
-		
+	private function order_formatter( array $orders, int $place = 0, int $tax = 0 ):string {
+		$content    = '';
+		$food_items = [];
+		$items      = [];
+		$place      = get_term_meta( $place, 'kebabble_ordpri', true );
+
 		foreach ( $orders as $order ) {
-			if ( ! in_array( $order['food'], $foodItems ) ) {
-				$foodItems[] = $order['food'];
+			if ( ! in_array( $order['food'], $food_items, true ) ) {
+				$food_items[] = $order['food'];
 			}
 		}
 
-		foreach ( $foodItems as $foodItem ) {
+		foreach ( $food_items as $food_item ) {
 			$obj = [
-				'food'   => $foodItem,
+				'food'   => $food_item,
 				'people' => [],
 			];
 
@@ -99,17 +101,18 @@ class Formatting {
 			$items[] = $obj;
 		}
 
-		$cost_overall = $cost_tax = 0;		
+		$cost_overall = 0;
+		$cost_tax     = 0;
 		foreach ( $items as $item ) {
 			$cost_item = 0;
 			$cost      = '';
-			if ( $place !== false ) {
+			if ( false !== $place ) {
 				$cost_item = ! empty( $place[ $item['food'] ] ) ? (int) $place[ $item['food'] ]['Price'] : 0;
 				$cost      = ! empty( $cost_item ) ? " ({$this->money->output($cost_item)} each)" : '';
 			}
 			$content .= "*{$item['food']}{$cost}* \n>";
 			foreach ( $item['people'] as $person ) {
-				$content .= "{$person}, ";
+				$content     .= "{$person}, ";
 				$cost_overall = $cost_overall + $cost_item;
 				$cost_tax     = $cost_tax + $tax;
 			}
@@ -119,7 +122,7 @@ class Formatting {
 
 		$cost_box = '';
 		if ( $cost_overall > 0 ) {
-			$cost_box = "\n\n";
+			$cost_box  = "\n\n";
 			$cost_box .= "*Cost*: {$this->money->output($cost_overall)} _for priced orders_.\n";
 			$cost_box .= "*Tax*: {$this->money->output($cost_tax)}.";
 		}
@@ -134,7 +137,7 @@ class Formatting {
 	 * @param array $option_payments   URL links for the above (matched by array key to payment type).
 	 * @return string
 	 */
-	private function acceptsPaymentFormatter( array $accepted_payments, array $option_payments = [] ):string {
+	private function accepts_payment_formatter( array $accepted_payments, array $option_payments = [] ):string {
 		$ap_count = count( $accepted_payments );
 
 		if ( 0 === $ap_count ) {
@@ -169,7 +172,7 @@ class Formatting {
 	 * @param string $food Label of the order type.
 	 * @return string colon-surrounded emoji format.
 	 */
-	private function emojiPicker( string $food ):string {
+	private function emoji_picker( string $food ):string {
 		switch ( strtolower( $food ) ) {
 			case 'burger':
 				return ':hamburger:';

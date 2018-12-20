@@ -23,7 +23,7 @@ class CompanyFields {
 	public function company_options_empty() {
 		$this->company_options();
 	}
-	
+
 	/**
 	 * Shows the menu specification input field.
 	 *
@@ -35,7 +35,7 @@ class CompanyFields {
 		?>
 		<div class="form-field">
 			<label for="tag-kebabble-pricing">Options & Pricing</label>
-			<input name="ctOrderPricing" id="tag-kebabble-pricing" value="<?php echo $existing; ?>" size="40" type="text" placeholder="food|price,food|price...">
+			<input name="ctOrderPricing" id="tag-kebabble-pricing" value="<?php echo esc_attr( $existing ); ?>" size="40" type="text" placeholder="food|price,food|price...">
 			<p>Comma-separated list of menu items, with a pipe-separated option of a price.</p>
 		</div>
 		<?php

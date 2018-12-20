@@ -23,11 +23,11 @@ class Money {
 	 */
 	public function output( int $value, string $high_symbol = '£', string $low_symbol = 'p' ):string {
 		$money_string = strval( $value / 100 );
-		$expl        = explode( '.', $money_string );
+		$expl         = explode( '.', $money_string );
 
-		$dec = ( strlen( $expl[1] ) == 1 ) ? $expl[1] . '0' : $expl[1];
+		$dec = ( strlen( $expl[1] ) === 1 ) ? $expl[1] . '0' : $expl[1];
 
-		if ( 0 == $expl[0] ) {
+		if ( 0 === (int) $expl[0] ) {
 			if ( $value < 10 ) {
 				return $value . $low_symbol;
 			} else {

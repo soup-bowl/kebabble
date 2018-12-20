@@ -24,7 +24,7 @@ class Settings {
 			'Kebabble',
 			'manage_options',
 			'kebabble',
-			[ &$this, 'optionsPage' ]
+			[ &$this, 'options_page' ]
 		);
 	}
 
@@ -33,7 +33,7 @@ class Settings {
 	 *
 	 * @return void Prints on page.
 	 */
-	public function optionsPage():void {
+	public function options_page():void {
 		?>
 		<form action='options.php' method='post'>
 			<h2>kebabble</h2>
@@ -54,8 +54,8 @@ class Settings {
 	public function settings():void {
 		register_setting( 'pluginPage', 'kbfos_settings' );
 
-		$this->renderDescription();
-		$this->renderSlackConfig();
+		$this->render_description();
+		$this->render_slack_config();
 	}
 
 	/**
@@ -63,12 +63,12 @@ class Settings {
 	 *
 	 * @return void Prints on page.
 	 */
-	public function renderDescription():void {
+	public function render_description():void {
 		add_settings_section(
 			'kbfos_pluginPage_section',
 			__( 'Slack Configuration', 'text_domain' ),
 			function() {
-					echo __( 'Configure Kebabble to use your Slack.', 'text_domain' );
+					echo 'Configure Kebabble to use your Slack.';
 			},
 			'pluginPage'
 		);
@@ -79,14 +79,14 @@ class Settings {
 	 *
 	 * @return void Prints on page.
 	 */
-	public function renderSlackConfig():void {
+	public function render_slack_config():void {
 		add_settings_field(
 			'kbfos_botkey',
 			__( 'Slack Bot Auth key', 'text_domain' ),
 			function () {
 				$options = get_option( 'kbfos_settings' );
 				?>
-				<input type='text' class='regular-text' name='kbfos_settings[kbfos_botkey]' value='<?php echo $options['kbfos_botkey']; ?>'>
+				<input type='text' class='regular-text' name='kbfos_settings[kbfos_botkey]' value='<?php echo esc_attr( $options['kbfos_botkey'] ); ?>'>
 				<?php
 			},
 			'pluginPage',
@@ -99,7 +99,7 @@ class Settings {
 			function() {
 				$options = get_option( 'kbfos_settings' );
 				?>
-				<input type='text' name='kbfos_settings[kbfos_botchannel]' value='<?php echo $options['kbfos_botchannel']; ?>'>
+				<input type='text' name='kbfos_settings[kbfos_botchannel]' value='<?php echo esc_attr( $options['kbfos_botchannel'] ); ?>'>
 				<?php
 			},
 			'pluginPage',
@@ -126,7 +126,7 @@ class Settings {
 			function() {
 				$options = get_option( 'kbfos_settings' );
 				?>
-				<input type='text' class='regular-text'  name='kbfos_settings[kbfos_payopts]' value='<?php echo $options['kbfos_payopts']; ?>'>
+				<input type='text' class='regular-text'  name='kbfos_settings[kbfos_payopts]' value='<?php echo esc_attr( $options['kbfos_payopts'] ); ?>'>
 				<p class="description">Comma-seperated values accepted.</p>
 				<?php
 			},

@@ -52,11 +52,11 @@ class Delete {
 	 * @param WP_Post $post_obj Whole post object.
 	 * @return void No user feedback. Deletion result handled by WordPress.
 	 */
-	public function handleDeletion( int $post_ID, WP_Post $post_obj ):void {
-		$existingMessage = get_post_meta( $post_ID, 'kebabble-slack-ts', true );
-		$existingChannel = get_post_meta( $post_ID, 'kebabble-slack-channel', true );
+	public function handle_deletion( int $post_ID, WP_Post $post_obj ):void {
+		$existing_message = get_post_meta( $post_ID, 'kebabble-slack-ts', true );
+		$existing_channel = get_post_meta( $post_ID, 'kebabble-slack-channel', true );
 
-		$this->slack->slack->deleteMessage( $existingMessage, $existingChannel );
+		$this->slack->slack->deleteMessage( $existing_message, $existing_channel );
 
 		add_post_meta( $post_ID, 'kebabble-slack-deleted', true, true );
 	}
@@ -67,11 +67,11 @@ class Delete {
 	 * @param integer $post_ID ID of the associated post.
 	 * @return void Message is re-posted, and new TS stored.
 	 */
-	public function handleUndeletion( int $post_ID ):void {
+	public function handle_undeletion( int $post_ID ):void {
 		$post_obj = get_post( $post_ID );
 		$post_adt = $this->orderstore->get( $post_ID );
 
-		$timestamp = $this->slack->sendToSlack( $post_ID, $post_adt );
+		$timestamp = $this->slack->send_to_slack( $post_ID, $post_adt );
 
 		update_post_meta( $post_ID, 'kebabble-slack-ts', $timestamp );
 
