@@ -114,7 +114,7 @@ class Formatting {
 			$content .= "*{$item['food']}{$cost}* \n>";
 			foreach ( $item['people'] as $person ) {
 				if ( ! in_array( $person, $people_taxed, true ) ) {
-					$cost_tax = $cost_tax + $tax;
+					$cost_tax       = $cost_tax + $tax;
 					$people_taxed[] = $person;
 				}
 				$content     .= "{$person}, ";
