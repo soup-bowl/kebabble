@@ -13,6 +13,7 @@ use Kebabble\Processes\Meta\Orderstore;
 
 use WP_Post;
 use WP_Term;
+use stdClass;
 
 /**
  * Display formatting on the kebabble order form.
@@ -43,36 +44,27 @@ class OrderFields {
 	 * @return void Prints on the page.
 	 */
 	public function order_options_setup( WP_Post $post ):void {
+		$existing_order_details = $this->get_existing_details( $post->ID );
+
 		add_meta_box(
 			'kebabbleorderdetails',
 			'Order',
-			function( $post ) {
-				$existing         = $this->orderstore->get( $post->ID );
-				$existing_company = wp_get_post_terms( $post->ID, 'kebabble_company' );
-
-				// Non-strict comparison needed here, until checkbox sanitization on meta is done.
-				if ( empty( $existing ) && 1 == get_option( 'kbfos_settings' )['kbfos_pullthrough'] && ! empty( get_previous_post() ) ) {
-					$existing         = $this->orderstore->get( get_previous_post()->ID );
-					$existing_company = wp_get_post_terms( get_previous_post()->ID, 'kebabble_company' );
-
-					$existing['override']['enabled'] = false;
-					$existing['override']['message'] = '';
-				}
-
-				$this->custom_message_renderer( $post, $existing );
-				?><div id="kebabbleOrder">
-				<input type="hidden" name="kebabbleNonce" value="<?php echo esc_attr( wp_create_nonce( 'kebabble_nonce' ) ); ?>">
-				<?php
-				$this->company_menu_selector( $post, ( ! empty( $existing_company ) ) ? $existing_company[0] : null );
-				$this->food_selection( $post, $existing );
-				$this->order_input( $post, $existing );
-				$this->driver_input( $post, $existing );
-				$this->driver_tax_input( $post, $existing );
-				$this->payment_options( $post, $existing );
+			function( $post ) use ( &$existing_order_details ) {
+				$this->pin_status( $post, $existing_order_details->existing );
+				$this->custom_message_renderer( $post, $existing_order_details->existing );
 				?>
+				<div id="kebabbleOrder">
+					<input type="hidden" name="kebabbleNonce" value="<?php echo esc_attr( wp_create_nonce( 'kebabble_nonce' ) ); ?>">
+					<?php
+					$this->company_menu_selector( $post, ( ! empty( $existing_order_details->existing_company ) ) ? $existing_order_details->existing_company[0] : null );
+					$this->food_selection( $post, $existing_order_details->existing );
+					$this->order_input( $post, $existing_order_details->existing );
+					$this->driver_input( $post, $existing_order_details->existing );
+					$this->driver_tax_input( $post, $existing_order_details->existing );
+					$this->payment_options( $post, $existing_order_details->existing );
+					?>
 				</div>
 				<?php
-				$this->pin_status( $post, $existing );
 			},
 			'kebabble_orders',
 			'normal',
@@ -111,8 +103,12 @@ class OrderFields {
 		$message           = ( ! empty( $existing_contents->message ) ) ? $existing_contents->message : '';
 		?>
 		<div>
-			<p><input name="kebabbleCustomMessageEnabled" id="cmCheckBox" type="checkbox" <?php echo esc_attr( $enabled ); ?>> - Custom Message</p>
-			<hr>
+			<div>
+				<p class="label"><label>Custom Message</label></p>
+				<ul>
+					<input name="kebabbleCustomMessageEnabled" id="cmCheckBox" type="checkbox" <?php echo esc_attr( $enabled ); ?>>
+				</ul>
+			</div>
 			<div id="kebabbleCustomMessage">
 				<p class="label"><label for="kebabbleCustomMessageEntry">Custom Message</label></p>
 				<textarea name="kebabbleCustomMessageEntry"><?php echo esc_textarea( $message ); ?></textarea>
@@ -329,5 +325,27 @@ class OrderFields {
 			<td><a class="btnRemkorder button" href="#">Remove</a></td>
 		</tr>
 		<?php
+	}
+	
+	/**
+	 * Gets the existing details, or pulls through previous if enabled in settings.
+	 *
+	 * @param integer $post_id ID of the post in question.
+	 * @return stdClass
+	 */
+	private function get_existing_details( int $post_id ):stdClass {
+		$existing         = $this->orderstore->get( $post_id );
+		$existing_company = wp_get_post_terms( $post_id, 'kebabble_company' );
+
+		// Non-strict comparison needed here, until checkbox sanitization on meta is done.
+		if ( empty( $existing ) && 1 == get_option( 'kbfos_settings' )['kbfos_pullthrough'] && ! empty( get_previous_post() ) ) {
+			$existing         = $this->orderstore->get( get_previous_post()->ID );
+			$existing_company = wp_get_post_terms( get_previous_post()->ID, 'kebabble_company' );
+
+			$existing['override']['enabled'] = false;
+			$existing['override']['message'] = '';
+		}
+
+		return (object) [ 'existing' => $existing, 'existing_company' => $existing_company ];
 	}
 }
