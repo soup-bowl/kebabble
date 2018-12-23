@@ -70,7 +70,7 @@ class Publish {
 				$this->slack->slack->unpin( $timestamp );
 			}
 
-			if ( false === $existing_message ) {
+			if ( empty( $existing_message ) ) {
 				add_post_meta( $post_ID, 'kebabble-slack-ts', $timestamp, true );
 				add_post_meta( $post_ID, 'kebabble-slack-channel', get_option( 'kbfos_settings' )['kbfos_botchannel'], true );
 			}
