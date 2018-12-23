@@ -50,7 +50,6 @@ class OrderFields {
 			'kebabbleorderdetails',
 			'Order',
 			function( $post ) use ( &$existing_order_details ) {
-				$this->pin_status( $post, $existing_order_details->existing );
 				$this->custom_message_renderer( $post, $existing_order_details->existing );
 				?>
 				<div id="kebabbleOrder">
@@ -74,7 +73,9 @@ class OrderFields {
 		add_meta_box(
 			'kebabbleorderoverrides',
 			'Slack',
-			function( $post ) {
+			function( $post ) use ( &$existing_order_details ) {
+				$this->pin_status( $post, $existing_order_details->existing );
+
 				$c_output = get_post_meta( $post->ID, 'kebabble-slack-channel', true );
 				$channel  = ( empty( $c_output ) ) ? 'N/A' : $c_output;
 				?>
