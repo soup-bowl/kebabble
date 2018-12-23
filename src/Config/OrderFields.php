@@ -51,7 +51,7 @@ class OrderFields {
 				$existing_company = wp_get_post_terms( $post->ID, 'kebabble_company' );
 
 				// Non-strict comparison needed here, until checkbox sanitization on meta is done.
-				if ( empty( $existing ) && 1 == get_option( 'kbfos_settings' )['kbfos_pullthrough'] ) {
+				if ( empty( $existing ) && 1 == get_option( 'kbfos_settings' )['kbfos_pullthrough'] && ! empty( get_previous_post() ) ) {
 					$existing         = $this->orderstore->get( get_previous_post()->ID );
 					$existing_company = wp_get_post_terms( get_previous_post()->ID, 'kebabble_company' );
 
@@ -197,7 +197,7 @@ class OrderFields {
 		?>
 		<div>
 			<p class="label"><label for="kebabbleOrders">Orders</label></p>
-			<table>
+			<table class="wp-list-table widefat fixed striped">
 				<thead>
 					<tr>
 						<th>Person</th>
