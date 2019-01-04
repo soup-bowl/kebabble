@@ -38,9 +38,14 @@ class Slack extends botclient {
 	 * @param string      $message            Desired message to be displayed.
 	 * @param string|null $existing_timestamp If an existing timestamp is passed, that message is modified.
 	 * @param string|null $override_channel   Change the Slack channel, if desired.
+	 * @param string|null $thread_timestamp   Timestamp of a thread, if desired.
 	 * @return string Unique timestamp of the message, used for editing.
 	 */
-	public function send_message( string $message, ?string $existing_timestamp = null, ?string $override_channel = null ):string {
-		return $this->message( $message, ( ! empty( $existing_timestamp ) ) ? $existing_timestamp : false );
+	public function send_message( string $message, ?string $existing_timestamp = null, ?string $override_channel = null, ?string $thread_timestamp = null ):string {
+		return $this->message(
+			$message,
+			( ! empty( $existing_timestamp ) ) ? $existing_timestamp : false,
+			( ! empty( $thread_timestamp ) ) ? $thread_timestamp : false
+		);
 	}
 }
