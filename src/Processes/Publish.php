@@ -23,28 +23,28 @@ use WP_Post;
  */
 class Publish {
 	/**
-	 * Slack API communication handler.
-	 *
-	 * @var Slack
-	 */
-	protected $slack;
-
-	/**
 	 * Stores and retrieves order data.
 	 *
 	 * @var Orderstore
 	 */
 	protected $orderstore;
+	
+	/**
+	 * Pre-processing before publishing.
+	 *
+	 * @var Formatting
+	 */
+	protected $formatting;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param Slack      $slack      Slack API communication handler.
 	 * @param Orderstore $orderstore Stores and retrieves order data.
+	 * @param Formatting $formatting Pre-processing before publishing.
 	 */
-	public function __construct( Slack $slack, Orderstore $orderstore ) {
-		$this->slack      = $slack;
+	public function __construct( Orderstore $orderstore, Formatting $formatting ) {
 		$this->orderstore = $orderstore;
+		$this->formatting = $formatting;
 	}
 
 	/**
@@ -62,17 +62,32 @@ class Publish {
 			$existing_message = get_post_meta( $post_ID, 'kebabble-slack-ts', true );
 			$existing_channel = get_post_meta( $post_ID, 'kebabble-slack-channel', true );
 			
+			$slack = new Slack( $existing_channel );
+			
 			$timestamp = null;
 			if ( $order_details['override']['enabled'] ) {
-				$timestamp = $this->slack->send_custom_message( $order_details['override']['message'], $existing_message, $existing_channel );
+				$timestamp = $slack->send_message( $order_details['override']['message'], $existing_message, $existing_channel );
 			} else {
-				$timestamp = $this->slack->send_order( $post_ID, $order_details, $existing_message, $existing_channel );
+				$timestamp = $slack->send_message(
+					$this->formatting->status(
+						$post_ID,
+						$order_details['food'],
+						$order_details['order'],
+						$order_details['driver'],
+						(int) $order_details['tax'],
+						Carbon::parse( get_the_date( 'Y-m-d H:i:s', $post_ID ) ),
+						( is_array( $order_details['payment'] ) ) ? $order_details['payment'] : [ $order_details['payment'] ],
+						$order_details['paymentLink']
+					),
+					$existing_message,
+					$existing_channel
+				);
 			}
 
 			if ( $order_details['pin'] ) {
-				$this->slack->bot()->pin( $timestamp );
+				$slack->pin( $timestamp );
 			} else {
-				$this->slack->bot()->unpin( $timestamp );
+				$slack->unpin( $timestamp );
 			}
 
 			if ( empty( $existing_message ) ) {

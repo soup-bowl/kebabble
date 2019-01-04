@@ -4,6 +4,8 @@ Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versio
 ## Unreleased
 ### Added
 - Optional Slack-based simple order management. Currently add-only.
+### Changed
+- Slack communications are handled differently, to hopefully smooth things later.
 ### Fixed
 - Fixed a bug where enabling order pullthrough on an empty install caused an exception.
 
