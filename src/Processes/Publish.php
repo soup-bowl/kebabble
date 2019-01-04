@@ -61,13 +61,18 @@ class Publish {
 
 			$existing_message = get_post_meta( $post_ID, 'kebabble-slack-ts', true );
 			$existing_channel = get_post_meta( $post_ID, 'kebabble-slack-channel', true );
-
-			$timestamp = $this->slack->send_to_slack( $post_ID, $order_details, $existing_message, $existing_channel );
+			
+			$timestamp = null;
+			if ( $order_details['override']['enabled'] ) {
+				$timestamp = $this->slack->send_custom_message( $order_details['override']['message'], $existing_message, $existing_channel );
+			} else {
+				$timestamp = $this->slack->send_order( $post_ID, $order_details, $existing_message, $existing_channel );
+			}
 
 			if ( $order_details['pin'] ) {
-				$this->slack->slack->pin( $timestamp );
+				$this->slack->bot()->pin( $timestamp );
 			} else {
-				$this->slack->slack->unpin( $timestamp );
+				$this->slack->bot()->unpin( $timestamp );
 			}
 
 			if ( empty( $existing_message ) ) {

@@ -56,7 +56,7 @@ class Delete {
 		$existing_message = get_post_meta( $post_ID, 'kebabble-slack-ts', true );
 		$existing_channel = get_post_meta( $post_ID, 'kebabble-slack-channel', true );
 
-		$this->slack->slack->deleteMessage( $existing_message, $existing_channel );
+		$this->slack->bot()->deleteMessage( $existing_message, $existing_channel );
 
 		add_post_meta( $post_ID, 'kebabble-slack-deleted', true, true );
 	}
@@ -71,14 +71,19 @@ class Delete {
 		$post_obj = get_post( $post_ID );
 		$post_adt = $this->orderstore->get( $post_ID );
 
-		$timestamp = $this->slack->send_to_slack( $post_ID, $post_adt );
+		$timestamp = null;
+		if ( $post_adt['override']['enabled'] ) {
+			$timestamp = $this->slack->send_custom_message( $post_adt['override']['message'] );
+		} else {
+			$timestamp = $this->slack->send_order( $post_ID, $post_adt );
+		}
 
 		update_post_meta( $post_ID, 'kebabble-slack-ts', $timestamp );
 
 		if ( $post_adt['pin'] ) {
-			$this->slack->slack->pin( $timestamp );
+			$this->slack->bot()->pin( $timestamp );
 		} else {
-			$this->slack->slack->unpin( $timestamp );
+			$this->slack->bot()->unpin( $timestamp );
 		}
 	}
 }

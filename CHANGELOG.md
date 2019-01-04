@@ -2,6 +2,8 @@
 Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Added
+- Optional Slack-based simple order management. Currently add-only.
 ### Fixed
 - Fixed a bug where enabling order pullthrough on an empty install caused an exception.
 
