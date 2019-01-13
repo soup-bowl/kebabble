@@ -124,7 +124,7 @@ class Mention {
 		$this->publish->handle_publish( $order_obj, false );
 		$slack->react( $timestamp );
 
-		$slack->send_message( "```\n" . var_export($order_items, true) . "\n```", null, $channel );
+		//$slack->send_message( "```\n" . var_export($order_items, true) . "\n```", null, $channel );
 		//$slack->send_message( ':x: I couldn\'t determine your order. Please try again or ask me for help.', null, $channel );
 	}
 	
