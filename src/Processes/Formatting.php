@@ -117,7 +117,12 @@ class Formatting {
 					$cost_tax       = $cost_tax + $tax;
 					$people_taxed[] = $person;
 				}
-				$content     .= "{$person}, ";
+				if (strpos($person, 'SLACK_') !== false) {
+					$slack_conv = str_replace( 'SLACK_', '', $person );
+					$content .= "<@{$slack_conv}>, ";
+				} else {
+					$content .= "{$person}, ";	
+				}
 				$cost_overall = $cost_overall + $cost_item;
 			}
 			$content  = substr( $content, 0, -2 );

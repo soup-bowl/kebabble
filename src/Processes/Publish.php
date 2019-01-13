@@ -46,7 +46,7 @@ class Publish {
 		$this->orderstore = $orderstore;
 		$this->formatting = $formatting;
 	}
-
+	
 	/**
 	 * Hooks on to the order publish process.
 	 *
@@ -54,13 +54,23 @@ class Publish {
 	 * @param WP_Post $post_obj Whole post object.
 	 * @return void
 	 */
-	public function handle_publish( int $post_ID, WP_Post $post_obj ):void {
-		// I'm sure there's a million better ways to do this, but for now it suffices.
-		if ( empty( get_post_meta( $post_ID, 'kebabble-slack-deleted', true ) ) ) {
-			$order_details = $this->orderstore->set( $post_ID );
+	public function hook_handle_publish( int $post_ID, WP_Post $post_obj ):void {
+		$this->handle_publish( $post_obj, true );
+	}
 
-			$existing_message = get_post_meta( $post_ID, 'kebabble-slack-ts', true );
-			$existing_channel = get_post_meta( $post_ID, 'kebabble-slack-channel', true );
+	/**
+	 * Post-process handling and formatting for the message.
+	 *
+	 * @param WP_Post $post_obj Whole post object.
+	 * @return void
+	 */
+	public function handle_publish( WP_Post $post_obj, bool $set_order = true ):void {
+		// I'm sure there's a million better ways to do this, but for now it suffices.
+		if ( empty( get_post_meta( $post_obj->ID, 'kebabble-slack-deleted', true ) ) ) {
+			$order_details = ( $set_order ) ? $this->orderstore->set( $post_obj->ID ) : $this->orderstore->get( $post_obj->ID );
+
+			$existing_message = get_post_meta( $post_obj->ID, 'kebabble-slack-ts', true );
+			$existing_channel = get_post_meta( $post_obj->ID, 'kebabble-slack-channel', true );
 			
 			$slack = new Slack( $existing_channel );
 			
@@ -70,12 +80,12 @@ class Publish {
 			} else {
 				$timestamp = $slack->send_message(
 					$this->formatting->status(
-						$post_ID,
+						$post_obj->ID,
 						$order_details['food'],
 						$order_details['order'],
 						$order_details['driver'],
 						(int) $order_details['tax'],
-						Carbon::parse( get_the_date( 'Y-m-d H:i:s', $post_ID ) ),
+						Carbon::parse( get_the_date( 'Y-m-d H:i:s', $post_obj->ID ) ),
 						( is_array( $order_details['payment'] ) ) ? $order_details['payment'] : [ $order_details['payment'] ],
 						$order_details['paymentLink']
 					),
@@ -91,11 +101,11 @@ class Publish {
 			}
 
 			if ( empty( $existing_message ) ) {
-				add_post_meta( $post_ID, 'kebabble-slack-ts', $timestamp, true );
-				add_post_meta( $post_ID, 'kebabble-slack-channel', get_option( 'kbfos_settings' )['kbfos_botchannel'], true );
+				add_post_meta( $post_obj->ID, 'kebabble-slack-ts', $timestamp, true );
+				add_post_meta( $post_obj->ID, 'kebabble-slack-channel', get_option( 'kbfos_settings' )['kbfos_botchannel'], true );
 			}
 		} else {
-			delete_post_meta( $post_ID, 'kebabble-slack-deleted' );
+			delete_post_meta( $post_obj->ID, 'kebabble-slack-deleted' );
 		}
 	}
 

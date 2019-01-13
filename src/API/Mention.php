@@ -10,6 +10,8 @@
 namespace Kebabble\API;
 
 use Kebabble\Library\Slack;
+use Kebabble\Processes\Meta\Orderstore;
+use Kebabble\Processes\Publish;
 
 use WP_Post;
 use WP_REST_Request;
@@ -18,6 +20,25 @@ use WP_REST_Request;
  * Handles Slack mentions, and processes the contents for relevant information.
  */
 class Mention {
+	/**
+	 * Stores and retrieves order data.
+	 *
+	 * @var Orderstore
+	 */
+	protected $orderstore;
+
+	protected $publish;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param Orderstore $orderstore Stores and retrieves order data.
+	 */
+	public function __construct( Orderstore $orderstore, Publish $publish ) {
+		$this->orderstore = $orderstore;
+		$this->publish    = $publish;
+	}
+
 	/**
 	 * Initial function for the Slack Events segment of the API.
 	 *
@@ -49,6 +70,7 @@ class Mention {
 	private function process_input_request( string $user, string $request, string $timestamp, string $channel ):void {
 		$order_obj = $this->get_latest_order();
 		$place     = wp_get_object_terms( $order_obj->ID, 'kebabble_company' )[0];
+		$order     = $this->orderstore->get( $order_obj->ID );
 		$slack     = new Slack();
 		
 		// Friendly message to Kebabble? Also useful as a quick hello-world test.
@@ -56,18 +78,53 @@ class Mention {
 			$slack->send_message( $this->help_message( $user ), null, $channel, $timestamp );
 			return;
 		}
-		
+
 		// Split up the presence of commas, and remove the @kebabble call. A better way would be appreciated.
 		$message_split       = explode( ',', str_replace( '<>', '', preg_replace( '/@\w+/', '', strtolower( $request ) ) ) );
 		//$message_split_count = count( $message_split );
 		
-		$message = [];
+		$messages = [];
 		foreach ( $message_split as $message_segment ) {
-			$message[] = $this->decipher_order( $message_segment, ['kebab roll'] );
+			$messages[] = $this->decipher_order( $message_segment, ['kebab roll'] );
 		}
+
+		$order_items = $order['order'];
+		$order_count = count( $order['order'] );
+		// Each segment of a multiple request. Normally only one.
+		foreach ( $messages as $message ) {
+			$name = ( $message['for'] === 'me' ) ? "SLACK_{$user}" : $message['for'];
+			// Iterate through existing order, check for duplicates and removals.
+			$already_removed = false;
+			for ( $i = 0; $i < $order_count; $i++ ) {
+				error_log( "{$i} of {$order_count}" );
+				switch ( $message['operator'] ) {
+					default:
+					case 'add':
+						if ( ( $i + 1 ) === $order_count ) {
+							$order_items[] = [
+								'person' => $name,
+								'food'   => $message['item']
+							];
+						}
+						break;
+					case 'remove':
+						if ( strtolower( $order_items[$i]['person'] ) === strtolower( $name ) && ! $already_removed ) {
+							unset( $order_items[$i] );
+							$already_removed = true;
+						}
+						break;
+				}
+			}
+		}
+
+		unset( $order['order'] );
+		$order['order'] = array_values( $order_items );
 		
-		$slack->send_message( "```\n" . var_export($message, true) . "\n```", null, $channel );
-		
+		$this->orderstore->update( $order_obj->ID, $order );
+		$this->publish->handle_publish( $order_obj, false );
+		$slack->react( $timestamp );
+
+		$slack->send_message( "```\n" . var_export($order_items, true) . "\n```", null, $channel );
 		//$slack->send_message( ':x: I couldn\'t determine your order. Please try again or ask me for help.', null, $channel );
 	}
 	

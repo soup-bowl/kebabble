@@ -125,7 +125,7 @@ class Hooks {
 		add_action( 'admin_enqueue_scripts', [ &$this, 'enqueued_scripts' ] );
 
 		// Order functionality.
-		add_action( 'publish_kebabble_orders', [ &$this->publish, 'handle_publish' ], 10, 2 );
+		add_action( 'publish_kebabble_orders', [ &$this->publish, 'hook_handle_publish' ], 10, 2 );
 		add_filter( 'wp_insert_post_data', [ &$this->publish, 'change_title' ], 99, 2 );
 		add_action( 'trash_kebabble_orders', [ &$this->delete, 'handle_deletion' ], 10, 2 );
 		add_action( 'untrash_post', [ &$this->delete, 'handle_undeletion' ], 10, 2 );
