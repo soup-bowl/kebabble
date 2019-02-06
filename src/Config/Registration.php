@@ -67,6 +67,7 @@ class Registration {
 				'public'       => false,
 				'show_ui'      => true,
 				'show_in_menu' => true,
+				'meta_box_cb'  => false,
 			]
 		);
 	}

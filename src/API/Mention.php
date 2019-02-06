@@ -69,7 +69,7 @@ class Mention {
 	 */
 	private function process_input_request( string $user, string $request, string $timestamp, string $channel ):void {
 		$order_obj = $this->get_latest_order();
-		$place     = wp_get_object_terms( $order_obj->ID, 'kebabble_company' )[0];
+		$place     = wp_get_object_terms( $order_obj->ID, 'kebabble_company' )[0]; // Returns NULL if no company.
 		$order     = $this->orderstore->get( $order_obj->ID );
 		$slack     = new Slack();
 		
@@ -80,12 +80,14 @@ class Mention {
 		}
 
 		// Split up the presence of commas, and remove the @kebabble call. A better way would be appreciated.
-		$message_split       = explode( ',', str_replace( '<>', '', preg_replace( '/@\w+/', '', strtolower( $request ) ) ) );
-		//$message_split_count = count( $message_split );
-		
+		$message_split = explode( ',', str_replace( '<>', '', preg_replace( '/@\w+/', '', strtolower( $request ) ) ) );
+
 		$messages = [];
 		foreach ( $message_split as $message_segment ) {
-			$messages[] = $this->decipher_order( $message_segment, ['kebab roll'] );
+			$messages[] = $this->decipher_order(
+				$message_segment,
+				( isset( $place ) ) ? $this->get_potentials( $place->term_id ) : []
+			);
 		}
 
 		$order_items = $order['order'];
@@ -202,6 +204,7 @@ class Mention {
 	 * @return string Pre-formatted for Slack.
 	 */
 	private function help_message( string $user ):string {
+		return $this->get_potentials( 2 );
 		return "Hello, <@{$user}>! To help me help you, you can do the following:
 		• To order a kebab, mention the name of a known food item.
 		• To remove your order, say 'remove' before your food item.
@@ -209,5 +212,22 @@ class Mention {
 		• To process many in one comment, separate with commas.\n
 		I will respond with a :thumbsup: if I've added your order, or I'll message back if a problem occurs. Don't forget to @kebabble me!
 		";
+	}
+
+	/**
+	 * Collects an array of menu items listed against the provided company.
+	 *
+	 * @param int $company_id Company meta ID to obtain details from.
+	 * @return array
+	 */
+	private function get_potentials( int $company_id ):array {
+		$menu  = get_term_meta( $company_id, 'kebabble_ordpri', true );
+		$items = [];
+
+		foreach ( $menu as $food => $extra ) {
+			$items[] = $food;
+		}
+
+		return $items;
 	}
 }
