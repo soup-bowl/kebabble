@@ -204,7 +204,6 @@ class Mention {
 	 * @return string Pre-formatted for Slack.
 	 */
 	private function help_message( string $user ):string {
-		return $this->get_potentials( 2 );
 		return "Hello, <@{$user}>! To help me help you, you can do the following:
 		• To order a kebab, mention the name of a known food item.
 		• To remove your order, say 'remove' before your food item.
