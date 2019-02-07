@@ -27,12 +27,18 @@ class Mention {
 	 */
 	protected $orderstore;
 
+	/**
+	 * Handles the communication with the WordPress post.
+	 *
+	 * @var Publish
+	 */
 	protected $publish;
 
 	/**
 	 * Constructor.
 	 *
 	 * @param Orderstore $orderstore Stores and retrieves order data.
+	 * @param Publish    $publish    Handles the communication with the WordPress post.
 	 */
 	public function __construct( Orderstore $orderstore, Publish $publish ) {
 		$this->orderstore = $orderstore;
@@ -48,7 +54,7 @@ class Mention {
 	public function main( WP_REST_Request $request ):array {
 		// First setup verification.
 		if ( ! empty( $request['challenge'] ) ) {
-			return ['challenge' => $request['challenge']];
+			return [ 'challenge' => $request['challenge'] ];
 		}
 
 		if ( ! empty( $request['event'] ) ) {
@@ -60,19 +66,19 @@ class Mention {
 	/**
 	 * Processes the request contents and modifies the order accordingly.
 	 *
-	 * @todo Filter custom message more efficiently. 
-	 * @param string $user      TBA.
-	 * @param string $request   TBA.
-	 * @param string $timestamp TBA.
-	 * @param string $channel   TBA.
-	 * @return void
+	 * @todo Filter custom message more efficiently.
+	 * @param string $user      Slack user code.
+	 * @param string $request   The whole message string that's been sent to our bot.
+	 * @param string $timestamp Message timestamp.
+	 * @param string $channel   Slack channel of communications.
+	 * @return void Choices reflect on the current post and the Slack channel.
 	 */
 	private function process_input_request( string $user, string $request, string $timestamp, string $channel ):void {
 		$order_obj = $this->get_latest_order();
-		$place     = wp_get_object_terms( $order_obj->ID, 'kebabble_company' )[0]; // Returns NULL if no company.
+		$place     = wp_get_object_terms( $order_obj->ID, 'kebabble_company' )[0];
 		$order     = $this->orderstore->get( $order_obj->ID );
 		$slack     = new Slack();
-		
+
 		// Friendly message to Kebabble? Also useful as a quick hello-world test.
 		if ( strpos( strtolower( $request ), 'help' ) !== false ) {
 			$slack->send_message( $this->help_message( $user ), null, $channel, $timestamp );
@@ -100,7 +106,7 @@ class Mention {
 				continue;
 			}
 
-			$name = ( $message['for'] === 'me' ) ? "SLACK_{$user}" : $message['for'];
+			$name = ( 'me' === $message['for'] ) ? "SLACK_{$user}" : $message['for'];
 			// Iterate through existing order, check for duplicates and removals.
 			$already_removed = false;
 			for ( $i = 0; $i < $order_count; $i++ ) {
@@ -111,13 +117,13 @@ class Mention {
 						if ( ( $i + 1 ) === $order_count ) {
 							$order_items[] = [
 								'person' => $name,
-								'food'   => $message['item']
+								'food'   => $message['item'],
 							];
 						}
 						break;
 					case 'remove':
-						if ( strtolower( $order_items[$i]['person'] ) === strtolower( $name ) && ! $already_removed ) {
-							unset( $order_items[$i] );
+						if ( strtolower( $order_items[ $i ]['person'] ) === strtolower( $name ) && ! $already_removed ) {
+							unset( $order_items[ $i ] );
 							$already_removed = true;
 						}
 						break;
@@ -125,7 +131,7 @@ class Mention {
 				$success_count++;
 			}
 		}
-		
+
 		if ( $success_count > 0 ) {
 			unset( $order['order'] );
 			$order['order'] = array_values( $order_items );
@@ -137,9 +143,9 @@ class Mention {
 			$slack->send_message( ':x: I couldn\'t determine your order. Please try again or ask me for help.', null, $channel );
 		}
 
-		//$slack->send_message( "```\n" . var_export($messages, true) . "\n```", null, $channel );
+		// $slack->send_message( "```\n" . var_export($messages, true) . "\n```", null, $channel );
 	}
-	
+
 	/**
 	 * Processes the response and attempts to decipher what the contactee wants.
 	 *
@@ -154,7 +160,7 @@ class Mention {
 		$ops = [
 			'operator' => 'add',
 			'item'     => null,
-			'for'      => 'me'
+			'for'      => 'me',
 		];
 
 		// Attempt to work out the item.
@@ -163,10 +169,10 @@ class Mention {
 				$ops['item'] = $potential;
 			}
 		}
-		
+
 		// now for the operator, and if this is for someone else.
 		for ( $i = 0; $i < $segment_split_count; $i++ ) {
-			switch( $segment_split[$i] ) {
+			switch ( $segment_split[ $i ] ) {
 				case 'no':
 				case 'delete':
 				case 'remove':
@@ -175,12 +181,12 @@ class Mention {
 					$ops['operator'] = 'remove';
 					break;
 				case 'for':
-					$ops['for'] = $segment_split[($i + 1)];
+					$ops['for'] = $segment_split[ ( $i + 1 ) ];
 					break;
 			}
 		}
 
-		if ( isset ( $ops['item'] ) ) {
+		if ( isset( $ops['item'] ) ) {
 			return $ops;
 		} else {
 			return null;
@@ -193,20 +199,22 @@ class Mention {
 	 * @return WP_Post|null
 	 */
 	private function get_latest_order():?WP_Post {
-		$order = get_posts([
-			'post_type'      => 'kebabble_orders',
-			'post_status'    => 'publish',
-			'posts_per_page' => 1,
-			'orderby'        => 'date',
-			'order'          => 'DESC',
-			'meta_query'     => [
-				[
-					'key'     => 'kebabble-order',
-					'value'   => '"override":{"enabled":false',
-					'compare' => 'LIKE'
-				]
+		$order = get_posts(
+			[
+				'post_type'      => 'kebabble_orders',
+				'post_status'    => 'publish',
+				'posts_per_page' => 1,
+				'orderby'        => 'date',
+				'order'          => 'DESC',
+				'meta_query'     => [
+					[
+						'key'     => 'kebabble-order',
+						'value'   => '"override":{"enabled":false',
+						'compare' => 'LIKE',
+					],
+				],
 			]
-		]);
+		);
 
 		if ( ! empty( $order ) ) {
 			return $order[0];
