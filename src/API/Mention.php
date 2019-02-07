@@ -167,7 +167,11 @@ class Mention {
 		// now for the operator, and if this is for someone else.
 		for ( $i = 0; $i < $segment_split_count; $i++ ) {
 			switch( $segment_split[$i] ) {
+				case 'no':
+				case 'delete':
 				case 'remove':
+				case 'x':
+				case '-':
 					$ops['operator'] = 'remove';
 					break;
 				case 'for':
