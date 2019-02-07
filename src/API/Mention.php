@@ -90,10 +90,16 @@ class Mention {
 			);
 		}
 
-		$order_items = $order['order'];
-		$order_count = count( $order['order'] );
+		$order_items   = $order['order'];
+		$order_count   = count( $order['order'] );
+		$success_count = 0;
 		// Each segment of a multiple request. Normally only one.
 		foreach ( $messages as $message ) {
+			if ( empty( $message ) ) {
+				$slack->react( $timestamp, 'question' );
+				continue;
+			}
+
 			$name = ( $message['for'] === 'me' ) ? "SLACK_{$user}" : $message['for'];
 			// Iterate through existing order, check for duplicates and removals.
 			$already_removed = false;
@@ -116,18 +122,22 @@ class Mention {
 						}
 						break;
 				}
+				$success_count++;
 			}
 		}
-
-		unset( $order['order'] );
-		$order['order'] = array_values( $order_items );
 		
-		$this->orderstore->update( $order_obj->ID, $order );
-		$this->publish->handle_publish( $order_obj, false );
-		$slack->react( $timestamp );
+		if ( $success_count > 0 ) {
+			unset( $order['order'] );
+			$order['order'] = array_values( $order_items );
 
-		//$slack->send_message( "```\n" . var_export($order_items, true) . "\n```", null, $channel );
-		//$slack->send_message( ':x: I couldn\'t determine your order. Please try again or ask me for help.', null, $channel );
+			$this->orderstore->update( $order_obj->ID, $order );
+			$this->publish->handle_publish( $order_obj, false );
+			$slack->react( $timestamp );
+		} else {
+			$slack->send_message( ':x: I couldn\'t determine your order. Please try again or ask me for help.', null, $channel );
+		}
+
+		//$slack->send_message( "```\n" . var_export($messages, true) . "\n```", null, $channel );
 	}
 	
 	/**
@@ -135,9 +145,9 @@ class Mention {
 	 *
 	 * @param string $segment    Request string (split multi-request prior to input).
 	 * @param array  $potentials Simple array of all detectable options.
-	 * @return array Collection of arrays, with params 'operator', 'item' and 'for'.
+	 * @return array|null Collection of arrays, with params 'operator', 'item' and 'for'.
 	 */
-	private function decipher_order( string $segment, array $potentials ):array {
+	private function decipher_order( string $segment, array $potentials ):?array {
 		$segment_split       = explode( ' ', $segment );
 		$segment_split_count = count( $segment_split );
 
@@ -166,7 +176,11 @@ class Mention {
 			}
 		}
 
-		return $ops;
+		if ( isset ( $ops['item'] ) ) {
+			return $ops;
+		} else {
+			return null;
+		}
 	}
 
 	/**
