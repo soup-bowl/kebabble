@@ -12,6 +12,7 @@ namespace Kebabble\API;
 use Kebabble\Library\Slack;
 use Kebabble\Processes\Meta\Orderstore;
 use Kebabble\Processes\Publish;
+use Kebabble\Library\Money;
 
 use WP_Post;
 use WP_REST_Request;
@@ -35,14 +36,23 @@ class Mention {
 	protected $publish;
 
 	/**
+	 * Formattings money representations.
+	 *
+	 * @var Money
+	 */
+	protected $money;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param Orderstore $orderstore Stores and retrieves order data.
 	 * @param Publish    $publish    Handles the communication with the WordPress post.
+	 * @param Money      $money      Formattings money representations.
 	 */
-	public function __construct( Orderstore $orderstore, Publish $publish ) {
+	public function __construct( Orderstore $orderstore, Publish $publish, Money $money ) {
 		$this->orderstore = $orderstore;
 		$this->publish    = $publish;
+		$this->money      = $money;
 	}
 
 	/**
@@ -82,6 +92,11 @@ class Mention {
 		// Friendly message to Kebabble? Also useful as a quick hello-world test.
 		if ( strpos( strtolower( $request ), 'help' ) !== false ) {
 			$slack->send_message( $this->help_message( $user ), null, $channel, $timestamp );
+			return;
+		}
+		
+		if ( strpos( strtolower( $request ), 'menu' ) !== false ) {
+			$slack->send_message( $this->menu( $place->term_id ), null, $channel, $timestamp );
 			return;
 		}
 
@@ -237,6 +252,30 @@ class Mention {
 		• To process many in one comment, separate with commas.\n
 		I will respond with a :thumbsup: if I've added your order, or I'll message back if a problem occurs. Don't forget to @kebabble me!
 		";
+	}
+
+	/**
+	 * Generates a simple menu of items ready for automatic parsing.
+	 *
+	 * @param int|null $company_id Company to collect the list from.
+	 * @return string
+	 */
+	private function menu( ?int $company_id = null ):string {
+		$menu = get_term_meta( $company_id, 'kebabble_ordpri', true );
+		
+		if ( isset( $menu ) && false !== $menu ) {
+			$items = '';
+			foreach ( $menu as $food => $extra ) {
+				$items .= sprintf( '*%1$s* %2$s', $food, $this->money->output( $extra['Price'] ) ) . PHP_EOL;
+			}
+
+			return sprintf(
+				"I'm currently aware of the following menu items:\n\n%s\n\nMention one of these (@kebabble add/remove item) and I will handle it for you!",
+				$items
+			);
+		} else {
+			return ":disappointed: Drat, I don't know this place! Let the order manager know instead.";
+		}
 	}
 
 	/**
