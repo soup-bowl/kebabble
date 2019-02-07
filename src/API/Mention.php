@@ -145,6 +145,15 @@ class Mention {
 				}
 				$success_count++;
 			}
+			
+			if ( 0 === $order_count && 'add' === $message['operator'] ) {
+				error_log('No existing orders, first one added.');
+				$order_items[] = [
+					'person' => $name,
+					'food'   => $message['item'],
+				];
+				$success_count++;
+			}
 		}
 
 		if ( $success_count > 0 ) {
@@ -158,7 +167,7 @@ class Mention {
 			$slack->send_message( ':x: I couldn\'t determine your order. Please try again or ask me for help.', null, $channel );
 		}
 
-		// $slack->send_message( "```\n" . var_export($messages, true) . "\n```", null, $channel );
+		//$slack->send_message( "```\n" . var_export($messages, true) . "\n```", null, $channel );
 	}
 
 	/**
@@ -196,7 +205,7 @@ class Mention {
 					$ops['operator'] = 'remove';
 					break;
 				case 'for':
-					$ops['for'] = $segment_split[ ( $i + 1 ) ];
+					$ops['for'] = ucfirst( $segment_split[ ( $i + 1 ) ] );
 					break;
 			}
 		}
