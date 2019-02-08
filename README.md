@@ -11,8 +11,6 @@ project anyway.
 [![forthebadge][F2]][FU]
 [![forthebadge][F3]][FU]
 
-*This is a development branch. Please switch to Master for the mainline release*
-
 ## Requirements
 * PHP 7.2 or higher.
 * WordPress 4 or higher.
