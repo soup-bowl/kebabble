@@ -14,7 +14,7 @@ project anyway.
 *This is a development branch. Please switch to Master for the mainline release*
 
 ## Requirements
-* PHP 7 or higher (currently tested using PHP 7.2).
+* PHP 7.2 or higher.
 * WordPress 4 or higher.
 * Slack (admin needed for setup).
 
