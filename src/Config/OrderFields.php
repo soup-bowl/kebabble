@@ -50,17 +50,17 @@ class OrderFields {
 			'kebabbleorderdetails',
 			'Order',
 			function( $post ) use ( &$existing_order_details ) {
-				$this->custom_message_renderer( $post, $existing_order_details->existing );
+				$this->custom_message_renderer( $existing_order_details->existing );
 				?>
 				<div id="kebabbleOrder">
 					<input type="hidden" name="kebabbleNonce" value="<?php echo esc_attr( wp_create_nonce( 'kebabble_nonce' ) ); ?>">
 					<?php
-					$this->company_menu_selector( $post, ( ! empty( $existing_order_details->existing_company ) ) ? $existing_order_details->existing_company[0] : null );
-					$this->food_selection( $post, $existing_order_details->existing );
-					$this->order_input( $post, $existing_order_details->existing );
-					$this->driver_input( $post, $existing_order_details->existing );
-					$this->driver_tax_input( $post, $existing_order_details->existing );
-					$this->payment_options( $post, $existing_order_details->existing );
+					$this->company_menu_selector( ( ! empty( $existing_order_details->existing_company ) ) ? $existing_order_details->existing_company[0] : null );
+					$this->food_selection( $existing_order_details->existing );
+					$this->order_input( $existing_order_details->existing );
+					$this->driver_input( $existing_order_details->existing );
+					$this->driver_tax_input( $existing_order_details->existing );
+					$this->payment_options( $existing_order_details->existing );
 					?>
 				</div>
 				<?php
@@ -74,7 +74,7 @@ class OrderFields {
 			'kebabbleorderoverrides',
 			'Slack',
 			function( $post ) use ( &$existing_order_details ) {
-				$this->pin_status( $post, $existing_order_details->existing );
+				$this->pin_status( $existing_order_details->existing );
 
 				$c_output = get_post_meta( $post->ID, 'kebabble-slack-channel', true );
 				$channel  = ( empty( $c_output ) ) ? 'N/A' : $c_output;
@@ -94,11 +94,10 @@ class OrderFields {
 	/**
 	 * Input block for a custom override message.
 	 *
-	 * @param WP_Post    $post     The post object being created/edited.
 	 * @param array|null $existing Existing value (from orderstore) in the database.
 	 * @return void Constructs on page where called.
 	 */
-	public function custom_message_renderer( WP_Post $post, ?array $existing = null ):void {
+	public function custom_message_renderer( ?array $existing = null ):void {
 		$existing_contents = ( ! empty( $existing ) ) ? (object) $existing['override'] : false;
 		$enabled           = ( false !== $existing_contents && $existing_contents->enabled ) ? 'checked' : '';
 		$message           = ( ! empty( $existing_contents->message ) ) ? $existing_contents->message : '';
@@ -122,11 +121,10 @@ class OrderFields {
 	 * Select what resturant you're ordering from, if stored. Allows for price and
 	 * location information pullthroughs.
 	 *
-	 * @param WP_Post      $post     The post object being created/edited.
 	 * @param WP_Term|null $existing Existing values in the database.
 	 * @return void Prints on the page.
 	 */
-	public function company_menu_selector( WP_Post $post, ?WP_Term $existing = null ):void {
+	public function company_menu_selector( ?WP_Term $existing = null ):void {
 		$selected          = ( ! empty( $existing ) ) ? $existing->term_id : 0;
 		$options_available = get_terms(
 			[
@@ -156,11 +154,10 @@ class OrderFields {
 	/**
 	 * Shows a dropdown menu with all available food-type selections.
 	 *
-	 * @param WP_Post    $post     The post object being created/edited.
 	 * @param array|null $existing Existing value (from orderstore) in the database.
 	 * @return void Constructs on page where called.
 	 */
-	public function food_selection( WP_Post $post, ?array $existing = null ):void {
+	public function food_selection( ?array $existing = null ):void {
 		$selected = ( ! empty( $existing ) ) ? $existing['food'] : '';
 		$options  = [ 'Kebab', 'Pizza', 'Burger', 'Resturant', 'Event', 'Other' ];
 
@@ -185,11 +182,10 @@ class OrderFields {
 	/**
 	 * Creates a monospaced order input form.
 	 *
-	 * @param WP_Post    $post      The post object being created/edited.
 	 * @param array|null $existings Existing value (from orderstore) in the database.
 	 * @return void Constructs on page where called.
 	 */
-	public function order_input( WP_Post $post, ?array $existings = null ):void {
+	public function order_input( ?array $existings = null ):void {
 		$existings = ( ! empty( $existings ) ) ? $existings['order'] : '';
 		?>
 		<div>
@@ -224,11 +220,10 @@ class OrderFields {
 	/**
 	 * Field for allocating the driver.
 	 *
-	 * @param WP_Post    $post     The post object being created/edited.
 	 * @param array|null $existing Existing value (from orderstore) in the database.
 	 * @return void Constructs on page where called.
 	 */
-	public function driver_input( WP_Post $post, ?array $existing = null ) {
+	public function driver_input( ?array $existing = null ) {
 		$existing = ( ! empty( $existing ) ) ? $existing['driver'] : '';
 		?>
 		<div>
@@ -241,11 +236,10 @@ class OrderFields {
 	/**
 	 * Allows the orderer to specify a per-person tax, if desired.
 	 *
-	 * @param WP_Post    $post     The post object being created/edited.
 	 * @param array|null $existing Existing value (from orderstore) in the database.
 	 * @return void Constructs on page where called.
 	 */
-	public function driver_tax_input( WP_Post $post, ?array $existing = null ):void {
+	public function driver_tax_input( ?array $existing = null ):void {
 		$existing = ( ! empty( $existing ) ) ? $existing['tax'] : '';
 		?>
 		<div>
@@ -258,11 +252,10 @@ class OrderFields {
 	/**
 	 * Shows an inline list of all the payment options the driver accepts.
 	 *
-	 * @param WP_Post    $post     The post object being created/edited.
 	 * @param array|null $existing Existing value (from orderstore) in the database.
 	 * @return void Constructs on page where called.
 	 */
-	public function payment_options( WP_Post $post, ?array $existing = null ):void {
+	public function payment_options( ?array $existing = null ):void {
 		$existing_pm = ( ! empty( $existing ) ) ? $existing['payment'] : '';
 		$existing_pl = ( ! empty( $existing ) ) ? $existing['paymentLink'] : [];
 		$opts        = get_option( 'kbfos_settings' );
@@ -293,11 +286,10 @@ class OrderFields {
 	/**
 	 * Slack-specific checkbox to pin the message to the chat.
 	 *
-	 * @param WP_Post    $post     The post object being created/edited.
 	 * @param array|null $existing Existing value (from orderstore) in the database.
 	 * @return void Constructs on page where called.
 	 */
-	public function pin_status( WP_Post $post, ?array $existing = null ):void {
+	public function pin_status( ?array $existing = null ):void {
 		$existing = ( ! empty( $existing ) ) ? $existing['pin'] : false;
 		?>
 		<div>
