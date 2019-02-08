@@ -58,7 +58,7 @@ class Formatting {
 			"{$slack_emoji} *{$food} {$date->format('l')}{$loc_str} ({$date->format('jS F')})* {$slack_emoji}",
 			'*Orders*',
 			$order,
-			"Polling @channel for orders. Today's driver is *{$driver}* :car:",
+			"Polling <!here> for orders. Today's driver is *{$driver}* :car:",
 			( $tax > 0 ) ? ':pound: *Additional ' . $this->money->output( $tax ) . ' per person* to fund the driver.' : null,
 			$this->accepts_payment_formatter( $payments, $pay_opts ),
 		];
@@ -117,7 +117,12 @@ class Formatting {
 					$cost_tax       = $cost_tax + $tax;
 					$people_taxed[] = $person;
 				}
-				$content     .= "{$person}, ";
+				if (strpos($person, 'SLACK_') !== false) {
+					$slack_conv = str_replace( 'SLACK_', '', $person );
+					$content .= "<@{$slack_conv}>, ";
+				} else {
+					$content .= "{$person}, ";	
+				}
 				$cost_overall = $cost_overall + $cost_item;
 			}
 			$content  = substr( $content, 0, -2 );

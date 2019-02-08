@@ -23,30 +23,30 @@ use WP_Post;
  */
 class Publish {
 	/**
-	 * Slack API communication handler.
-	 *
-	 * @var Slack
-	 */
-	protected $slack;
-
-	/**
 	 * Stores and retrieves order data.
 	 *
 	 * @var Orderstore
 	 */
 	protected $orderstore;
+	
+	/**
+	 * Pre-processing before publishing.
+	 *
+	 * @var Formatting
+	 */
+	protected $formatting;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param Slack      $slack      Slack API communication handler.
 	 * @param Orderstore $orderstore Stores and retrieves order data.
+	 * @param Formatting $formatting Pre-processing before publishing.
 	 */
-	public function __construct( Slack $slack, Orderstore $orderstore ) {
-		$this->slack      = $slack;
+	public function __construct( Orderstore $orderstore, Formatting $formatting ) {
 		$this->orderstore = $orderstore;
+		$this->formatting = $formatting;
 	}
-
+	
 	/**
 	 * Hooks on to the order publish process.
 	 *
@@ -54,28 +54,58 @@ class Publish {
 	 * @param WP_Post $post_obj Whole post object.
 	 * @return void
 	 */
-	public function handle_publish( int $post_ID, WP_Post $post_obj ):void {
+	public function hook_handle_publish( int $post_ID, WP_Post $post_obj ):void {
+		$this->handle_publish( $post_obj, true );
+	}
+
+	/**
+	 * Post-process handling and formatting for the message.
+	 *
+	 * @param WP_Post $post_obj Whole post object.
+	 * @return void
+	 */
+	public function handle_publish( WP_Post $post_obj, bool $set_order = true ):void {
 		// I'm sure there's a million better ways to do this, but for now it suffices.
-		if ( empty( get_post_meta( $post_ID, 'kebabble-slack-deleted', true ) ) ) {
-			$order_details = $this->orderstore->set( $post_ID );
+		if ( empty( get_post_meta( $post_obj->ID, 'kebabble-slack-deleted', true ) ) ) {
+			$order_details = ( $set_order ) ? $this->orderstore->set( $post_obj->ID ) : $this->orderstore->get( $post_obj->ID );
 
-			$existing_message = get_post_meta( $post_ID, 'kebabble-slack-ts', true );
-			$existing_channel = get_post_meta( $post_ID, 'kebabble-slack-channel', true );
-
-			$timestamp = $this->slack->send_to_slack( $post_ID, $order_details, $existing_message, $existing_channel );
+			$existing_message = get_post_meta( $post_obj->ID, 'kebabble-slack-ts', true );
+			$existing_channel = get_post_meta( $post_obj->ID, 'kebabble-slack-channel', true );
+			
+			$slack = new Slack( $existing_channel );
+			
+			$timestamp = null;
+			if ( $order_details['override']['enabled'] ) {
+				$timestamp = $slack->send_message( $order_details['override']['message'], $existing_message, $existing_channel );
+			} else {
+				$timestamp = $slack->send_message(
+					$this->formatting->status(
+						$post_obj->ID,
+						$order_details['food'],
+						$order_details['order'],
+						$order_details['driver'],
+						(int) $order_details['tax'],
+						Carbon::parse( get_the_date( 'Y-m-d H:i:s', $post_obj->ID ) ),
+						( is_array( $order_details['payment'] ) ) ? $order_details['payment'] : [ $order_details['payment'] ],
+						$order_details['paymentLink']
+					),
+					$existing_message,
+					$existing_channel
+				);
+			}
 
 			if ( $order_details['pin'] ) {
-				$this->slack->slack->pin( $timestamp );
+				$slack->pin( $timestamp );
 			} else {
-				$this->slack->slack->unpin( $timestamp );
+				$slack->unpin( $timestamp );
 			}
 
 			if ( empty( $existing_message ) ) {
-				add_post_meta( $post_ID, 'kebabble-slack-ts', $timestamp, true );
-				add_post_meta( $post_ID, 'kebabble-slack-channel', get_option( 'kbfos_settings' )['kbfos_botchannel'], true );
+				add_post_meta( $post_obj->ID, 'kebabble-slack-ts', $timestamp, true );
+				add_post_meta( $post_obj->ID, 'kebabble-slack-channel', get_option( 'kbfos_settings' )['kbfos_botchannel'], true );
 			}
 		} else {
-			delete_post_meta( $post_ID, 'kebabble-slack-deleted' );
+			delete_post_meta( $post_obj->ID, 'kebabble-slack-deleted' );
 		}
 	}
 

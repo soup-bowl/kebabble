@@ -80,6 +80,10 @@ class Orderstore {
 		return $this->get( $post_id );
 	}
 
+	public function update( int $post_id, array $updated ) {
+		update_post_meta( $post_id, 'kebabble-order', wp_json_encode( $updated ) );
+	}
+
 	/**
 	 * Collates the dizzying array of values from the order page into easier to handle values.
 	 *

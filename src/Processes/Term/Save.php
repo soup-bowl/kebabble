@@ -24,7 +24,7 @@ class Save {
 			$foodstr = sanitize_text_field( wp_unslash( $_POST['ctOrderPricing'] ) );
 
 			update_term_meta( $term_id, 'kebabble_ordpri_org', $foodstr );
-			update_term_meta( $term_id, 'kebabble_ordpri', $this->parse_food_options( $foodstr ) );
+			update_term_meta( $term_id, 'kebabble_ordpri', ( ! empty( $foodstr ) ) ? $this->parse_food_options( $foodstr ) : null );
 		}
 	}
 

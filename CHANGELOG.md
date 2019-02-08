@@ -2,8 +2,12 @@
 Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Added
+- Support for slack bot communications, able to add and remove orders (#4).
+- Ask Kebabble for assistance and a menu for the active order company.
 ### Fixed
 - Fixed a bug where enabling order pullthrough on an empty install caused an exception.
+- Hidden the WordPress taxonomy box on order, since a custom entry was present.
 
 ## [0.2.2] - 2018-12-20
 (Due to human error, 0.2.1 was skipped).

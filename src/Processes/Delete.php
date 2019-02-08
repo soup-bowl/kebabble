@@ -21,13 +21,6 @@ use WP_Post;
  */
 class Delete {
 	/**
-	 * Slack API communication handler.
-	 *
-	 * @var Slack
-	 */
-	protected $slack;
-
-	/**
 	 * Stores and retrieves order data.
 	 *
 	 * @var Orderstore
@@ -35,14 +28,21 @@ class Delete {
 	protected $orderstore;
 
 	/**
+	 * Pre-processing before publishing.
+	 *
+	 * @var Formatting
+	 */
+	protected $formatting;
+
+	/**
 	 * Constructor.
 	 *
-	 * @param Slack      $slack      Slack API communication handler.
 	 * @param Orderstore $orderstore Stores and retrieves order data.
+	 * @param Formatting $formatting Pre-processing before publishing.
 	 */
-	public function __construct( Slack $slack, Orderstore $orderstore ) {
-		$this->slack      = $slack;
+	public function __construct( Orderstore $orderstore, Formatting $formatting ) {
 		$this->orderstore = $orderstore;
+		$this->formatting = $formatting;
 	}
 
 	/**
@@ -56,7 +56,7 @@ class Delete {
 		$existing_message = get_post_meta( $post_ID, 'kebabble-slack-ts', true );
 		$existing_channel = get_post_meta( $post_ID, 'kebabble-slack-channel', true );
 
-		$this->slack->slack->deleteMessage( $existing_message, $existing_channel );
+		( new Slack() )->deleteMessage( $existing_message, $existing_channel );
 
 		add_post_meta( $post_ID, 'kebabble-slack-deleted', true, true );
 	}
@@ -68,17 +68,33 @@ class Delete {
 	 * @return void Message is re-posted, and new TS stored.
 	 */
 	public function handle_undeletion( int $post_ID ):void {
-		$post_obj = get_post( $post_ID );
-		$post_adt = $this->orderstore->get( $post_ID );
+		$post_obj   = get_post( $post_ID );
+		$post_adt   = $this->orderstore->get( $post_ID );
+		
+		$slack = new Slack();
 
-		$timestamp = $this->slack->send_to_slack( $post_ID, $post_adt );
+		$timestamp = null;
+		if ( $post_adt['override']['enabled'] ) {
+			$timestamp = $slack->send_message( $post_adt['override']['message'] );
+		} else {
+			$timestamp = $slack->send_message( $this->formatting->status(
+				$post_ID,
+				$post_adt['food'],
+				$post_adt['order'],
+				$post_adt['driver'],
+				(int) $post_adt['tax'],
+				Carbon::parse( get_the_date( 'Y-m-d H:i:s', $post_ID ) ),
+				( is_array( $post_adt['payment'] ) ) ? $post_adt['payment'] : [ $post_adt['payment'] ],
+				$post_adt['paymentLink']
+			));
+		}
 
 		update_post_meta( $post_ID, 'kebabble-slack-ts', $timestamp );
 
 		if ( $post_adt['pin'] ) {
-			$this->slack->slack->pin( $timestamp );
+			$slack->pin( $timestamp );
 		} else {
-			$this->slack->slack->unpin( $timestamp );
+			$slack->unpin( $timestamp );
 		}
 	}
 }
