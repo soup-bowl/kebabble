@@ -1,15 +1,7 @@
 <?php
-add_action( 'login_enqueue_scripts', function() { ?>
-<style type="text/css">
-	#login h1 a, .login h1 a {
-		background-image: url( <?php echo trailingslashit( get_stylesheet_directory_uri() ); ?>kebabbleman.png);
-		height: 70px;
-		width: 100px;
-		padding-bottom: 30px;
-	}
-	#backtoblog { display:none; }
-</style>
-<?php });
+add_action( 'login_enqueue_scripts', function() {
+	wp_enqueue_style( 'notheme-login-style', trailingslashit( get_stylesheet_directory_uri() ) . 'admin.css' );
+});
 
 add_action( 'admin_menu', function() {
     remove_menu_page( 'edit.php' );
@@ -24,4 +16,15 @@ add_action( 'wp_dashboard_setup', function() {
 	unset( $wp_meta_boxes['dashboard']['side']['core']['dashboard_quick_press'] );
 	unset( $wp_meta_boxes['dashboard']['normal']['core']['dashboard_right_now'] );
 	unset( $wp_meta_boxes['dashboard']['normal']['core']['dashboard_activity'] );
+});
+
+add_action( 'wp_before_admin_bar_render', function() {
+	global $wp_admin_bar;
+
+    $wp_admin_bar->remove_menu( 'site-name' );
+    $wp_admin_bar->remove_menu( 'view-site' );
+    $wp_admin_bar->remove_menu( 'comments' );
+    $wp_admin_bar->remove_menu( 'new-post' );
+    $wp_admin_bar->remove_menu( 'new-media' );
+    $wp_admin_bar->remove_menu( 'new-page' );
 });

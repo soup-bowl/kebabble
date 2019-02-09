@@ -1,0 +1,10 @@
+#login h1 a, .login h1 a {
+	background-image: url(kebabbleman.png);
+	height: 70px;
+	width: 100px;
+	padding-bottom: 30px;
+}
+#backtoblog {
+	display:none;
+	
+}
