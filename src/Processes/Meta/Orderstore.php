@@ -54,18 +54,17 @@ class Orderstore {
 		}
 
 		$conf_array = [
-			'override'      => [
+			'override'    => [
 				'enabled' => empty( $response['kebabbleCustomMessageEnabled'] ) ? false : true,
-				'message' => $response['kebabbleCustomMessageEntry'],
+				'message' => ( isset( $response['kebabbleCustomMessageEntry'] ) ) ? $response['kebabbleCustomMessageEntry'] : null,
 			],
-			'food'          => $response['kebabbleOrderTypeSelection'],
-			'order'         => $this->order_list_collator( $response['korder_name'], $response['korder_food'] ),
-			'order_classic' => $response['kebabbleOrders'],
-			'driver'        => $response['kebabbleDriver'],
-			'tax'           => $response['kebabbleDriverTax'],
-			'payment'       => $response['paymentOpts'],
-			'paymentLink'   => [],
-			'pin'           => empty( $response['pinState'] ) ? false : true,
+			'food'        => $response['kebabbleOrderTypeSelection'],
+			'order'       => $this->order_list_collator( $response['korder_name'], $response['korder_food'] ),
+			'driver'      => ( isset( $response['kebabbleDriver'] ) ) ? $response['kebabbleDriver'] : null,
+			'tax'         => ( isset( $response['kebabbleDriverTax'] ) ) ? $response['kebabbleDriverTax'] : 0,
+			'payment'     => ( isset( $response['paymentOpts'] ) ) ? $response['paymentOpts'] : [],
+			'paymentLink' => [],
+			'pin'         => empty( $response['pinState'] ) ? false : true,
 		];
 
 		$opts    = get_option( 'kbfos_settings' );

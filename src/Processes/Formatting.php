@@ -45,8 +45,7 @@ class Formatting {
 	 * @return string
 	 */
 	public function status( int $id, string $food, array $order, string $driver, int $tax = 0, ?Carbon $date = null, array $payments = [ 'Cash' ], array $pay_opts = [] ):string {
-		$rolls       = ( '' === $rolls ) ? 'N/A' : $rolls;
-		$location    = wp_get_object_terms( $id, 'kebabble_company' )[0];
+		$location    = ( ! empty( wp_get_object_terms( $id, 'kebabble_company' ) ) ) ? wp_get_object_terms( $id, 'kebabble_company' )[0] : null;
 		$location_id = ( ! empty( $location ) ) ? $location->term_id : 0;
 		$loc_str     = ( ! empty( $location ) ) ? " at {$location->name}" : '';
 		$order       = ( empty( $order ) ) ? '_None yet!_' : $this->order_formatter( $order, $location_id, $tax );

@@ -71,9 +71,9 @@ class Publish {
 
 			$existing_message = get_post_meta( $post_obj->ID, 'kebabble-slack-ts', true );
 			$existing_channel = get_post_meta( $post_obj->ID, 'kebabble-slack-channel', true );
-			
+
 			$slack = new Slack( $existing_channel );
-			
+
 			$timestamp = null;
 			if ( $order_details['override']['enabled'] ) {
 				$timestamp = $slack->send_message( $order_details['override']['message'], $existing_message, $existing_channel );

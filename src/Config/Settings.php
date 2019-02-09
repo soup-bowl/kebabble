@@ -110,9 +110,10 @@ class Settings {
 			'kbfos_pullthrough',
 			__( 'Use Existing', 'text_domain' ),
 			function() {
-				$options = get_option( 'kbfos_settings' );
+				$options     = get_option( 'kbfos_settings' );
+				$pullthrough = ( isset( get_option( 'kbfos_settings' )['kbfos_pullthrough'] ) ) ? get_option( 'kbfos_settings' )['kbfos_pullthrough'] : 0;
 				?>
-				<input type='checkbox' name='kbfos_settings[kbfos_pullthrough]' <?php checked( $options['kbfos_pullthrough'], 1 ); ?> value='1'>
+				<input type='checkbox' name='kbfos_settings[kbfos_pullthrough]' <?php checked( $pullthrough, 1 ); ?> value='1'>
 				<p class="description">Pulls through the previously used values, excluding the order.</p>
 				<?php
 			},
