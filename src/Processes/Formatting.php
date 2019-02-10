@@ -49,7 +49,7 @@ class Formatting {
 		$location_id = ( ! empty( $location ) ) ? $location->term_id : 0;
 		$loc_str     = ( ! empty( $location ) ) ? " at {$location->name}" : '';
 		$order       = ( empty( $order ) ) ? '_None yet!_' : $this->order_formatter( $order, $location_id, $tax );
-		$driver      = ( '' === $driver ) ? 'unspecified' : $driver;
+		$driver      = ( '' === $driver ) ? 'Unknown' : $driver;
 		$date        = ( empty( $date ) ) ? Carbon::now() : $date;
 		$slack_emoji = $this->emoji_picker( $food );
 

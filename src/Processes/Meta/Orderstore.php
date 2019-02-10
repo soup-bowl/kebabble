@@ -60,7 +60,7 @@ class Orderstore {
 			],
 			'food'        => $response['kebabbleOrderTypeSelection'],
 			'order'       => $this->order_list_collator( $response['korder_name'], $response['korder_food'] ),
-			'driver'      => ( isset( $response['kebabbleDriver'] ) ) ? $response['kebabbleDriver'] : null,
+			'driver'      => ( isset( $response['kebabbleDriver'] ) ) ? $response['kebabbleDriver'] : wp_get_current_user()->display_name,
 			'tax'         => ( isset( $response['kebabbleDriverTax'] ) ) ? $response['kebabbleDriverTax'] : 0,
 			'payment'     => ( isset( $response['paymentOpts'] ) ) ? $response['paymentOpts'] : [],
 			'paymentLink' => [],

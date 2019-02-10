@@ -228,7 +228,7 @@ class OrderFields {
 		?>
 		<div>
 			<p class="label"><label for="kebabbleDriver">Driver</label></p>
-			<input type="text" name="kebabbleDriver" id="kebabbleDriver" value="<?php echo esc_attr( $existing ); ?>">
+			<input type="text" name="kebabbleDriver" id="kebabbleDriver" value="<?php echo esc_attr( $existing ); ?>" placeholder="Leave blank to use your WordPress name.">
 		</div>
 		<?php
 	}

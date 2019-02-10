@@ -83,7 +83,7 @@ class Publish {
 						$post_obj->ID,
 						$order_details['food'],
 						$order_details['order'],
-						$order_details['driver'],
+						( ! empty( $order_details['driver'] ) ) ? $order_details['driver'] : wp_get_current_user()->display_name,
 						(int) $order_details['tax'],
 						Carbon::parse( get_the_date( 'Y-m-d H:i:s', $post_obj->ID ) ),
 						( is_array( $order_details['payment'] ) ) ? $order_details['payment'] : [ $order_details['payment'] ],

@@ -81,7 +81,7 @@ class Delete {
 				$post_ID,
 				$post_adt['food'],
 				$post_adt['order'],
-				$post_adt['driver'],
+				( ! empty( $post_adt['driver'] ) ) ? $post_adt['driver'] : wp_get_current_user()->display_name,
 				(int) $post_adt['tax'],
 				Carbon::parse( get_the_date( 'Y-m-d H:i:s', $post_ID ) ),
 				( is_array( $post_adt['payment'] ) ) ? $post_adt['payment'] : [ $post_adt['payment'] ],

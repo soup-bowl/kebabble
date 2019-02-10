@@ -4,6 +4,7 @@ Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versio
 ## [Unreleased]
 ### Added
 - Orders per item are now counted (#21).
+- Blank drivers field will now default to the current WordPress user (#20).
 ### Fixed
 - Various coding smells throwing PHP notice messages (#25).
 
