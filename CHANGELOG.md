@@ -1,6 +1,12 @@
 # Changelog
 Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Added
+- Orders per item are now counted (#21).
+### Fixed
+- Various coding smells throwing PHP notice messages (#25).
+
 ## [0.3.0] - 2019-02-08
 ### Added
 - Support for slack bot communications, able to add and remove orders (#4).

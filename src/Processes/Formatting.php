@@ -55,7 +55,6 @@ class Formatting {
 
 		$formatted_posts = [
 			"{$slack_emoji} *{$food} {$date->format('l')}{$loc_str} ({$date->format('jS F')})* {$slack_emoji}",
-			'*Orders*',
 			$order,
 			"Polling <!here> for orders. Today's driver is *{$driver}* :car:",
 			( $tax > 0 ) ? ':pound: *Additional ' . $this->money->output( $tax ) . ' per person* to fund the driver.' : null,
@@ -110,7 +109,8 @@ class Formatting {
 				$cost_item = ! empty( $place[ $item['food'] ] ) ? (int) $place[ $item['food'] ]['Price'] : 0;
 				$cost      = ! empty( $cost_item ) ? " ({$this->money->output($cost_item)} each)" : '';
 			}
-			$content .= "*{$item['food']}{$cost}* \n>";
+			$order_count = count( $item['people'] );
+			$content    .= "*{$order_count}x {$item['food']}{$cost}* \n>";
 			foreach ( $item['people'] as $person ) {
 				if ( ! in_array( $person, $people_taxed, true ) ) {
 					$cost_tax       = $cost_tax + $tax;
