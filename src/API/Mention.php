@@ -68,6 +68,7 @@ class Mention {
 		}
 
 		if ( ! empty( $request['event'] ) ) {
+			error_log( var_export( $request['event'], true ) );
 			$this->process_input_request( $request['event']['user'], $request['event']['text'], $request['event']['ts'], $request['event']['channel'] );
 			return [];
 		}
@@ -85,7 +86,8 @@ class Mention {
 	 */
 	private function process_input_request( string $user, string $request, string $timestamp, string $channel ):void {
 		$order_obj = $this->get_latest_order();
-		$place     = wp_get_object_terms( $order_obj->ID, 'kebabble_company' )[0];
+		$places    = wp_get_object_terms( $order_obj->ID, 'kebabble_company' );
+		$place     = ( isset( $place ) ) ? $places[0] : null;
 		$order     = $this->orderstore->get( $order_obj->ID );
 		$slack     = new Slack();
 
@@ -163,11 +165,7 @@ class Mention {
 			$this->orderstore->update( $order_obj->ID, $order );
 			$this->publish->handle_publish( $order_obj, false );
 			$slack->react( $timestamp );
-		} else {
-			$slack->send_message( ':x: I couldn\'t determine your order. Please try again or ask me for help.', null, $channel );
 		}
-
-		//$slack->send_message( "```\n" . var_export($messages, true) . "\n```", null, $channel );
 	}
 
 	/**
@@ -259,7 +257,7 @@ class Mention {
 		• To remove your order, say 'remove' before your food item.
 		• To order for someone else, add 'for (name)' after one of the above.
 		• To process many in one comment, separate with commas.\n
-		I will respond with a :thumbsup: if I've added your order, or I'll message back if a problem occurs. Don't forget to @kebabble me!
+		I will respond with a :thumbsup: if I've added your order, a :question: if I'm unsure and a :x: if there's a problem.
 		";
 	}
 
@@ -279,7 +277,7 @@ class Mention {
 			}
 
 			return sprintf(
-				"I'm currently aware of the following menu items:\n\n%s\n\nMention one of these (@kebabble add/remove item) and I will handle it for you!",
+				"I'm currently aware of the following menu items:\n\n%s\n\nMention one of these (ask me for help!) and I will handle it for you!",
 				$items
 			);
 		} else {
