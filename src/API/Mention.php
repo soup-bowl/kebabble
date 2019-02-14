@@ -68,7 +68,6 @@ class Mention {
 		}
 
 		if ( ! empty( $request['event'] ) ) {
-			error_log( var_export( $request['event'], true ) );
 			$this->process_input_request( $request['event']['user'], $request['event']['text'], $request['event']['ts'], $request['event']['channel'] );
 			return [];
 		}
@@ -87,7 +86,7 @@ class Mention {
 	private function process_input_request( string $user, string $request, string $timestamp, string $channel ):void {
 		$order_obj = $this->get_latest_order();
 		$places    = wp_get_object_terms( $order_obj->ID, 'kebabble_company' );
-		$place     = ( isset( $place ) ) ? $places[0] : null;
+		$place     = ( isset( $places ) ) ? $places[0] : null;
 		$order     = $this->orderstore->get( $order_obj->ID );
 		$slack     = new Slack();
 
@@ -127,7 +126,7 @@ class Mention {
 			// Iterate through existing order, check for duplicates and removals.
 			$already_removed = false;
 			for ( $i = 0; $i < $order_count; $i++ ) {
-				error_log( "{$i} of {$order_count}" );
+				//error_log( "{$i} of {$order_count}" );
 				switch ( $message['operator'] ) {
 					default:
 					case 'add':
@@ -139,7 +138,7 @@ class Mention {
 						}
 						break;
 					case 'remove':
-						if ( strtolower( $order_items[ $i ]['person'] ) === strtolower( $name ) && ! $already_removed ) {
+						if ( isset( $order[ $i ] ) && strtolower( $order_items[ $i ]['person'] ) === strtolower( $name ) && ! $already_removed ) {
 							unset( $order_items[ $i ] );
 							$already_removed = true;
 						}

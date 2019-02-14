@@ -22,8 +22,13 @@ class Money {
 	 * @return string Formatted display version of the currency input.
 	 */
 	public function output( int $value, string $high_symbol = '£', string $low_symbol = 'p' ):string {
+		if ( $value <= 0 ) {
+			return "0{$low_symbol}";
+		}
+		
 		$money_string = strval( $value / 100 );
 		$expl         = explode( '.', $money_string );
+		$expl[1]      = ( empty( $expl[1] ) ) ? '0' : $expl[1];
 
 		$dec = ( strlen( $expl[1] ) === 1 ) ? $expl[1] . '0' : $expl[1];
 
