@@ -68,25 +68,27 @@ class Delete {
 	 * @return void Message is re-posted, and new TS stored.
 	 */
 	public function handle_undeletion( int $post_ID ):void {
-		$post_obj   = get_post( $post_ID );
-		$post_adt   = $this->orderstore->get( $post_ID );
-		
+		$post_obj = get_post( $post_ID );
+		$post_adt = $this->orderstore->get( $post_ID );
+
 		$slack = new Slack();
 
 		$timestamp = null;
 		if ( $post_adt['override']['enabled'] ) {
 			$timestamp = $slack->send_message( $post_adt['override']['message'] );
 		} else {
-			$timestamp = $slack->send_message( $this->formatting->status(
-				$post_ID,
-				$post_adt['food'],
-				$post_adt['order'],
-				( ! empty( $post_adt['driver'] ) ) ? $post_adt['driver'] : wp_get_current_user()->display_name,
-				(int) $post_adt['tax'],
-				Carbon::parse( get_the_date( 'Y-m-d H:i:s', $post_ID ) ),
-				( is_array( $post_adt['payment'] ) ) ? $post_adt['payment'] : [ $post_adt['payment'] ],
-				$post_adt['paymentLink']
-			));
+			$timestamp = $slack->send_message(
+				$this->formatting->status(
+					$post_ID,
+					$post_adt['food'],
+					$post_adt['order'],
+					( ! empty( $post_adt['driver'] ) ) ? $post_adt['driver'] : wp_get_current_user()->display_name,
+					(int) $post_adt['tax'],
+					Carbon::parse( get_the_date( 'Y-m-d H:i:s', $post_ID ) ),
+					( is_array( $post_adt['payment'] ) ) ? $post_adt['payment'] : [ $post_adt['payment'] ],
+					$post_adt['paymentLink']
+				)
+			);
 		}
 
 		update_post_meta( $post_ID, 'kebabble-slack-ts', $timestamp );

@@ -265,7 +265,7 @@ class OrderFields {
 		$options_count = count( $options );
 		for ( $i = 0; $i < $options_count; $i++ ) {
 			$option      = $options[ $i ];
-			$option_ex   = ( isset( $existing_pl[$option] ) ) ? $existing_pl[$option] : '';
+			$option_ex   = ( isset( $existing_pl[ $option ] ) ) ? $existing_pl[ $option ] : '';
 			$mark_select = ( ! empty( $existing_pm ) && in_array( $option, $existing_pm, true ) ) ? 'checked' : '';
 			$lists      .= "<li><label><input name='paymentOpts[]' type='checkbox' value='{$option}' {$mark_select}> {$option}</label>";
 			$lists      .= ' - ';
@@ -320,7 +320,7 @@ class OrderFields {
 		</tr>
 		<?php
 	}
-	
+
 	/**
 	 * Gets the existing details, or pulls through previous if enabled in settings.
 	 *
@@ -330,7 +330,7 @@ class OrderFields {
 	private function get_existing_details( int $post_id ):stdClass {
 		$existing         = $this->orderstore->get( $post_id );
 		$existing_company = wp_get_post_terms( $post_id, 'kebabble_company' );
-		$pullthrough      = ( isset( get_option( 'kbfos_settings' )['kbfos_pullthrough'] ) && 1 == get_option( 'kbfos_settings' )['kbfos_pullthrough']  ) ? true : false;
+		$pullthrough      = ( isset( get_option( 'kbfos_settings' )['kbfos_pullthrough'] ) && 1 === (int) get_option( 'kbfos_settings' )['kbfos_pullthrough'] ) ? true : false;
 
 		// Non-strict comparison needed here, until checkbox sanitization on meta is done.
 		if ( empty( $existing ) && $pullthrough && ! empty( get_previous_post() ) ) {
@@ -341,6 +341,9 @@ class OrderFields {
 			$existing['override']['message'] = '';
 		}
 
-		return (object) [ 'existing' => $existing, 'existing_company' => $existing_company ];
+		return (object) [
+			'existing'         => $existing,
+			'existing_company' => $existing_company,
+		];
 	}
 }

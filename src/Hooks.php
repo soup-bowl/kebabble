@@ -158,19 +158,26 @@ class Hooks {
 	public function api_endpoints():void {
 		// ?rest_route=/kebabble/v1/test
 		// Just a comical test message, as I've had problems with the API before (permalinks, normally).
-		register_rest_route( 'kebabble/v1', '/test', [
-			'methods'  => 'GET',
-			'callback' => function ( WP_REST_Request $r ) {
-				error_log( wp_json_encode( $r ) );
-				return new WP_Error( 'kebabble_called_test', "I'm a little teapot, short and stout. Here's my handle, here's my spout. When I see the tea cups hear me shout. Tip me up and pour me out.", [ 'status' => 418 ] );
-			},
-		]);
+		register_rest_route(
+			'kebabble/v1',
+			'/test',
+			[
+				'methods'  => 'GET',
+				'callback' => function ( WP_REST_Request $r ) {
+					return new WP_Error( 'kebabble_called_test', "I'm a little teapot, short and stout. Here's my handle, here's my spout. When I see the tea cups hear me shout. Tip me up and pour me out.", [ 'status' => 418 ] );
+				},
+			]
+		);
 
 		// ?rest_route=/kebabble/v1/slack
 		// All Slack-based comms via the Events API are sent to only one endpoint.
-		register_rest_route( 'kebabble/v1', 'slack', [
-			'methods'  => 'POST',
-			'callback' => [ &$this->api_mention, 'main' ],
-		]);
+		register_rest_route(
+			'kebabble/v1',
+			'slack',
+			[
+				'methods'  => 'POST',
+				'callback' => [ &$this->api_mention, 'main' ],
+			]
+		);
 	}
 }

@@ -95,7 +95,7 @@ class Mention {
 			$slack->send_message( $this->help_message( $user ), null, $channel, $timestamp );
 			return;
 		}
-		
+
 		if ( strpos( strtolower( $request ), 'menu' ) !== false ) {
 			$slack->send_message( $this->menu( $place->term_id ), null, $channel, $timestamp );
 			return;
@@ -126,7 +126,6 @@ class Mention {
 			// Iterate through existing order, check for duplicates and removals.
 			$already_removed = false;
 			for ( $i = 0; $i < $order_count; $i++ ) {
-				//error_log( "{$i} of {$order_count}" );
 				switch ( $message['operator'] ) {
 					default:
 					case 'add':
@@ -146,9 +145,8 @@ class Mention {
 				}
 				$success_count++;
 			}
-			
+
 			if ( 0 === $order_count && 'add' === $message['operator'] ) {
-				error_log('No existing orders, first one added.');
 				$order_items[] = [
 					'person' => $name,
 					'food'   => $message['item'],
@@ -220,6 +218,7 @@ class Mention {
 	 * @return WP_Post|null
 	 */
 	private function get_latest_order():?WP_Post {
+		// phpcs:disable WordPress.DB.SlowDBQuery
 		$order = get_posts(
 			[
 				'post_type'      => 'kebabble_orders',
@@ -236,6 +235,7 @@ class Mention {
 				],
 			]
 		);
+		// phpcs:enable
 
 		if ( ! empty( $order ) ) {
 			return $order[0];
@@ -268,7 +268,7 @@ class Mention {
 	 */
 	private function menu( ?int $company_id = null ):string {
 		$menu = get_term_meta( $company_id, 'kebabble_ordpri', true );
-		
+
 		if ( isset( $menu ) && false !== $menu ) {
 			$items = '';
 			foreach ( $menu as $food => $extra ) {

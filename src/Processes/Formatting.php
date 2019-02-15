@@ -116,11 +116,11 @@ class Formatting {
 					$cost_tax       = $cost_tax + $tax;
 					$people_taxed[] = $person;
 				}
-				if (strpos($person, 'SLACK_') !== false) {
+				if ( strpos( $person, 'SLACK_' ) !== false ) {
 					$slack_conv = str_replace( 'SLACK_', '', $person );
-					$content .= "<@{$slack_conv}>, ";
+					$content   .= "<@{$slack_conv}>, ";
 				} else {
-					$content .= "{$person}, ";	
+					$content .= "{$person}, ";
 				}
 				$cost_overall = $cost_overall + $cost_item;
 			}

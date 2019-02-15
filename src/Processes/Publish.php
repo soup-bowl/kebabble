@@ -28,7 +28,7 @@ class Publish {
 	 * @var Orderstore
 	 */
 	protected $orderstore;
-	
+
 	/**
 	 * Pre-processing before publishing.
 	 *
@@ -46,7 +46,7 @@ class Publish {
 		$this->orderstore = $orderstore;
 		$this->formatting = $formatting;
 	}
-	
+
 	/**
 	 * Hooks on to the order publish process.
 	 *
@@ -61,7 +61,8 @@ class Publish {
 	/**
 	 * Post-process handling and formatting for the message.
 	 *
-	 * @param WP_Post $post_obj Whole post object.
+	 * @param WP_Post $post_obj  Whole post object.
+	 * @param boolean $set_order Update the stored order in the process.
 	 * @return void
 	 */
 	public function handle_publish( WP_Post $post_obj, bool $set_order = true ):void {

@@ -79,6 +79,14 @@ class Orderstore {
 		return $this->get( $post_id );
 	}
 
+	/**
+	 * Replaces the stored order details with a new copy. Recommended use is to modify the
+	 * received initial data and pass back for true update.
+	 *
+	 * @param integer $post_id ID of the post being modified.
+	 * @param array   $updated The new replacement fields.
+	 * @return void
+	 */
 	public function update( int $post_id, array $updated ) {
 		update_post_meta( $post_id, 'kebabble-order', wp_json_encode( $updated ) );
 	}

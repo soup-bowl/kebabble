@@ -25,7 +25,7 @@ class Money {
 		if ( $value <= 0 ) {
 			return "0{$low_symbol}";
 		}
-		
+
 		$money_string = strval( $value / 100 );
 		$expl         = explode( '.', $money_string );
 		$expl[1]      = ( empty( $expl[1] ) ) ? '0' : $expl[1];
