@@ -1,7 +1,7 @@
 # Changelog
 Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.3.1] - 2019-02-19
 ### Added
 - Orders per item are now counted (#21).
 - Blank drivers field will now default to the current WordPress user (#20).
@@ -50,3 +50,5 @@ Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versio
 [0.1.5]: https://gitlab.com/soup-bowl/kebabble/tags/v0.1.5-alpha
 [0.2.0]: https://gitlab.com/soup-bowl/kebabble/tags/v0.2-alpha
 [0.2.2]: https://gitlab.com/soup-bowl/kebabble/tags/v0.2.2-alpha
+[0.3.0]: https://gitlab.com/soup-bowl/kebabble/tags/v0.3-alpha
+[0.3.1]: https://gitlab.com/soup-bowl/kebabble/tags/v0.3.1-alpha
