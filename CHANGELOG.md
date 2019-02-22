@@ -1,6 +1,8 @@
 # Changelog
 Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
 ## [0.3.1] - 2019-02-19
 ### Added
 - Orders per item are now counted (#21).
