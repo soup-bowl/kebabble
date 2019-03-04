@@ -38,7 +38,7 @@ class Registration {
 				'public'       => false,
 				'show_ui'      => true,
 				'show_in_menu' => true,
-				'menu_icon'    => plugin_dir_url( __FILE__ ) . '../../resource/kebab-s.png',
+				'menu_icon'    => 'data:image/svg+xml;base64,' . base64_encode( file_get_contents( __DIR__ . '/../../resource/menu-silhouette.svg' ) ),
 				'rewrite'      => [
 					'slug'       => 'kebabble_orders',
 					'with_front' => true,
