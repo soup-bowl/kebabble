@@ -4,6 +4,8 @@ Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versio
 ## Unreleased
 ### Changed
 - Menu kebab is now a silhouette SVG instead of a picture.
+### Fixed
+- Fixed bug where removals stopped working via events (#27).
 
 ## [0.3.1] - 2019-02-19
 ### Added

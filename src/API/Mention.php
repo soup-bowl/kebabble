@@ -137,7 +137,7 @@ class Mention {
 						}
 						break;
 					case 'remove':
-						if ( isset( $order[ $i ] ) && strtolower( $order_items[ $i ]['person'] ) === strtolower( $name ) && ! $already_removed ) {
+						if ( isset( $order_items[ $i ] ) && strtolower( $order_items[ $i ]['person'] ) === strtolower( $name ) && ! $already_removed ) {
 							unset( $order_items[ $i ] );
 							$already_removed = true;
 						}
