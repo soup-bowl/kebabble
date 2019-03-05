@@ -83,7 +83,7 @@ class Mention {
 	 * @param string $channel   Slack channel of communications.
 	 * @return void Choices reflect on the current post and the Slack channel.
 	 */
-	private function process_input_request( string $user, string $request, string $timestamp, string $channel ):void {
+	public function process_input_request( string $user, string $request, string $timestamp, string $channel ):void {
 		$order_obj = $this->get_latest_order();
 		$places    = wp_get_object_terms( $order_obj->ID, 'kebabble_company' );
 		$place     = ( isset( $places ) ) ? $places[0] : null;
@@ -172,7 +172,7 @@ class Mention {
 	 * @param array  $potentials Simple array of all detectable options.
 	 * @return array|null Collection of arrays, with params 'operator', 'item' and 'for'.
 	 */
-	private function decipher_order( string $segment, array $potentials ):?array {
+	public function decipher_order( string $segment, array $potentials ):?array {
 		$segment_split       = explode( ' ', $segment );
 		$segment_split_count = count( $segment_split );
 
@@ -217,7 +217,7 @@ class Mention {
 	 *
 	 * @return WP_Post|null
 	 */
-	private function get_latest_order():?WP_Post {
+	public function get_latest_order():?WP_Post {
 		// phpcs:disable WordPress.DB.SlowDBQuery
 		$order = get_posts(
 			[
