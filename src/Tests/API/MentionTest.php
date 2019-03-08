@@ -16,17 +16,35 @@ use WP_Mock;
 use WP_Mock\Functions;
 use DI\Container;
 
+/**
+ * Kebabble mentions test case.
+ */
 class MentionTest extends TestCase {
-    protected $mention;
-    public function setUp() {
-        $this->mention = ( new Container() )->get( 'Kebabble\API\Mention' );
+	/**
+	 * Mentions.
+	 *
+	 * @var Mention
+	 */
+	protected $mention;
+
+	/**
+	 * Test class constructor.
+	 */
+	public function setUp() {
+		$this->mention = ( new Container() )->get( 'Kebabble\API\Mention' );
 		WP_Mock::setUp();
 	}
 
+	/**
+	 * Test class destructor.
+	 */
 	public function tearDown() {
 		WP_Mock::tearDown();
 	}
-	
+
+	/**
+	 * Rudimentary tests to see if basic operation works.
+	 */
 	public function testCorrectOrderDetermination() {
 		$food_items = [ 'Food Roll' ];
 

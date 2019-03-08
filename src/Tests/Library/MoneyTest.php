@@ -13,7 +13,13 @@ use Kebabble\Library\Money;
 
 use \PHPUnit\Framework\TestCase;
 
+/**
+ * Test entries for Money.
+ */
 class MoneyTest extends TestCase {
+	/**
+	 * Tests to see if the money formatter resolves properly.
+	 */
 	public function testUKMoneyOutputSyntax() {
 		$money = new Money();
 		$this->assertEquals( $money->output( 0 ), '0p' );
