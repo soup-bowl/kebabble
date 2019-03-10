@@ -102,7 +102,7 @@ class Mention {
 		}
 
 		// Split up the presence of commas, and remove the @kebabble call. A better way would be appreciated.
-		$message_split = explode( ',', str_replace( '<>', '', preg_replace( '/@\w+/', '', strtolower( $request ) ) ) );
+		$message_split = explode( ',', str_replace( '<>', '', preg_replace( '/@\w+/', '', strtolower( $request ), 1 ) ) );
 
 		$messages = [];
 		foreach ( $message_split as $message_segment ) {
@@ -168,6 +168,7 @@ class Mention {
 	/**
 	 * Processes the response and attempts to decipher what the contactee wants.
 	 *
+	 * @todo Implement ordering on behalf of other Slack users. 
 	 * @param string $segment    Request string (split multi-request prior to input).
 	 * @param array  $potentials Simple array of all detectable options.
 	 * @return array|null Collection of arrays, with params 'operator', 'item' and 'for'.
@@ -200,7 +201,12 @@ class Mention {
 					$ops['operator'] = 'remove';
 					break;
 				case 'for':
-					$ops['for'] = ucfirst( $segment_split[ ( $i + 1 ) ] );
+					$for_person = ucfirst( $segment_split[ ( $i + 1 ) ] );
+					if ( false !== strpos( $for_person, '@' ) ) {
+						return null;
+					} else {
+						$ops['for'] = $for_person;
+					}
 					break;
 			}
 		}
