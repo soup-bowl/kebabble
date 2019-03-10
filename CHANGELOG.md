@@ -1,7 +1,7 @@
 # Changelog
 Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [0.3.2] - 2019-03-10
 ### Changed
 - Menu kebab is now a silhouette SVG instead of a picture.
 ### Fixed
@@ -59,3 +59,4 @@ Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versio
 [0.2.2]: https://gitlab.com/soup-bowl/kebabble/tags/v0.2.2-alpha
 [0.3.0]: https://gitlab.com/soup-bowl/kebabble/tags/v0.3-alpha
 [0.3.1]: https://gitlab.com/soup-bowl/kebabble/tags/v0.3.1-alpha
+[0.3.2]: https://gitlab.com/soup-bowl/kebabble/tags/v0.3.2-alpha
