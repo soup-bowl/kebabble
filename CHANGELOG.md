@@ -6,6 +6,7 @@ Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versio
 - Menu kebab is now a silhouette SVG instead of a picture.
 ### Fixed
 - Fixed bug where removals stopped working via events (#27).
+- Stopped for entries with a Slack reference in events (#28).
 
 ## [0.3.1] - 2019-02-19
 ### Added
