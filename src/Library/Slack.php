@@ -11,7 +11,7 @@ namespace Kebabble\Library;
 
 use Kebabble\Processes\Formatting;
 
-use SlackClient\botclient;
+use SlackClient\BotClient;
 use Carbon\Carbon;
 
 /**
@@ -19,17 +19,15 @@ use Carbon\Carbon;
  *
  * @todo Become parent of botclient. Remove formatting dependency and declare in use.
  */
-class Slack extends botclient {
+class Slack {
+	protected $client;
+	protected $token;
 	/**
 	 * Constructor.
-	 *
-	 * @param string $channel Optional channel override.
 	 */
-	public function __construct( ?string $channel = null ) {
-		parent::__construct(
-			get_option( 'kbfos_settings' )['kbfos_botkey'],
-			( empty( $channel ) ) ? get_option( 'kbfos_settings' )['kbfos_botchannel'] : $channel
-		);
+	public function __construct( BotClient $client ) {
+		$this->client = $client;
+		$this->token  = get_option( 'kbfos_settings' )['kbfos_botkey'];
 	}
 
 	/**
@@ -41,11 +39,36 @@ class Slack extends botclient {
 	 * @param string|null $thread_timestamp   Timestamp of a thread, if desired.
 	 * @return string Unique timestamp of the message, used for editing.
 	 */
-	public function send_message( string $message, ?string $existing_timestamp = null, ?string $override_channel = null, ?string $thread_timestamp = null ):string {
-		return $this->message(
-			$message,
-			( ! empty( $existing_timestamp ) ) ? $existing_timestamp : false,
-			( ! empty( $thread_timestamp ) ) ? $thread_timestamp : false
-		);
+	public function send_message( string $message, ?string $existing_timestamp = null, ?string $channel = null, ?string $thread_timestamp = null ):string {
+		return $this->client->connect( $this->token )
+			->setChannel( ( empty( $channel ) ) ? get_option( 'kbfos_settings' )['kbfos_botchannel'] : $channel )
+			->message(
+				$message,
+				( ! empty( $existing_timestamp ) ) ? $existing_timestamp : false,
+				( ! empty( $thread_timestamp ) ) ? $thread_timestamp : false
+			);
+	}
+	
+	public function remove_message( string $ts, string $channel ) {
+		$this->client->connect( $this->token )->setChannel( $channel )->deleteMessage( $ts );
+
+		return true;
+	}
+	
+	public function pin( bool $pin, string $ts, string $channel ) {
+		if ( $pin ) {
+			$this->client->connect( $this->token )->setChannel( $channel )->pin( $ts );
+		} else {
+			$this->client->connect( $this->token )->setChannel( $channel )->unpin( $ts );
+		}
+	}
+	
+	public function react( string $reaction, string $ts, string $channel ) {
+		$this->client->connect( $this->token )->setChannel( $channel )->react( $ts, $reaction );
+	}
+
+	public function info() {
+		$info = $this->client->connect( $this->token )->botInfo();var_dump($info);
+		return $info;
 	}
 }

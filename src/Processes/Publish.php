@@ -13,7 +13,6 @@ use Kebabble\Processes\Meta\Orderstore;
 use Kebabble\Processes\Term\Save;
 use Kebabble\Processes\Formatting;
 use Kebabble\Library\Slack;
-use SlackClient\botclient;
 use Carbon\Carbon;
 
 use WP_Post;
@@ -37,14 +36,23 @@ class Publish {
 	protected $formatting;
 
 	/**
+	 * Communication handler for Slack.
+	 *
+	 * @var Slack
+	 */
+	protected $slack;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param Orderstore $orderstore Stores and retrieves order data.
 	 * @param Formatting $formatting Pre-processing before publishing.
+	 * @param Slack      $slack      Communication handler for Slack.
 	 */
-	public function __construct( Orderstore $orderstore, Formatting $formatting ) {
+	public function __construct( Orderstore $orderstore, Formatting $formatting, Slack $slack ) {
 		$this->orderstore = $orderstore;
 		$this->formatting = $formatting;
+		$this->slack      = $slack;
 	}
 
 	/**
@@ -73,13 +81,11 @@ class Publish {
 			$existing_message = get_post_meta( $post_obj->ID, 'kebabble-slack-ts', true );
 			$existing_channel = get_post_meta( $post_obj->ID, 'kebabble-slack-channel', true );
 
-			$slack = new Slack( $existing_channel );
-
 			$timestamp = null;
 			if ( $order_details['override']['enabled'] ) {
-				$timestamp = $slack->send_message( $order_details['override']['message'], $existing_message, $existing_channel );
+				$timestamp = $this->slack->send_message( $order_details['override']['message'], $existing_message, $existing_channel );
 			} else {
-				$timestamp = $slack->send_message(
+				$timestamp = $this->slack->send_message(
 					$this->formatting->status(
 						$post_obj->ID,
 						$order_details['food'],
@@ -95,11 +101,7 @@ class Publish {
 				);
 			}
 
-			if ( $order_details['pin'] ) {
-				$slack->pin( $timestamp );
-			} else {
-				$slack->unpin( $timestamp );
-			}
+			$this->slack->pin( $order_details['pin'], $timestamp, $existing_channel );
 
 			if ( empty( $existing_message ) ) {
 				add_post_meta( $post_obj->ID, 'kebabble-slack-ts', $timestamp, true );

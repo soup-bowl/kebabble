@@ -43,16 +43,25 @@ class Mention {
 	protected $money;
 
 	/**
+	 * Communication handler for Slack.
+	 *
+	 * @var Slack
+	 */
+	protected $slack;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param Orderstore $orderstore Stores and retrieves order data.
 	 * @param Publish    $publish    Handles the communication with the WordPress post.
 	 * @param Money      $money      Formattings money representations.
+	 * @param Slack      $slack      Communication handler for Slack.
 	 */
-	public function __construct( Orderstore $orderstore, Publish $publish, Money $money ) {
+	public function __construct( Orderstore $orderstore, Publish $publish, Money $money, Slack $slack ) {
 		$this->orderstore = $orderstore;
 		$this->publish    = $publish;
 		$this->money      = $money;
+		$this->slack      = $slack;
 	}
 
 	/**
@@ -68,7 +77,10 @@ class Mention {
 		}
 
 		if ( ! empty( $request['event'] ) ) {
-			$this->process_input_request( $request['event']['user'], $request['event']['text'], $request['event']['ts'], $request['event']['channel'] );
+			if ( $request['event']['type'] === 'message' && ! ( isset( $request['event']['subtype'] ) && $request['event']['subtype'] === 'message_changed' ) ) {
+				$this->process_input_request( $request['event']['user'], $request['event']['text'], $request['event']['ts'], $request['event']['channel'] );
+			}
+
 			return [];
 		}
 	}
@@ -88,16 +100,15 @@ class Mention {
 		$places    = wp_get_object_terms( $order_obj->ID, 'kebabble_company' );
 		$place     = ( isset( $places ) ) ? $places[0] : null;
 		$order     = $this->orderstore->get( $order_obj->ID );
-		$slack     = new Slack();
 
 		// Friendly message to Kebabble? Also useful as a quick hello-world test.
 		if ( strpos( strtolower( $request ), 'help' ) !== false ) {
-			$slack->send_message( $this->help_message( $user ), null, $channel, $timestamp );
+			$this->slack->send_message( $this->help_message( $user ), null, $channel, $timestamp );
 			return;
 		}
 
 		if ( strpos( strtolower( $request ), 'menu' ) !== false ) {
-			$slack->send_message( $this->menu( $place->term_id ), null, $channel, $timestamp );
+			$this->slack->send_message( $this->menu( $place->term_id ), null, $channel, $timestamp );
 			return;
 		}
 
@@ -118,7 +129,7 @@ class Mention {
 		// Each segment of a multiple request. Normally only one.
 		foreach ( $messages as $message ) {
 			if ( empty( $message ) ) {
-				$slack->react( $timestamp, 'question' );
+				$this->slack->react( 'question', $timestamp, $channel );
 				continue;
 			}
 
@@ -161,7 +172,7 @@ class Mention {
 
 			$this->orderstore->update( $order_obj->ID, $order );
 			$this->publish->handle_publish( $order_obj, false );
-			$slack->react( $timestamp );
+			$this->slack->react( 'thumbsup', $timestamp, $channel );
 		}
 	}
 

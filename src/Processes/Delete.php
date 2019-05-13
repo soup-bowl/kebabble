@@ -11,7 +11,6 @@ namespace Kebabble\Processes;
 
 use Kebabble\Processes\Meta\Orderstore;
 use Kebabble\Library\Slack;
-use SlackClient\botclient;
 use Carbon\Carbon;
 
 use WP_Post;
@@ -35,14 +34,23 @@ class Delete {
 	protected $formatting;
 
 	/**
+	 * Communication handler for Slack.
+	 *
+	 * @var Slack
+	 */
+	protected $slack;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param Orderstore $orderstore Stores and retrieves order data.
 	 * @param Formatting $formatting Pre-processing before publishing.
+	 * @param Slack      $slack      Communication handler for Slack.
 	 */
-	public function __construct( Orderstore $orderstore, Formatting $formatting ) {
+	public function __construct( Orderstore $orderstore, Formatting $formatting, Slack $slack ) {
 		$this->orderstore = $orderstore;
 		$this->formatting = $formatting;
+		$this->slack      = $slack;
 	}
 
 	/**
@@ -53,10 +61,10 @@ class Delete {
 	 * @return void No user feedback. Deletion result handled by WordPress.
 	 */
 	public function handle_deletion( int $post_ID, WP_Post $post_obj ):void {
-		$existing_message = get_post_meta( $post_ID, 'kebabble-slack-ts', true );
-		$existing_channel = get_post_meta( $post_ID, 'kebabble-slack-channel', true );
-
-		( new Slack() )->deleteMessage( $existing_message, $existing_channel );
+		$this->slack->remove_message(
+			get_post_meta( $post_ID, 'kebabble-slack-ts', true ),
+			get_post_meta( $post_ID, 'kebabble-slack-channel', true )
+		);
 
 		add_post_meta( $post_ID, 'kebabble-slack-deleted', true, true );
 	}
@@ -71,13 +79,11 @@ class Delete {
 		$post_obj = get_post( $post_ID );
 		$post_adt = $this->orderstore->get( $post_ID );
 
-		$slack = new Slack();
-
 		$timestamp = null;
 		if ( $post_adt['override']['enabled'] ) {
-			$timestamp = $slack->send_message( $post_adt['override']['message'] );
+			$timestamp = $this->slack->send_message( $post_adt['override']['message'] );
 		} else {
-			$timestamp = $slack->send_message(
+			$timestamp = $this->slack->send_message(
 				$this->formatting->status(
 					$post_ID,
 					$post_adt['food'],
@@ -93,10 +99,6 @@ class Delete {
 
 		update_post_meta( $post_ID, 'kebabble-slack-ts', $timestamp );
 
-		if ( $post_adt['pin'] ) {
-			$slack->pin( $timestamp );
-		} else {
-			$slack->unpin( $timestamp );
-		}
+		$this->slack->pin( $post_adt['pin'], $timestamp, get_option( 'kbfos_settings' )['kbfos_botchannel'] );
 	}
 }
