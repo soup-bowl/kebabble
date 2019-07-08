@@ -84,10 +84,16 @@ class Settings {
 			'kbfos_botkey',
 			__( 'Slack Bot Auth key', 'text_domain' ),
 			function () {
-				$options = get_option( 'kbfos_settings' );
-				?>
-				<input type='text' class='regular-text' name='kbfos_settings[kbfos_botkey]' value='<?php echo esc_attr( $options['kbfos_botkey'] ); ?>'>
-				<?php
+				if ( getenv( 'KEBABBLE_BOT_AUTH' ) !== false ) {
+					?>
+					<input type='text' class='regular-text disabled' name='kbfos_settings[kbfos_botkey]' value='<?php echo getenv( 'KEBABBLE_BOT_AUTH' ); ?>' disabled>
+					<?php
+				} else {
+					$options = get_option( 'kbfos_settings' );
+					?>
+					<input type='text' class='regular-text' name='kbfos_settings[kbfos_botkey]' value='<?php echo esc_attr( $options['kbfos_botkey'] ); ?>'>
+					<?php
+				}
 			},
 			'pluginPage',
 			'kbfos_pluginPage_section'

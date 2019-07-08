@@ -27,7 +27,7 @@ class Slack {
 	 */
 	public function __construct( BotClient $client ) {
 		$this->client = $client;
-		$this->token  = get_option( 'kbfos_settings' )['kbfos_botkey'];
+		$this->token  = ( getenv( 'KEBABBLE_BOT_AUTH' ) === false ) ? get_option( 'kbfos_settings' )['kbfos_botkey'] : getenv( 'KEBABBLE_BOT_AUTH' );
 	}
 
 	/**
@@ -48,13 +48,13 @@ class Slack {
 				( ! empty( $thread_timestamp ) ) ? $thread_timestamp : false
 			);
 	}
-	
+
 	public function remove_message( string $ts, string $channel ) {
 		$this->client->connect( $this->token )->setChannel( $channel )->deleteMessage( $ts );
 
 		return true;
 	}
-	
+
 	public function pin( bool $pin, string $ts, string $channel ) {
 		if ( $pin ) {
 			$this->client->connect( $this->token )->setChannel( $channel )->pin( $ts );
@@ -62,7 +62,7 @@ class Slack {
 			$this->client->connect( $this->token )->setChannel( $channel )->unpin( $ts );
 		}
 	}
-	
+
 	public function react( string $reaction, string $ts, string $channel ) {
 		$this->client->connect( $this->token )->setChannel( $channel )->react( $ts, $reaction );
 	}
