@@ -1,0 +1,7 @@
+services:
+  - docker
+language: php
+before_script:
+  - composer install --dev
+  - docker-compose up -d --build
+script: vendor/bin/phpunit
