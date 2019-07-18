@@ -11,7 +11,7 @@ project anyway.
 [![forthebadge][F2]][FU]
 [![forthebadge][F3]][FU]
 
-![Travis status](https://api.travis-ci.org/soup-bowl/kebabble.svg?branch=ci-dev)
+[![Travis status](https://api.travis-ci.org/soup-bowl/kebabble.svg?branch=ci-dev)][CI]
 
 ## Requirements
 * PHP 7.2 or higher.
@@ -56,6 +56,7 @@ to you.
 
 [KM]: https://www.soupbowl.io/wp-content/uploads/2018/04/kebabbleman.png
 
+[CI]: https://travis-ci.org/soup-bowl/kebabble
 [FU]: https://forthebadge.com
 [F1]: https://forthebadge.com/images/badges/gluten-free.svg
 [F2]: https://forthebadge.com/images/badges/built-with-grammas-recipe.svg
