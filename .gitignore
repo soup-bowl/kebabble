@@ -1,3 +1,4 @@
 vendor/
 advanced-custom-fields/
 .phpunit.result.cache
+.env
