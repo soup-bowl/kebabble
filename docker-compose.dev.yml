@@ -1,4 +1,4 @@
-version: '3.6'
+version: '3.0'
 services:
   rbb_db:
     image: mariadb:latest
