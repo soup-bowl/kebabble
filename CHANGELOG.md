@@ -1,6 +1,10 @@
 # Changelog
 Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Changed
+- Dependencies have been upgraded.
+
 ## [0.3.2] - 2019-03-10
 ### Changed
 - Menu kebab is now a silhouette SVG instead of a picture.

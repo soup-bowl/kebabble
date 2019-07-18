@@ -11,7 +11,7 @@ namespace Kebabble\Tests\API;
 
 use Kebabble\API\Mention;
 
-use \PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\TestCase;
 use WP_Mock;
 use WP_Mock\Functions;
 use DI\Container;
@@ -30,7 +30,7 @@ class MentionTest extends TestCase {
 	/**
 	 * Test class constructor.
 	 */
-	public function setUp() {
+	public function setUp():void {
 		$this->mention = ( new Container() )->get( 'Kebabble\API\Mention' );
 		WP_Mock::setUp();
 	}
@@ -38,7 +38,7 @@ class MentionTest extends TestCase {
 	/**
 	 * Test class destructor.
 	 */
-	public function tearDown() {
+	public function tearDown():void {
 		WP_Mock::tearDown();
 	}
 
