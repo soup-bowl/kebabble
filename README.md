@@ -11,6 +11,8 @@ project anyway.
 [![forthebadge][F2]][FU]
 [![forthebadge][F3]][FU]
 
+![Travis status](https://api.travis-ci.org/soup-bowl/kebabble.svg?branch=ci-dev)
+
 ## Requirements
 * PHP 7.2 or higher.
 * WordPress 4 or higher.
