@@ -12,13 +12,18 @@
  */
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-// Replicate the WordPress option functionality used by Kebabble to retrieve settings.
-function get_option( $option ) {
+/**
+ * Replicate the WordPress option functionality used by Kebabble to retrieve settings.
+ *
+ * @param string|null $option Dummy input variable. Return will always be the same.
+ * @return string[]
+ */
+function get_option( $option = null ) {
 	return [
 		'kbfos_botkey'      => 'xorb-somefakestring',
 		'kbfos_botchannel'  => '#example',
 		'kbfos_pullthrough' => 1,
-		'kbfos_payopts'     => 'Cash, Other'
+		'kbfos_payopts'     => 'Cash, Other',
 	];
 }
 

@@ -20,10 +20,24 @@ use Carbon\Carbon;
  * @todo Become parent of botclient. Remove formatting dependency and declare in use.
  */
 class Slack {
+	/**
+	 * Slack based communications library.
+	 *
+	 * @var Botclient
+	 */
 	protected $client;
+
+	/**
+	 * Authorisation key, either from WP options or environment.
+	 *
+	 * @var string
+	 */
 	protected $token;
+
 	/**
 	 * Constructor.
+	 *
+	 * @param BotClient $client Slack based communications library.
 	 */
 	public function __construct( BotClient $client ) {
 		$this->client = $client;
@@ -35,7 +49,7 @@ class Slack {
 	 *
 	 * @param string      $message            Desired message to be displayed.
 	 * @param string|null $existing_timestamp If an existing timestamp is passed, that message is modified.
-	 * @param string|null $override_channel   Change the Slack channel, if desired.
+	 * @param string|null $channel            Change the Slack channel, if desired.
 	 * @param string|null $thread_timestamp   Timestamp of a thread, if desired.
 	 * @return string Unique timestamp of the message, used for editing.
 	 */
@@ -49,12 +63,27 @@ class Slack {
 			);
 	}
 
+	/**
+	 * Removes the specified message from Slack.
+	 *
+	 * @param string $ts      Operation timestamp (basically an ID).
+	 * @param string $channel Channel of operation.
+	 * @return boolean
+	 */
 	public function remove_message( string $ts, string $channel ) {
 		$this->client->connect( $this->token )->setChannel( $channel )->deleteMessage( $ts );
 
 		return true;
 	}
 
+	/**
+	 * Changes the pin status of the specified Slack message.
+	 *
+	 * @param boolean $pin    Represents the pin status.
+	 * @param string  $ts      Operation timestamp (basically an ID).
+	 * @param string  $channel Channel of operation.
+	 * @return void
+	 */
 	public function pin( bool $pin, string $ts, string $channel ) {
 		if ( $pin ) {
 			$this->client->connect( $this->token )->setChannel( $channel )->pin( $ts );
@@ -63,12 +92,15 @@ class Slack {
 		}
 	}
 
+	/**
+	 * Emoji-based reaction to a message.
+	 *
+	 * @param string $reaction Emoji to be used.
+	 * @param string $ts       Operation timestamp (basically an ID).
+	 * @param string $channel  Channel of operation.
+	 * @return void
+	 */
 	public function react( string $reaction, string $ts, string $channel ) {
 		$this->client->connect( $this->token )->setChannel( $channel )->react( $ts, $reaction );
-	}
-
-	public function info() {
-		$info = $this->client->connect( $this->token )->botInfo();var_dump($info);
-		return $info;
 	}
 }

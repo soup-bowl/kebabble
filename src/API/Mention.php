@@ -179,7 +179,7 @@ class Mention {
 	/**
 	 * Processes the response and attempts to decipher what the contactee wants.
 	 *
-	 * @todo Implement ordering on behalf of other Slack users. 
+	 * @todo Implement ordering on behalf of other Slack users.
 	 * @param string $segment    Request string (split multi-request prior to input).
 	 * @param array  $potentials Simple array of all detectable options.
 	 * @return array|null Collection of arrays, with params 'operator', 'item' and 'for'.

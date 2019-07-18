@@ -86,7 +86,7 @@ class Settings {
 			function () {
 				if ( getenv( 'KEBABBLE_BOT_AUTH' ) !== false ) {
 					?>
-					<input type='text' class='regular-text disabled' name='kbfos_settings[kbfos_botkey]' value='<?php echo getenv( 'KEBABBLE_BOT_AUTH' ); ?>' disabled>
+					<input type='text' class='regular-text disabled' name='kbfos_settings[kbfos_botkey]' value='<?php echo esc_attr( getenv( 'KEBABBLE_BOT_AUTH' ) ); ?>' disabled>
 					<?php
 				} else {
 					$options = get_option( 'kbfos_settings' );

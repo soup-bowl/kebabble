@@ -4,6 +4,7 @@
 
 	<rule ref="WordPress">
 		<exclude name="WordPress.Files.FileName" />
+		<exclude name="WordPress.PHP.YodaConditions" />
 
 		<properties>
 			<property name="strict_class_file_names" value="false"/>

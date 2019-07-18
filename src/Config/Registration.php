@@ -38,7 +38,10 @@ class Registration {
 				'public'       => false,
 				'show_ui'      => true,
 				'show_in_menu' => true,
+				// base64_encode used for logo display purposes.
+				// phpcs:disable WordPress.PHP.DiscouragedPHPFunctions
 				'menu_icon'    => 'data:image/svg+xml;base64,' . base64_encode( file_get_contents( __DIR__ . '/../../resource/menu-silhouette.svg' ) ),
+				// phpcs:enable
 				'rewrite'      => [
 					'slug'       => 'kebabble_orders',
 					'with_front' => true,
