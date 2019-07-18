@@ -3,5 +3,5 @@ services:
 language: php
 before_script:
   - composer install --dev
-  - docker-compose up -d --build
+  - docker-compose up -f docker-compose.dev.yml -d --build
 script: vendor/bin/phpunit
