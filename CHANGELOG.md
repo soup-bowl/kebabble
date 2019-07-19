@@ -5,6 +5,9 @@ Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versio
 ### Changed
 - Dependencies have been upgraded.
 
+### Fixed
+- Longer items with a similar name are no longer incorrectly assigned (#38).
+
 ## [0.3.2] - 2019-03-10
 ### Changed
 - Menu kebab is now a silhouette SVG instead of a picture.
