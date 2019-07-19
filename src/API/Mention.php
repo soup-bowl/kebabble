@@ -194,6 +194,14 @@ class Mention {
 			'for'      => 'me',
 		];
 
+		// Sort into length order.
+		usort(
+			$potentials,
+			function ( $a, $b ) {
+				return strlen( $a ) <=> strlen( $b );
+			}
+		);
+
 		// Attempt to work out the item.
 		foreach ( $potentials as $potential ) {
 			if ( strpos( strtolower( $segment ), strtolower( $potential ) ) !== false ) {

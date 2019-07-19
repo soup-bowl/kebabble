@@ -31,7 +31,7 @@ class MentionTest extends TestCase {
 	 * Test class constructor.
 	 */
 	public function setUp():void {
-		$this->mention = ( new Container() )->get( 'Kebabble\API\Mention' );
+		$this->mention = ( new Container() )->get( Mention::class );
 		WP_Mock::setUp();
 	}
 
@@ -46,7 +46,12 @@ class MentionTest extends TestCase {
 	 * Rudimentary tests to see if basic operation works.
 	 */
 	public function testCorrectOrderDetermination() {
-		$food_items = [ 'Food Roll' ];
+		$food_items = [
+			'Large Food Roll',
+			'Food Roll',
+			'Medium Food Roll',
+			'Drink',
+		];
 
 		$response = $this->mention->decipher_order( 'Please sir, may I have a food roll?', $food_items );
 		$this->assertTrue( isset( $response['operator'], $response['item'], $response['for'] ) );
@@ -57,6 +62,11 @@ class MentionTest extends TestCase {
 		$this->assertTrue( isset( $response['operator'], $response['item'], $response['for'] ) );
 		$this->assertEquals( $response['item'], 'Food Roll' );
 		$this->assertEquals( $response['operator'], 'remove' );
+
+		$response = $this->mention->decipher_order( 'can I get a large food roll?', $food_items );
+		$this->assertTrue( isset( $response['operator'], $response['item'], $response['for'] ) );
+		$this->assertEquals( $response['item'], 'Large Food Roll' );
+		$this->assertEquals( $response['operator'], 'add' );
 
 		$response = $this->mention->decipher_order( 'This string is invalid!', $food_items );
 		$this->assertNull( $response );
