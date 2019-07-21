@@ -13,6 +13,7 @@ use Kebabble\Library\Slack;
 use Kebabble\Processes\Meta\Orderstore;
 use Kebabble\Processes\Publish;
 use Kebabble\Library\Money;
+use KOrderParser\Parser;
 
 use WP_Post;
 use WP_REST_Request;
@@ -50,18 +51,27 @@ class Mention {
 	protected $slack;
 
 	/**
+	 * Natural-language order parser.
+	 *
+	 * @var Parser
+	 */
+	protected $order_parser;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param Orderstore $orderstore Stores and retrieves order data.
 	 * @param Publish    $publish    Handles the communication with the WordPress post.
 	 * @param Money      $money      Formattings money representations.
 	 * @param Slack      $slack      Communication handler for Slack.
+	 * @param Parser     $parser     Natural-language order parser.
 	 */
-	public function __construct( Orderstore $orderstore, Publish $publish, Money $money, Slack $slack ) {
-		$this->orderstore = $orderstore;
-		$this->publish    = $publish;
-		$this->money      = $money;
-		$this->slack      = $slack;
+	public function __construct( Orderstore $orderstore, Publish $publish, Money $money, Slack $slack, Parser $parser ) {
+		$this->orderstore   = $orderstore;
+		$this->publish      = $publish;
+		$this->money        = $money;
+		$this->slack        = $slack;
+		$this->order_parser = $parser;
 	}
 
 	/**
@@ -120,7 +130,7 @@ class Mention {
 
 		$messages = [];
 		foreach ( $message_split as $message_segment ) {
-			$messages[] = $this->decipher_order(
+			$messages[] = $this->order_parser->decipherOrder(
 				$message_segment,
 				( isset( $place ) ) ? $this->get_potentials( $place->term_id ) : []
 			);
@@ -136,17 +146,17 @@ class Mention {
 				continue;
 			}
 
-			$name = ( 'me' === $message['for'] ) ? "SLACK_{$user}" : $message['for'];
+			$name = ( null === $message->getFor() ) ? "SLACK_{$user}" : $message->getFor();
 			// Iterate through existing order, check for duplicates and removals.
 			$already_removed = false;
 			for ( $i = 0; $i < $order_count; $i++ ) {
-				switch ( $message['operator'] ) {
+				switch ( $message->getOperator() ) {
 					default:
 					case 'add':
 						if ( ( $i + 1 ) === $order_count ) {
 							$order_items[] = [
 								'person' => $name,
-								'food'   => $message['item'],
+								'food'   => $message->getItem(),
 							];
 						}
 						break;
@@ -160,10 +170,10 @@ class Mention {
 				$success_count++;
 			}
 
-			if ( 0 === $order_count && 'add' === $message['operator'] ) {
+			if ( 0 === $order_count && 'add' === $message->getOperator() ) {
 				$order_items[] = [
 					'person' => $name,
-					'food'   => $message['item'],
+					'food'   => $message->getItem(),
 				];
 				$success_count++;
 			}
@@ -176,67 +186,6 @@ class Mention {
 			$this->orderstore->update( $order_obj->ID, $order );
 			$this->publish->handle_publish( $order_obj, false );
 			$this->slack->react( 'thumbsup', $timestamp, $channel );
-		}
-	}
-
-	/**
-	 * Processes the response and attempts to decipher what the contactee wants.
-	 *
-	 * @todo Implement ordering on behalf of other Slack users.
-	 * @param string $segment    Request string (split multi-request prior to input).
-	 * @param array  $potentials Simple array of all detectable options.
-	 * @return array|null Collection of arrays, with params 'operator', 'item' and 'for'.
-	 */
-	public function decipher_order( string $segment, array $potentials ):?array {
-		$segment_split       = explode( ' ', $segment );
-		$segment_split_count = count( $segment_split );
-
-		$ops = [
-			'operator' => 'add',
-			'item'     => null,
-			'for'      => 'me',
-		];
-
-		// Sort into length order.
-		usort(
-			$potentials,
-			function ( $a, $b ) {
-				return strlen( $a ) <=> strlen( $b );
-			}
-		);
-
-		// Attempt to work out the item.
-		foreach ( $potentials as $potential ) {
-			if ( strpos( strtolower( $segment ), strtolower( $potential ) ) !== false ) {
-				$ops['item'] = $potential;
-			}
-		}
-
-		// now for the operator, and if this is for someone else.
-		for ( $i = 0; $i < $segment_split_count; $i++ ) {
-			switch ( $segment_split[ $i ] ) {
-				case 'no':
-				case 'delete':
-				case 'remove':
-				case 'x':
-				case '-':
-					$ops['operator'] = 'remove';
-					break;
-				case 'for':
-					$for_person = ucfirst( $segment_split[ ( $i + 1 ) ] );
-					if ( false !== strpos( $for_person, '@' ) ) {
-						return null;
-					} else {
-						$ops['for'] = $for_person;
-					}
-					break;
-			}
-		}
-
-		if ( isset( $ops['item'] ) ) {
-			return $ops;
-		} else {
-			return null;
 		}
 	}
 

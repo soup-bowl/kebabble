@@ -4,6 +4,7 @@ Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versio
 ## [Unreleased]
 ### Changed
 - Dependencies have been upgraded.
+- Kebabbble order parser split into seperate dependency project.
 
 ### Fixed
 - A check made for incoming Slack events was configured incorrectly.
