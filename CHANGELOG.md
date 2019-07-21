@@ -2,6 +2,9 @@
 Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- The channel is changable for new orders created via WordPress (#33).
+
 ### Changed
 - Dependencies have been upgraded.
 - Kebabbble order parser split into seperate dependency project.
