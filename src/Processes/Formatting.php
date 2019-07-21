@@ -56,8 +56,8 @@ class Formatting {
 		$formatted_posts = [
 			"{$slack_emoji} *{$food} {$date->format('l')}{$loc_str} ({$date->format('jS F')})* {$slack_emoji}",
 			$order,
-			"Polling <!here> for orders. Today's driver is *{$driver}* :car:",
-			( $tax > 0 ) ? ':pound: *Additional ' . $this->money->output( $tax ) . ' per person* to fund the driver.' : null,
+			"Polling <!here> for orders. Today's collector is *{$driver}* :truck:",
+			( $tax > 0 ) ? ':pound: *Additional ' . $this->money->output( $tax ) . ' per person* to fund the collector.' : null,
 			$this->accepts_payment_formatter( $payments, $pay_opts ),
 		];
 

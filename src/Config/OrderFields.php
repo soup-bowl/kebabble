@@ -227,7 +227,7 @@ class OrderFields {
 		$existing = ( ! empty( $existing ) ) ? $existing['driver'] : '';
 		?>
 		<div>
-			<p class="label"><label for="kebabbleDriver">Driver</label></p>
+			<p class="label"><label for="kebabbleDriver">Collector</label></p>
 			<input type="text" name="kebabbleDriver" id="kebabbleDriver" value="<?php echo esc_attr( $existing ); ?>" placeholder="Leave blank to use your WordPress name.">
 		</div>
 		<?php
@@ -243,7 +243,7 @@ class OrderFields {
 		$existing = ( ! empty( $existing ) ) ? $existing['tax'] : '';
 		?>
 		<div>
-			<p class="label"><label for="kebabbleDriverTax">Driver Charge (in pence)</label></p>
+			<p class="label"><label for="kebabbleDriverTax">Collector Charge (in pence)</label></p>
 			<input type="number" name="kebabbleDriverTax" id="kebabbleDriverTax" value="<?php echo intval( $existing ); ?>">
 		</div>
 		<?php
