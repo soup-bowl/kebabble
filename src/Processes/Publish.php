@@ -81,6 +81,10 @@ class Publish {
 			$existing_message = get_post_meta( $post_obj->ID, 'kebabble-slack-ts', true );
 			$existing_channel = get_post_meta( $post_obj->ID, 'kebabble-slack-channel', true );
 
+			if ( empty( $existing_channel ) ) {
+				$existing_channel = ( isset( $_POST['kebabbleOverrideChannel'] ) ) ? $_POST['kebabbleOverrideChannel'] : get_option( 'kbfos_settings' )['kbfos_botchannel'];
+			}
+
 			$timestamp = null;
 			if ( $order_details['override']['enabled'] ) {
 				$timestamp = $this->slack->send_message( $order_details['override']['message'], $existing_message, $existing_channel );
@@ -105,7 +109,7 @@ class Publish {
 
 			if ( empty( $existing_message ) ) {
 				add_post_meta( $post_obj->ID, 'kebabble-slack-ts', $timestamp, true );
-				add_post_meta( $post_obj->ID, 'kebabble-slack-channel', get_option( 'kbfos_settings' )['kbfos_botchannel'], true );
+				add_post_meta( $post_obj->ID, 'kebabble-slack-channel', $existing_channel, true );
 			}
 		} else {
 			delete_post_meta( $post_obj->ID, 'kebabble-slack-deleted' );

@@ -103,4 +103,29 @@ class Slack {
 	public function react( string $reaction, string $ts, string $channel ) {
 		$this->client->connect( $this->token )->setChannel( $channel )->react( $ts, $reaction );
 	}
+
+	/**
+	 * Gets all available channels that kebabble can connect to.
+	 *
+	 * @return array
+	 */
+	public function channels() {
+		$channels = get_transient( 'kebabble_channels' );
+
+		if ( $channels === false ) {		
+			$response = $this->client->connect( $this->token )->findChannels();
+
+			$channels = [];
+			foreach ( $response['channels'] as $channel ) {
+				$channels[] = [
+					'key'     => $channel['id'],
+					'channel' => '#' . $channel['name'],
+				];
+			}
+
+			set_transient( 'kebabble_channels', $channels, 6 * HOUR_IN_SECONDS );
+		}
+
+		return $channels;
+	}
 }

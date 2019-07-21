@@ -9,10 +9,28 @@
 
 namespace Kebabble\Config;
 
+use Kebabble\Library\Slack;
+
 /**
  * Displays the configuration options in the WordPress admin options.
  */
 class Settings {
+	/**
+	 * Slack communication access.
+	 *
+	 * @var Slack
+	 */
+	protected $slack;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param Slack $slack Slack communication access.
+	 */
+	public function __construct(Slack $slack) {
+		$this->slack = $slack;
+	}
+
 	/**
 	 * Tells WordPress about Kebabble settngs, and adds them to as a submenu.
 	 *
@@ -101,11 +119,18 @@ class Settings {
 
 		add_settings_field(
 			'kbfos_botchannel',
-			__( 'Slack Channel', 'text_domain' ),
+			__( 'Default Slack Channel', 'text_domain' ),
 			function() {
-				$options = get_option( 'kbfos_settings' );
+				$options  = get_option( 'kbfos_settings' );
+				$channels = $this->slack->channels();
 				?>
-				<input type='text' name='kbfos_settings[kbfos_botchannel]' value='<?php echo esc_attr( $options['kbfos_botchannel'] ); ?>'>
+				<select name="kbfos_settings[kbfos_botchannel]">
+					<?php foreach ( $channels as $channel ) : ?>
+					<option value='<?php echo $channel['key']; ?>' <?php selected( $options['kbfos_botchannel'], $channel['key'] ); ?>>
+						<?php echo $channel['channel']; ?>
+					</option>
+					<?php endforeach; ?>
+				</select>
 				<?php
 			},
 			'pluginPage',

@@ -41,34 +41,4 @@ class MentionTest extends TestCase {
 	public function tearDown():void {
 		WP_Mock::tearDown();
 	}
-
-	/**
-	 * Rudimentary tests to see if basic operation works.
-	 */
-	public function testCorrectOrderDetermination() {
-		$food_items = [
-			'Large Food Roll',
-			'Food Roll',
-			'Medium Food Roll',
-			'Drink',
-		];
-
-		$response = $this->mention->decipher_order( 'Please sir, may I have a food roll?', $food_items );
-		$this->assertTrue( isset( $response['operator'], $response['item'], $response['for'] ) );
-		$this->assertEquals( $response['item'], 'Food Roll' );
-		$this->assertEquals( $response['operator'], 'add' );
-
-		$response = $this->mention->decipher_order( 'remove my fOod ROLL please!', $food_items );
-		$this->assertTrue( isset( $response['operator'], $response['item'], $response['for'] ) );
-		$this->assertEquals( $response['item'], 'Food Roll' );
-		$this->assertEquals( $response['operator'], 'remove' );
-
-		$response = $this->mention->decipher_order( 'can I get a large food roll?', $food_items );
-		$this->assertTrue( isset( $response['operator'], $response['item'], $response['for'] ) );
-		$this->assertEquals( $response['item'], 'Large Food Roll' );
-		$this->assertEquals( $response['operator'], 'add' );
-
-		$response = $this->mention->decipher_order( 'This string is invalid!', $food_items );
-		$this->assertNull( $response );
-	}
 }

@@ -16,6 +16,7 @@ use Kebabble\Config\Registration;
 use Kebabble\Config\Settings;
 use Kebabble\Config\OrderFields;
 use Kebabble\Config\CompanyFields;
+use Kebabble\Config\Table;
 use Kebabble\API\Mention;
 
 use WP_Term;
@@ -69,6 +70,13 @@ class Hooks {
 	protected $company_fields;
 
 	/**
+	 * Table configurations.
+	 *
+	 * @var Table
+	 */
+	protected $table;
+
+	/**
 	 * Storage processing for saved term items.
 	 *
 	 * @var Save
@@ -91,16 +99,28 @@ class Hooks {
 	 * @param Settings      $settings       Settings page handler.
 	 * @param OrderFields   $order_fields   Fields for the order form.
 	 * @param CompanyFields $company_fields Fields for the company taxonomy.
+	 * @param Table         $table          Table configurations.
 	 * @param Save          $save           Storage processing for saved term items.
 	 * @param Mention       $api_mention    Handles mentions from and to the Slack API.
 	 */
-	public function __construct( Registration $registration, Publish $publish, Delete $delete, Settings $settings, OrderFields $order_fields, CompanyFields $company_fields, Save $save, Mention $api_mention ) {
+	public function __construct(
+			Registration $registration,
+			Publish $publish,
+			Delete $delete,
+			Settings $settings,
+			OrderFields $order_fields,
+			CompanyFields $company_fields,
+			Table $table,
+			Save $save,
+			Mention $api_mention
+		) {
 		$this->registration   = $registration;
 		$this->publish        = $publish;
 		$this->delete         = $delete;
 		$this->settings       = $settings;
 		$this->order_fields   = $order_fields;
 		$this->company_fields = $company_fields;
+		$this->table          = $table;
 		$this->save           = $save;
 		$this->api_mention    = $api_mention;
 	}
@@ -133,6 +153,10 @@ class Hooks {
 		// Company functionality.
 		add_action( 'created_kebabble_company', [ &$this->save, 'save_custom_company_details' ] );
 		add_action( 'edited_kebabble_company', [ &$this->save, 'save_custom_company_details' ] );
+
+		// Tables.
+		add_filter( 'manage_kebabble_orders_posts_columns', [ &$this->table, 'orders_column_definition' ] );
+        add_filter( 'manage_kebabble_orders_posts_custom_column', [ &$this->table, 'orders_table_data' ], 10, 2 );
 
 		// API Hooks.
 		add_action( 'rest_api_init', [ &$this, 'api_endpoints' ] );

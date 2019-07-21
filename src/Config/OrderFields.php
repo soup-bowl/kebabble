@@ -10,6 +10,7 @@
 namespace Kebabble\Config;
 
 use Kebabble\Processes\Meta\Orderstore;
+use Kebabble\Library\Slack;
 
 use WP_Post;
 use WP_Term;
@@ -29,12 +30,21 @@ class OrderFields {
 	protected $orderstore;
 
 	/**
+	 * Slack communication access.
+	 *
+	 * @var Slack
+	 */
+	protected $slack;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param Orderstore $orderstore Stores and retrieves order data.
+	 * @param Slack      $slack      Slack communication access.
 	 */
-	public function __construct( Orderstore $orderstore ) {
+	public function __construct( Orderstore $orderstore, Slack $slack ) {
 		$this->orderstore = $orderstore;
+		$this->slack      = $slack;
 	}
 
 	/**
@@ -76,12 +86,32 @@ class OrderFields {
 			function( $post ) use ( &$existing_order_details ) {
 				$this->pin_status( $existing_order_details->existing );
 
-				$c_output = get_post_meta( $post->ID, 'kebabble-slack-channel', true );
-				$channel  = ( empty( $c_output ) ) ? 'N/A' : $c_output;
+				$default  = get_option( 'kbfos_settings' )['kbfos_botchannel'];
+				$chosen   = get_post_meta( $post->ID, 'kebabble-slack-channel', true );
+				$channels = $this->slack->channels();
+
+				$selected = null;
+				foreach ( $channels as $channel ) {
+					if ( $channel['key'] === $chosen ) {
+						$selected = $channel['channel'];
+					}
+				}
+
+				// If set, show a read-only box. If not, show a selection box.
 				?>
 				<div>
 					<p class="label"><label for="kebabbleOverrideChannel">Channel</label></p>
-					<input type="text" name="kebabbleOverrideChannel" id="kebabbleOverrideChannel" value="<?php echo esc_attr( $channel ); ?>" readonly>
+					<?php if ( ! empty( $chosen ) ) : ?>
+					<input type="text" name="kebabbleOverrideChannel" id="kebabbleOverrideChannel" value="<?php echo esc_attr( $selected ); ?>" readonly>
+					<?php else: ?>
+					<select name="kebabbleOverrideChannel">
+						<?php foreach ( $channels as $channel ) : ?>
+						<option value='<?php echo $channel['key']; ?>' <?php selected( $default, $channel['key'] ); ?>>
+							<?php echo $channel['channel']; ?>
+						</option>
+						<?php endforeach; ?>
+					</select>
+					<?php endif; ?>
 				</div>
 				<?php
 			},

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bad5389a24906e87b57a14978f5a3598",
+    "content-hash": "9ea9a8cd4b4d9a11a39499ee607d238a",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -807,17 +807,11 @@
         },
         {
             "name": "soup-bowl/slack-client-php",
-            "version": "0.1.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://gitlab.com/soup-bowl/slack-client-php.git",
-                "reference": "980c0f60983e483512026ff88b5303cd5cac891f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://gitlab.com/api/v4/projects/soup-bowl%2Fslack-client-php/repository/archive.zip?sha=980c0f60983e483512026ff88b5303cd5cac891f",
-                "reference": "980c0f60983e483512026ff88b5303cd5cac891f",
-                "shasum": ""
+                "reference": "530eb88dd88db6df175aab0e9ce9629a5c92f72c"
             },
             "require": {
                 "guzzlehttp/guzzle": "^6.3",
@@ -832,13 +826,17 @@
                     "SlackClient\\": "comms/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "SlackClientTest\\": "tests/"
+                }
+            },
             "license": [
                 "MIT"
             ],
             "description": "A simple Slack client for PHP.",
             "homepage": "https://github.com/soup-bowl/slack-client-php",
-            "time": "2019-05-02T07:54:04+00:00"
+            "time": "2019-05-13T14:39:07+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -2928,6 +2926,7 @@
     "aliases": [],
     "minimum-stability": "alpha",
     "stability-flags": {
+        "soup-bowl/slack-client-php": 20,
         "soup-bowl/kebabble-order-parser": 20
     },
     "prefer-stable": true,
