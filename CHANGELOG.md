@@ -4,6 +4,7 @@ Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versio
 ## [Unreleased]
 ### Added
 - The channel is changable for new orders created via WordPress (#33).
+- Slackbot can be told to change collector (#30).
 
 ### Changed
 - Dependencies have been upgraded.
