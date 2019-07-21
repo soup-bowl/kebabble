@@ -76,10 +76,13 @@ class Mention {
 			return [ 'challenge' => $request['challenge'] ];
 		}
 
-		if ( ! empty( $request['event'] ) ) {
-			if ( $request['event']['type'] === 'message' && ! ( isset( $request['event']['subtype'] ) && $request['event']['subtype'] === 'message_changed' ) ) {
-				$this->process_input_request( $request['event']['user'], $request['event']['text'], $request['event']['ts'], $request['event']['channel'] );
-			}
+		if ( ! empty( $request['event'] ) &&  $request['event']['type'] === 'app_mention' ) {
+			$this->process_input_request(
+				$request['event']['user'],
+				$request['event']['text'],
+				$request['event']['ts'],
+				$request['event']['channel']
+			);
 
 			return [];
 		}

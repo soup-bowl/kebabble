@@ -6,6 +6,9 @@ Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versio
 - Dependencies have been upgraded.
 
 ### Fixed
+- A check made for incoming Slack events was configured incorrectly.
+
+### Fixed
 - Longer items with a similar name are no longer incorrectly assigned (#38).
 
 ## [0.3.2] - 2019-03-10
