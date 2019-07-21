@@ -99,6 +99,18 @@ class Mention {
 				$place
 			);
 
+			// Detect command to change the collector.
+			$new_driver = $this->change_collector( $request['event']['text'], $order );
+			if ( isset( $new_driver ) ) {
+				$order['driver'] = $new_driver;
+
+				$this->orderstore->update( $order_obj->ID, $order );
+				$this->publish->handle_publish( $order_obj, false );
+				$this->slack->react( 'ok_hand', $request['event']['ts'], $request['event']['channel'] );
+
+				return [];
+			}
+
 			if ( isset( $response ) ) {
 				$this->slack->send_message(
 					$response,
@@ -198,6 +210,21 @@ class Mention {
 		} else {
 			return [ 'success' => false, 'order' => $order ];
 		}
+	}
+
+	/**
+	 * Detects a request to change the driver, and returns their name.
+	 *
+	 * @param string $request Request to parse.
+	 * @return string|null Name of the collector, or null if no request was made.
+	 */
+	public function change_collector( string $request ):?string {
+		$confirm = preg_match('/change (?:the )?(?:(?:collector)|(?:driver)) to (.*)/i', $request, $result );
+		if ( $confirm ) {
+			return $result[1];
+		}
+
+		return null;
 	}
 	
 	public function informational_commands( string $request, string $user, ?WP_Term $place = null ):?string {
