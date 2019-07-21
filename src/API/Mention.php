@@ -16,6 +16,7 @@ use Kebabble\Library\Money;
 use KOrderParser\Parser;
 
 use WP_Post;
+use WP_Term;
 use WP_REST_Request;
 
 /**
@@ -87,12 +88,40 @@ class Mention {
 		}
 
 		if ( ! empty( $request['event'] ) &&  $request['event']['type'] === 'app_mention' ) {
-			$this->process_input_request(
-				$request['event']['user'],
+			$order_obj = $this->get_latest_order();
+			$places    = wp_get_object_terms( $order_obj->ID, 'kebabble_company' );
+			$place     = ( isset( $places ) ) ? $places[0] : null;
+			$order     = $this->orderstore->get( $order_obj->ID );
+
+			$response = $this->informational_commands(
 				$request['event']['text'],
-				$request['event']['ts'],
-				$request['event']['channel']
+				$request['event']['user'],
+				$place
 			);
+
+			if ( isset( $response ) ) {
+				$this->slack->send_message(
+					$response,
+					null,
+					$request['event']['channel'],
+					$request['event']['ts']
+				);
+			} else {
+				$result = $this->process_input_request(
+					$request['event']['user'],
+					$request['event']['text'],
+					$place,
+					$order
+				);
+
+				if ( $result['success'] ) {
+					$this->orderstore->update( $order_obj->ID, $result['order'] );
+					$this->publish->handle_publish( $order_obj, false );
+					$this->slack->react( 'thumbsup', $request['event']['ts'], $request['event']['channel'] );
+				} else {
+					$this->slack->react( 'question', $request['event']['ts'], $request['event']['channel'] );
+				}
+			}
 
 			return [];
 		}
@@ -101,30 +130,13 @@ class Mention {
 	/**
 	 * Processes the request contents and modifies the order accordingly.
 	 *
-	 * @todo Filter custom message more efficiently.
-	 * @param string $user      Slack user code.
-	 * @param string $request   The whole message string that's been sent to our bot.
-	 * @param string $timestamp Message timestamp.
-	 * @param string $channel   Slack channel of communications.
-	 * @return void Choices reflect on the current post and the Slack channel.
+	 * @param string $user    Slack user code.
+	 * @param string $request The whole message string that's been sent to our bot.
+	 * @param WP_Term $place  The place to operate with.
+	 * @param array $order    The existing order entity to modify, if necessary.
+	 * @return array Choices reflect on the current post and the Slack channel.
 	 */
-	public function process_input_request( string $user, string $request, string $timestamp, string $channel ):void {
-		$order_obj = $this->get_latest_order();
-		$places    = wp_get_object_terms( $order_obj->ID, 'kebabble_company' );
-		$place     = ( isset( $places ) ) ? $places[0] : null;
-		$order     = $this->orderstore->get( $order_obj->ID );
-
-		// Friendly message to Kebabble? Also useful as a quick hello-world test.
-		if ( strpos( strtolower( $request ), 'help' ) !== false ) {
-			$this->slack->send_message( $this->help_message( $user ), null, $channel, $timestamp );
-			return;
-		}
-
-		if ( strpos( strtolower( $request ), 'menu' ) !== false ) {
-			$this->slack->send_message( $this->menu( $place->term_id ), null, $channel, $timestamp );
-			return;
-		}
-
+	public function process_input_request( string $user, string $request, ?WP_Term $place, ?array $order ):array {
 		// Split up the presence of commas, and remove the @kebabble call. A better way would be appreciated.
 		$message_split = explode( ',', str_replace( '<>', '', preg_replace( '/@\w+/', '', strtolower( $request ), 1 ) ) );
 
@@ -142,8 +154,7 @@ class Mention {
 		// Each segment of a multiple request. Normally only one.
 		foreach ( $messages as $message ) {
 			if ( empty( $message ) ) {
-				$this->slack->react( 'question', $timestamp, $channel );
-				continue;
+				return [ 'success' => false, 'order' => $order ];
 			}
 
 			$name = ( null === $message->getFor() ) ? "SLACK_{$user}" : $message->getFor();
@@ -183,10 +194,23 @@ class Mention {
 			unset( $order['order'] );
 			$order['order'] = array_values( $order_items );
 
-			$this->orderstore->update( $order_obj->ID, $order );
-			$this->publish->handle_publish( $order_obj, false );
-			$this->slack->react( 'thumbsup', $timestamp, $channel );
+			return [ 'success' => true, 'order' => $order ];
+		} else {
+			return [ 'success' => false, 'order' => $order ];
 		}
+	}
+	
+	public function informational_commands( string $request, string $user, ?WP_Term $place = null ):?string {
+		// Friendly message to Kebabble? Also useful as a quick hello-world test.
+		if ( strpos( strtolower( $request ), 'help' ) !== false ) {
+			return $this->help_message( $user );
+		}
+
+		if ( strpos( strtolower( $request ), 'menu' ) !== false ) {
+			return $this->menu( $user, $place->term_id );
+		}
+
+		return null;
 	}
 
 	/**
@@ -243,7 +267,7 @@ class Mention {
 	 * @param int|null $company_id Company to collect the list from.
 	 * @return string
 	 */
-	private function menu( ?int $company_id = null ):string {
+	private function menu( string $user, ?int $company_id = null ):string {
 		$menu = get_term_meta( $company_id, 'kebabble_ordpri', true );
 
 		if ( isset( $menu ) && false !== $menu ) {
@@ -253,7 +277,7 @@ class Mention {
 			}
 
 			return sprintf(
-				"I'm currently aware of the following menu items:\n\n%s\n\nMention one of these (ask me for help!) and I will handle it for you!",
+				"Howdy <@{$user}>! I'm currently aware of the following menu items:\n\n%s\n\nMention one of these (ask me for help!) and I will handle it for you!",
 				$items
 			);
 		} else {

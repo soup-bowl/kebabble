@@ -6,6 +6,7 @@ Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versio
 - Dependencies have been upgraded.
 - Kebabbble order parser split into seperate dependency project.
 - 'Driver' changed to 'Collector' (internal references unchanged) (#31).
+- Restructured Mention to remove Slack code from main process.
 
 ### Fixed
 - A check made for incoming Slack events was configured incorrectly.
