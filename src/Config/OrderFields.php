@@ -189,7 +189,7 @@ class OrderFields {
 	 */
 	public function food_selection( ?array $existing = null ):void {
 		$selected = ( ! empty( $existing ) ) ? $existing['food'] : '';
-		$options  = [ 'Kebab', 'Pizza', 'Burger', 'Resturant', 'Event', 'Other' ];
+		$options  = [ 'Kebab', 'Pizza', 'Burger', 'Restaurant', 'Event', 'Other' ];
 
 		$select = '';
 		foreach ( $options as $option ) {

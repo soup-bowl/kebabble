@@ -10,6 +10,7 @@
 namespace Kebabble\Processes;
 
 use Kebabble\Library\Money;
+use Kebabble\Library\Emojis;
 use Carbon\Carbon;
 
 /**
@@ -51,13 +52,13 @@ class Formatting {
 		$order       = ( empty( $order ) ) ? '_None yet!_' : $this->order_formatter( $order, $location_id, $tax );
 		$driver      = ( '' === $driver ) ? 'Unknown' : $driver;
 		$date        = ( empty( $date ) ) ? Carbon::now() : $date;
-		$slack_emoji = $this->emoji_picker( $food );
+		$slack_emoji = Emojis::food( $food );
 
 		$formatted_posts = [
 			"{$slack_emoji} *{$food} {$date->format('l')}{$loc_str} ({$date->format('jS F')})* {$slack_emoji}",
 			$order,
-			"Polling <!here> for orders. Today's collector is *{$driver}* :truck:",
-			( $tax > 0 ) ? ':pound: *Additional ' . $this->money->output( $tax ) . ' per person* to fund the collector.' : null,
+			"Polling <!here> for orders. Today's collector is *{$driver}* " . Emojis::misc( 'collector' ),
+			( $tax > 0 ) ? Emojis::misc( 'money' ) . ' *Additional ' . $this->money->output( $tax ) . ' per person* to fund the collector.' : null,
 			$this->accepts_payment_formatter( $payments, $pay_opts ),
 		];
 
@@ -172,24 +173,5 @@ class Formatting {
 			$format_string .= "{$indv_paym}.";
 		}
 		return $format_string;
-	}
-
-	/**
-	 * Chooses the emoji for the food type... yep, this exists.
-	 *
-	 * @param string $food Label of the order type.
-	 * @return string colon-surrounded emoji format.
-	 */
-	private function emoji_picker( string $food ):string {
-		switch ( strtolower( $food ) ) {
-			case 'burger':
-				return ':hamburger:';
-			case 'pizza':
-				return ':pizza:';
-			case 'event':
-				return ':popcorn:';
-			default:
-				return ':burrito:';
-		}
 	}
 }

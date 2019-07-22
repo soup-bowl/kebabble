@@ -9,10 +9,11 @@
 
 namespace Kebabble\API;
 
-use Kebabble\Library\Slack;
 use Kebabble\Processes\Meta\Orderstore;
 use Kebabble\Processes\Publish;
 use Kebabble\Library\Money;
+use Kebabble\Library\Slack;
+use Kebabble\Library\Emojis;
 use KOrderParser\Parser;
 
 use WP_Post;
@@ -106,7 +107,7 @@ class Mention {
 
 				$this->orderstore->update( $order_obj->ID, $order );
 				$this->publish->handle_publish( $order_obj, false );
-				$this->slack->react( 'ok_hand', $request['event']['ts'], $request['event']['channel'] );
+				$this->slack->react( Emojis::positive()[2], $request['event']['ts'], $request['event']['channel'] );
 
 				return [];
 			}
@@ -129,9 +130,9 @@ class Mention {
 				if ( $result['success'] ) {
 					$this->orderstore->update( $order_obj->ID, $result['order'] );
 					$this->publish->handle_publish( $order_obj, false );
-					$this->slack->react( 'thumbsup', $request['event']['ts'], $request['event']['channel'] );
+					$this->slack->react( Emojis::positive()[0], $request['event']['ts'], $request['event']['channel'] );
 				} else {
-					$this->slack->react( 'question', $request['event']['ts'], $request['event']['channel'] );
+					$this->slack->react( Emojis::negative()[0], $request['event']['ts'], $request['event']['channel'] );
 				}
 			}
 
@@ -308,7 +309,7 @@ class Mention {
 				$items
 			);
 		} else {
-			return ":disappointed: Drat, I don't know this place! Let the order manager know instead.";
+			return  Emojis::negative( true ) . " Drat, I don't know this place! Let the order manager know instead.";
 		}
 	}
 
