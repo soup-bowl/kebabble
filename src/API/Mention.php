@@ -88,8 +88,8 @@ class Mention {
 			return [ 'challenge' => $request['challenge'] ];
 		}
 
-		if ( ! empty( $request['event'] ) &&  $request['event']['type'] === 'app_mention' ) {
-			$order_obj = $this->get_latest_order();
+		if ( ! empty( $request['event'] ) && $request['event']['type'] === 'app_mention' ) {
+			$order_obj = $this->get_latest_order( $request['event']['channel'] );
 			$places    = wp_get_object_terms( $order_obj->ID, 'kebabble_company' );
 			$place     = ( isset( $places ) ) ? $places[0] : null;
 			$order     = $this->orderstore->get( $order_obj->ID );
@@ -244,9 +244,10 @@ class Mention {
 	/**
 	 * Grabs the latest order, and ignores incomplete or custom messages.
 	 *
+	 * @param string $channel Channel Slack-tag.
 	 * @return WP_Post|null
 	 */
-	public function get_latest_order():?WP_Post {
+	public function get_latest_order( string $channel ):?WP_Post {
 		// phpcs:disable WordPress.DB.SlowDBQuery
 		$order = get_posts(
 			[
@@ -260,6 +261,11 @@ class Mention {
 						'key'     => 'kebabble-order',
 						'value'   => '"override":{"enabled":false',
 						'compare' => 'LIKE',
+					],
+					[
+						'key'     => 'kebabble-slack-channel',
+						'value'   => $channel,
+						'compare' => '=',
 					],
 				],
 			]
