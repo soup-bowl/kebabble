@@ -90,9 +90,20 @@ class Mention {
 
 		if ( ! empty( $request['event'] ) && $request['event']['type'] === 'app_mention' ) {
 			$order_obj = $this->get_latest_order( $request['event']['channel'] );
-			$places    = wp_get_object_terms( $order_obj->ID, 'kebabble_company' );
-			$place     = ( isset( $places ) ) ? $places[0] : null;
-			$order     = $this->orderstore->get( $order_obj->ID );
+			if ( empty( $order_obj ) ) {
+				$this->slack->send_message(
+					Emojis::negative()[2] . ' I can\'t see an order, please check if the channel is correct!',
+					null,
+					$request['event']['channel'],
+					$request['event']['ts']
+				);
+
+				return [];
+			}
+
+			$places = wp_get_object_terms( $order_obj->ID, 'kebabble_company' );
+			$place  = ( isset( $places ) ) ? $places[0] : null;
+			$order  = $this->orderstore->get( $order_obj->ID );
 
 			$response = $this->informational_commands(
 				$request['event']['text'],
