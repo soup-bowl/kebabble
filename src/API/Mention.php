@@ -92,7 +92,7 @@ class Mention {
 			$order_obj = $this->get_latest_order( $request['event']['channel'] );
 			if ( empty( $order_obj ) ) {
 				$this->slack->send_message(
-					Emojis::negative()[2] . ' I can\'t see an order, please check if the channel is correct!',
+					$this->message( 4 ),
 					null,
 					$request['event']['channel'],
 					$request['event']['ts']
@@ -242,7 +242,7 @@ class Mention {
 	public function informational_commands( string $request, string $user, ?WP_Term $place = null ):?string {
 		// Friendly message to Kebabble? Also useful as a quick hello-world test.
 		if ( strpos( strtolower( $request ), 'help' ) !== false ) {
-			return $this->help_message( $user );
+			return sprintf( $this->message( 1 ), $user );
 		}
 
 		if ( strpos( strtolower( $request ), 'menu' ) !== false ) {
@@ -291,22 +291,6 @@ class Mention {
 	}
 
 	/**
-	 * Generic help message text.
-	 *
-	 * @param string $user Slack user ID, to @ them in the message.
-	 * @return string Pre-formatted for Slack.
-	 */
-	private function help_message( string $user ):string {
-		return "Hello, <@{$user}>! To help me help you, you can do the following:
-		• To order a kebab, mention the name of a known food item.
-		• To remove your order, say 'remove' before your food item.
-		• To order for someone else, add 'for (name)' after one of the above.
-		• To process many in one comment, separate with commas.\n
-		I will respond with a :thumbsup: if I've added your order, a :question: if I'm unsure and a :x: if there's a problem.
-		";
-	}
-
-	/**
 	 * Generates a simple menu of items ready for automatic parsing.
 	 *
 	 * @param int|null $company_id Company to collect the list from.
@@ -321,12 +305,9 @@ class Mention {
 				$items .= sprintf( '*%1$s* %2$s', $food, $this->money->output( $extra['Price'] ) ) . PHP_EOL;
 			}
 
-			return sprintf(
-				"Howdy <@{$user}>! I'm currently aware of the following menu items:\n\n%s\n\nMention one of these (ask me for help!) and I will handle it for you!",
-				$items
-			);
+			return sprintf( $this->message( 2 ), $user, $items );
 		} else {
-			return  Emojis::negative( true ) . " Drat, I don't know this place! Let the order manager know instead.";
+			return $this->message( 3 );
 		}
 	}
 
@@ -345,5 +326,37 @@ class Mention {
 		}
 
 		return $items;
+	}
+
+	/**
+	 * Sends back a sprintf-compatible message, based on the code:
+	 * 1 - Help message, %s for Slack name code.
+	 * 2 - Menu message, first %s for Slack name code and second for menu.
+	 * 3 - Unknown location response.
+	 * 4 - No current order response.
+	 *
+	 * @param integer $c Changes the response based on the input number.
+	 * @return string|null
+	 */
+	private function message( int $c ):?string {
+		switch ( $c ) {
+			case 1:
+				return "Hello, <@%s>! To help me help you, you can do the following:
+• To order a kebab, mention the name of a known food item.
+• To remove your order, say 'remove' before your food item.
+• To order for someone else, add 'for (name)' after one of the above.
+• To process many in one comment, separate with commas.
+
+I will respond with a :thumbsup: if I've added your order, a :question: if I'm unsure and a :x: if there's a problem.
+				";
+			case 2:
+				return "Howdy <@%s>! I'm currently aware of the following menu items:\n\n%s\n\nMention one of these (ask me for help!) and I will handle it for you!";
+			case 3:
+				return Emojis::negative( true ) . ' Drat, I don\'t know this place! Let the order manager know instead.';
+			case 4:
+				return Emojis::negative()[2] . ' I can\'t see an order, please check if the channel is correct!';
+			default:
+				return null;
+		}
 	}
 }
