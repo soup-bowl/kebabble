@@ -70,12 +70,20 @@ class Publish {
 	 * Post-process handling and formatting for the message.
 	 *
 	 * @param WP_Post $post_obj  Whole post object.
-	 * @param boolean $set_order Update the stored order in the process.
+	 * @param boolean $set_order Update the stored order in the process (also checks meta '_kebabble-dnr').
 	 * @return void
 	 */
 	public function handle_publish( WP_Post $post_obj, bool $set_order = true ):void {
 		// I'm sure there's a million better ways to do this, but for now it suffices.
 		if ( empty( get_post_meta( $post_obj->ID, 'kebabble-slack-deleted', true ) ) ) {
+			if ( $set_order ) {
+				$no_rep = get_post_meta( $post_obj->ID, '_kebabble-dnr' );
+				if ( ! empty( $no_rep ) ) {
+					$set_order = false;
+					delete_post_meta( $post_obj->ID, '_kebabble-dnr' );
+				}
+			}
+
 			$order_details = ( $set_order ) ? $this->orderstore->set( $post_obj->ID ) : $this->orderstore->get( $post_obj->ID );
 
 			$existing_message = get_post_meta( $post_obj->ID, 'kebabble-slack-ts', true );

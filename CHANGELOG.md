@@ -6,6 +6,7 @@ Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versio
 - The channel is changable for new orders created via WordPress (#33).
 - Orders placed via Slack can distinguish between channels.
 - Slackbot can be told to change collector (#30).
+- Slackbot can now begin orders (#29).
 
 ### Changed
 - Dependencies have been upgraded.

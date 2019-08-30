@@ -19,6 +19,7 @@ use KOrderParser\Parser;
 use WP_Post;
 use WP_Term;
 use WP_REST_Request;
+use Carbon\Carbon;
 
 /**
  * Handles Slack mentions, and processes the contents for relevant information.
@@ -89,6 +90,17 @@ class Mention {
 		}
 
 		if ( ! empty( $request['event'] ) && $request['event']['type'] === 'app_mention' ) {
+			if ( preg_match( '/\bnew order\b/', strtolower( $request['event']['text'] ) ) ) {
+				preg_match( '/(?<=at ).*$/i', $request['event']['text'], $place );
+				$this->new_order(
+					$request['event']['channel'],
+					( ! empty( $place ) ) ? $place[0] : null,
+					"<@{$request['event']['user']}>"
+				);
+
+				return [];
+			}
+
 			$order_obj = $this->get_latest_order( $request['event']['channel'] );
 			if ( empty( $order_obj ) ) {
 				$this->slack->send_message(
@@ -231,12 +243,62 @@ class Mention {
 	 * @return string|null Name of the collector, or null if no request was made.
 	 */
 	public function change_collector( string $request ):?string {
-		$confirm = preg_match('/change (?:the )?(?:(?:collector)|(?:driver)) to (.*)/i', $request, $result );
+		$confirm = preg_match( '/change (?:the )?(?:(?:collector)|(?:driver)) to (.*)/i', $request, $result );
 		if ( $confirm ) {
 			return $result[1];
 		}
 
 		return null;
+	}
+
+	/**
+	 * Starts a new order.
+	 *
+	 * @param string $channel   The Slack channel of operation.
+	 * @param string $resturant The place chosen, if in the system.
+	 * @param string $collector The name of the collector.
+	 * @return void Pubishes a new WordPress post.
+	 */
+	public function new_order( string $channel, ?string $resturant = null, ?string $collector = null ) {
+		$collector = ( isset( $collector ) ) ? $collector : 'Unspecified';
+		$company   = get_term_by( 'name', $resturant, 'kebabble_company' );
+
+		$post_title = 'Slack-generated order - ';
+		if ( isset( $resturant, $company ) ) {
+			$post_title .= $company->name . ' - ';
+		}
+		$post_title .= Carbon::now()->format( 'd/m/Y' );
+
+		$post_id = wp_insert_post(
+			[
+				'post_title'  => $post_title,
+				'post_status' => 'draft',
+				'post_type'   => 'kebabble_orders',
+				'meta_input'  => [
+					'kebabble-slack-channel' => $channel 
+				]
+			]
+		);
+
+		if ( is_wp_error( $post_id ) ) {
+			// TODO.
+			die();
+		}
+
+		$this->orderstore->set(
+			$post_id,
+			[
+				'korder_name'                => [],
+				'korder_food'                => [],
+				'kebabbleOrderTypeSelection' => 'Kebab',
+				'kebabbleCompanySelection'   => $company->term_id,
+				'kebabbleDriver'             => $collector
+			]
+		);
+
+		add_post_meta( $post_id, '_kebabble-dnr', 1 );
+
+		wp_publish_post( $post_id );
 	}
 	
 	public function informational_commands( string $request, string $user, ?WP_Term $place = null ):?string {
