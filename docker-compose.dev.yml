@@ -12,6 +12,8 @@ services:
     - 8081:80
     environment:
       MYSQL_ROOT_PASSWORD: zd09d7r39406d7s869f5s
+      PMA_USER: root
+      PMA_PASSWORD: zd09d7r39406d7s869f5s
   rbb_www:
     depends_on:
     - rbb_db
