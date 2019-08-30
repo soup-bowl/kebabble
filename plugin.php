@@ -9,15 +9,29 @@
  * Plugin Name: Kebabble
  * Description: Office food management system.
  * Author: soup-bowl
- * Author URI: https://github.com/soup-bowl/kebabble
- * Version: 0.3.3-Alpha
+ * Author URI: https://gitlab.com/soup-bowl/kebabble
+ * Version: 0.3.4-Alpha
  */
 
 defined( 'ABSPATH' ) || die( 'Operation not permitted.' );
 
-/**
- * Composer Autoloader.
- */
-require_once __DIR__ . '/vendor/autoload.php';
+$php_version = explode( '.', phpversion() );
+if ( (int) $php_version[0] >= 7 && (int) $php_version[1] >= 2 ) {
+	/**
+	 * Composer Autoloader.
+	 */
+	require_once __DIR__ . '/vendor/autoload.php';
 
-( new DI\Container() )->get( 'Kebabble\Hooks' )->main();
+	( new DI\Container() )->get( Kebabble\Hooks::class )->main();
+} else {
+	add_action(
+		'admin_notices',
+		function() {
+			?>
+			<div class="notice notice-error">
+				<p><b>Kebabble</b> is not supported on this PHP version. Please use <b>7.2 or higher</b>.</p>
+			</div>
+			<?php
+		}
+	);
+}

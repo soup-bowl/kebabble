@@ -1,6 +1,10 @@
 # Changelog
 Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+### Added
+- Check for PHP 7.2 or higher to avoid runtime errors (#36).
+
 ## [0.3.3] - 2019-08-30
 ### Added
 - The channel is changable for new orders created via WordPress (#33).
