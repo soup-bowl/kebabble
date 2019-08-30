@@ -3,7 +3,7 @@
  * Food ordering management system for WordPress.
  *
  * @package kebabble
- * @author soup-bowl <code@revive.today>
+ * @author soup-bowl <code@soupbowl.io>
  * @license MIT
  */
 
@@ -131,18 +131,11 @@ class Hooks {
 	 * @return void
 	 */
 	public function main():void {
-		// Settings API hooks.
-		add_action( 'admin_menu', [ &$this->settings, 'page' ] );
-		add_action( 'admin_init', [ &$this->settings, 'settings' ] );
-
 		// Register post type and data entries.
 		add_action( 'init', [ &$this->registration, 'orders' ], 0 );
 		add_action( 'add_meta_boxes_kebabble_orders', [ &$this->order_fields, 'order_options_setup' ] );
 		add_action( 'kebabble_company_add_form_fields', [ &$this->company_fields, 'company_options_empty' ] );
 		add_action( 'kebabble_company_edit_form_fields', [ &$this->company_fields, 'company_options' ] );
-
-		// Resource queue.
-		add_action( 'admin_enqueue_scripts', [ &$this, 'enqueued_scripts' ] );
 
 		// Order functionality.
 		add_action( 'publish_kebabble_orders', [ &$this->publish, 'hook_handle_publish' ], 10, 2 );
@@ -154,12 +147,22 @@ class Hooks {
 		add_action( 'created_kebabble_company', [ &$this->save, 'save_custom_company_details' ] );
 		add_action( 'edited_kebabble_company', [ &$this->save, 'save_custom_company_details' ] );
 
-		// Tables.
-		add_filter( 'manage_kebabble_orders_posts_columns', [ &$this->table, 'orders_column_definition' ] );
-        add_filter( 'manage_kebabble_orders_posts_custom_column', [ &$this->table, 'orders_table_data' ], 10, 2 );
-
 		// API Hooks.
 		add_action( 'rest_api_init', [ &$this, 'api_endpoints' ] );
+
+		// Admin area loaders.
+		if ( is_admin() ) {
+			// Settings API hooks.
+			add_action( 'admin_menu', [ &$this->settings, 'page' ] );
+			add_action( 'admin_init', [ &$this->settings, 'settings' ] );
+
+			// Resource queue.
+			add_action( 'admin_enqueue_scripts', [ &$this, 'enqueued_scripts' ] );
+
+			// Tables.
+			add_filter( 'manage_kebabble_orders_posts_columns', [ &$this->table, 'orders_column_definition' ] );
+			add_filter( 'manage_kebabble_orders_posts_custom_column', [ &$this->table, 'orders_table_data' ], 10, 2 );
+		}
 	}
 
 	/**
