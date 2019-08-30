@@ -15,16 +15,6 @@
         "phpunit/phpunit": "^8.2",
         "10up/wp_mock": "^0.4.1"
     },
-    "repositories": [
-        {
-            "type": "git",
-            "url": "https://gitlab.com/soup-bowl/kebabble-order-parser.git"
-        },
-        {
-            "type": "git",
-            "url": "https://gitlab.com/soup-bowl/slack-client-php.git"
-        }
-    ],
     "minimum-stability": "alpha",
     "prefer-stable": true,
     "autoload": {

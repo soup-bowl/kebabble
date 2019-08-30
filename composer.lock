@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "28ff1f4d9663a08cf14e29b038d15706",
+    "content-hash": "dabc98254d1f8430fc06ad2511960116",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -233,9 +233,9 @@
             "authors": [
                 {
                     "name": "Jeremy Lindblom",
-                    "role": "Developer",
                     "email": "jeremeamia@gmail.com",
-                    "homepage": "https://github.com/jeremeamia"
+                    "homepage": "https://github.com/jeremeamia",
+                    "role": "Developer"
                 }
             ],
             "description": "Serialize Closure objects, including their context and binding",
@@ -784,6 +784,12 @@
                 "url": "https://gitlab.com/soup-bowl/kebabble-order-parser.git",
                 "reference": "7aadb2f1cef079c6578219b85f8dfce9828a365c"
             },
+            "dist": {
+                "type": "zip",
+                "url": "https://gitlab.com/api/v4/projects/soup-bowl%2Fkebabble-order-parser/repository/archive.zip?sha=7aadb2f1cef079c6578219b85f8dfce9828a365c",
+                "reference": "7aadb2f1cef079c6578219b85f8dfce9828a365c",
+                "shasum": ""
+            },
             "require-dev": {
                 "phpunit/phpunit": "^8.2"
             },
@@ -793,11 +799,7 @@
                     "KOrderParser\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "KOrderParserTest\\": "tests/"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -813,6 +815,12 @@
                 "url": "https://gitlab.com/soup-bowl/slack-client-php.git",
                 "reference": "78c7a60082f293922e459f955cd1ae97caccfeab"
             },
+            "dist": {
+                "type": "zip",
+                "url": "https://gitlab.com/api/v4/projects/soup-bowl%2Fslack-client-php/repository/archive.zip?sha=78c7a60082f293922e459f955cd1ae97caccfeab",
+                "reference": "78c7a60082f293922e459f955cd1ae97caccfeab",
+                "shasum": ""
+            },
             "require": {
                 "guzzlehttp/guzzle": "^6.3",
                 "php": "^7.0"
@@ -826,11 +834,7 @@
                     "SlackClient\\": "comms/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "SlackClientTest\\": "tests/"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
