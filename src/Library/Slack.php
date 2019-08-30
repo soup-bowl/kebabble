@@ -120,6 +120,7 @@ class Slack {
 				$channels[] = [
 					'key'     => $channel['id'],
 					'channel' => '#' . $channel['name'],
+					'member'  => $channel['is_member']
 				];
 			}
 

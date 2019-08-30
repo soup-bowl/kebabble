@@ -126,9 +126,11 @@ class Settings {
 				?>
 				<select name="kbfos_settings[kbfos_botchannel]">
 					<?php foreach ( $channels as $channel ) : ?>
-					<option value='<?php echo $channel['key']; ?>' <?php selected( $options['kbfos_botchannel'], $channel['key'] ); ?>>
-						<?php echo $channel['channel']; ?>
-					</option>
+						<?php if ( $channel['member'] ) : ?>
+						<option value='<?php echo $channel['key']; ?>' <?php selected( $options['kbfos_botchannel'], $channel['key'] ); ?>>
+							<?php echo $channel['channel']; ?>
+						</option>
+						<?php endif; ?>
 					<?php endforeach; ?>
 				</select>
 				<?php
