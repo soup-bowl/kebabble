@@ -1,7 +1,7 @@
 # Changelog
 Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.3.3] - 2019-08-30
 ### Added
 - The channel is changable for new orders created via WordPress (#33).
 - Orders placed via Slack can distinguish between channels.
