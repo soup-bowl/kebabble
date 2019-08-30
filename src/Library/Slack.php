@@ -112,7 +112,7 @@ class Slack {
 	public function channels() {
 		$channels = get_transient( 'kebabble_channels' );
 
-		if ( $channels === false ) {		
+		if ( $channels === false ) {
 			$response = $this->client->connect( $this->token )->findChannels();
 
 			$channels = [];
@@ -120,7 +120,7 @@ class Slack {
 				$channels[] = [
 					'key'     => $channel['id'],
 					'channel' => '#' . $channel['name'],
-					'member'  => $channel['is_member']
+					'member'  => $channel['is_member'],
 				];
 			}
 

@@ -130,7 +130,7 @@ class Mention {
 
 				$this->orderstore->update( $order_obj->ID, $order );
 				$this->publish->handle_publish( $order_obj, false );
-				$this->slack->react( Emojis::positive()[2], $request['event']['ts'], $request['event']['channel'] );
+				$this->slack->react( Emojis::positive( 2 ), $request['event']['ts'], $request['event']['channel'] );
 
 				return [];
 			}
@@ -153,9 +153,9 @@ class Mention {
 				if ( $result['success'] ) {
 					$this->orderstore->update( $order_obj->ID, $result['order'] );
 					$this->publish->handle_publish( $order_obj, false );
-					$this->slack->react( Emojis::positive()[0], $request['event']['ts'], $request['event']['channel'] );
+					$this->slack->react( Emojis::positive( 0 ), $request['event']['ts'], $request['event']['channel'] );
 				} else {
-					$this->slack->react( Emojis::negative()[0], $request['event']['ts'], $request['event']['channel'] );
+					$this->slack->react( Emojis::negative( 0 ), $request['event']['ts'], $request['event']['channel'] );
 				}
 			}
 
@@ -166,10 +166,10 @@ class Mention {
 	/**
 	 * Processes the request contents and modifies the order accordingly.
 	 *
-	 * @param string $user    Slack user code.
-	 * @param string $request The whole message string that's been sent to our bot.
+	 * @param string  $user    Slack user code.
+	 * @param string  $request The whole message string that's been sent to our bot.
 	 * @param WP_Term $place  The place to operate with.
-	 * @param array $order    The existing order entity to modify, if necessary.
+	 * @param array   $order    The existing order entity to modify, if necessary.
 	 * @return array Choices reflect on the current post and the Slack channel.
 	 */
 	public function process_input_request( string $user, string $request, ?WP_Term $place, ?array $order ):array {
@@ -190,7 +190,10 @@ class Mention {
 		// Each segment of a multiple request. Normally only one.
 		foreach ( $messages as $message ) {
 			if ( empty( $message ) ) {
-				return [ 'success' => false, 'order' => $order ];
+				return [
+					'success' => false,
+					'order'   => $order,
+				];
 			}
 
 			$name = ( null === $message->getFor() ) ? "SLACK_{$user}" : $message->getFor();
@@ -230,9 +233,15 @@ class Mention {
 			unset( $order['order'] );
 			$order['order'] = array_values( $order_items );
 
-			return [ 'success' => true, 'order' => $order ];
+			return [
+				'success' => true,
+				'order'   => $order,
+			];
 		} else {
-			return [ 'success' => false, 'order' => $order ];
+			return [
+				'success' => false,
+				'order'   => $order,
+			];
 		}
 	}
 
@@ -275,8 +284,8 @@ class Mention {
 				'post_status' => 'draft',
 				'post_type'   => 'kebabble_orders',
 				'meta_input'  => [
-					'kebabble-slack-channel' => $channel 
-				]
+					'kebabble-slack-channel' => $channel,
+				],
 			]
 		);
 
@@ -292,7 +301,7 @@ class Mention {
 				'korder_food'                => [],
 				'kebabbleOrderTypeSelection' => 'Kebab',
 				'kebabbleCompanySelection'   => $company->term_id,
-				'kebabbleDriver'             => $collector
+				'kebabbleDriver'             => $collector,
 			]
 		);
 
@@ -300,7 +309,15 @@ class Mention {
 
 		wp_publish_post( $post_id );
 	}
-	
+
+	/**
+	 * Kebabble responds with an informational message.
+	 *
+	 * @param string       $request Slack request text.
+	 * @param string       $user    Slack user.
+	 * @param WP_Term|null $place   Place of order, if relevant.
+	 * @return string|null
+	 */
 	public function informational_commands( string $request, string $user, ?WP_Term $place = null ):?string {
 		// Friendly message to Kebabble? Also useful as a quick hello-world test.
 		if ( strpos( strtolower( $request ), 'help' ) !== false ) {
@@ -355,6 +372,7 @@ class Mention {
 	/**
 	 * Generates a simple menu of items ready for automatic parsing.
 	 *
+	 * @param string   $user       Slack user.
 	 * @param int|null $company_id Company to collect the list from.
 	 * @return string
 	 */
@@ -414,9 +432,9 @@ I will respond with a :thumbsup: if I've added your order, a :question: if I'm u
 			case 2:
 				return "Howdy <@%s>! I'm currently aware of the following menu items:\n\n%s\n\nMention one of these (ask me for help!) and I will handle it for you!";
 			case 3:
-				return Emojis::negative( true ) . ' Drat, I don\'t know this place! Let the order manager know instead.';
+				return Emojis::negative() . ' Drat, I don\'t know this place! Let the order manager know instead.';
 			case 4:
-				return Emojis::negative()[2] . ' I can\'t see an order, please check if the channel is correct!';
+				return Emojis::negative( 2 ) . ' I can\'t see an order, please check if the channel is correct!';
 			default:
 				return null;
 		}

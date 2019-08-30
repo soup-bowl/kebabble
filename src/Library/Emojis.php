@@ -13,54 +13,78 @@ namespace Kebabble\Library;
  * Slack emoji codes.
  */
 class Emojis {
-	public static function positive( bool $rand = false ) {
+	/**
+	 * Numerical index of various positively-viewed emojis.
+	 *
+	 * @param int|null $index Return a specific emoji, leave blank for random.
+	 * @return string Emoji in slack-code.
+	 */
+	public static function positive( int $index = null ):string {
 		$emojis = [
 			':thumbsup:',
 			':heavy_tick:',
 			':ok_hand:',
 			':muscle:',
 			':smile:',
-			':wink:'
+			':wink:',
 		];
 
-		if ( $rand ) {
-			return $emojis[ array_rand( $emojis, 1 ) ];
+		if ( isset( $index ) ) {
+			return $emojis[ $index ];
 		} else {
-			return $emojis;
+			return $emojis[ array_rand( $emojis, 1 ) ];
 		}
 	}
 
-	public static function negative( bool $rand = false ) {
+	/**
+	 * Numerical index of various negatively-viewed emojis.
+	 *
+	 * @param int|null $index Return a specific emoji, leave blank for random.
+	 * @return string Emoji in slack-code.
+	 */
+	public static function negative( int $index = null ):string {
 		$emojis = [
 			':thumbsdown:',
 			':heavy_multiplication_x:',
 			':disappointed:',
 			':flushed:',
 			':cry:',
-			':sad:'
+			':sad:',
 		];
 
-		if ( $rand ) {
-			return $emojis[ array_rand( $emojis, 1 ) ];
+		if ( isset( $index ) ) {
+			return $emojis[ $index ];
 		} else {
-			return $emojis;
+			return $emojis[ array_rand( $emojis, 1 ) ];
 		}
 	}
-	
-	public static function curious( bool $rand = false ) {
+
+	/**
+	 * Numerical index of various unexpected emojis.
+	 *
+	 * @param int|null $index Return a specific emoji, leave blank for random.
+	 * @return string Emoji in slack-code.
+	 */
+	public static function curious( int $index = null ):string {
 		$emojis = [
 			':question:',
 			':face_with_raised_eyebrow:',
-			':face_with_monocle:'
+			':face_with_monocle:',
 		];
 
-		if ( $rand ) {
-			return $emojis[ array_rand( $emojis, 1 ) ];
+		if ( isset( $index ) ) {
+			return $emojis[ $index ];
 		} else {
-			return $emojis;
+			return $emojis[ array_rand( $emojis, 1 ) ];
 		}
 	}
 
+	/**
+	 * Matches a string with an approximate emoji.
+	 *
+	 * @param string $desc String to be matched.
+	 * @return string Emoji in slack-code.
+	 */
 	public static function food( string $desc ):string {
 		$items = [
 			// Food types.
@@ -84,7 +108,7 @@ class Emojis {
 			'chinese'    => ':takeout_box:',
 			'indian'     => ':curry:',
 			'mexican'    => ':taco:',
-			'japanese'   => ':sushi:'
+			'japanese'   => ':sushi:',
 		];
 
 		$desc = strtolower( $desc );
@@ -95,6 +119,12 @@ class Emojis {
 		}
 	}
 
+	/**
+	 * Uncategorised string match emojis.
+	 *
+	 * @param string $name String to be matched.
+	 * @return string Emoji in slack-code.
+	 */
 	public static function misc( string $name ):string {
 		switch ( strtolower( $name ) ) {
 			case 'driver':

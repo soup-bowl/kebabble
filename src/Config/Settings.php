@@ -27,7 +27,7 @@ class Settings {
 	 *
 	 * @param Slack $slack Slack communication access.
 	 */
-	public function __construct(Slack $slack) {
+	public function __construct( Slack $slack ) {
 		$this->slack = $slack;
 	}
 
@@ -127,8 +127,8 @@ class Settings {
 				<select name="kbfos_settings[kbfos_botchannel]">
 					<?php foreach ( $channels as $channel ) : ?>
 						<?php if ( $channel['member'] ) : ?>
-						<option value='<?php echo $channel['key']; ?>' <?php selected( $options['kbfos_botchannel'], $channel['key'] ); ?>>
-							<?php echo $channel['channel']; ?>
+						<option value='<?php echo esc_attr( $channel['key'] ); ?>' <?php selected( $options['kbfos_botchannel'], $channel['key'] ); ?>>
+							<?php echo esc_attr( $channel['channel'] ); ?>
 						</option>
 						<?php endif; ?>
 					<?php endforeach; ?>

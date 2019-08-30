@@ -103,11 +103,11 @@ class OrderFields {
 					<p class="label"><label for="kebabbleOverrideChannel">Channel</label></p>
 					<?php if ( ! empty( $chosen ) ) : ?>
 					<input type="text" name="kebabbleOverrideChannel" id="kebabbleOverrideChannel" value="<?php echo esc_attr( $selected ); ?>" readonly>
-					<?php else: ?>
+					<?php else : ?>
 					<select name="kebabbleOverrideChannel">
 						<?php foreach ( $channels as $channel ) : ?>
-						<option value='<?php echo $channel['key']; ?>' <?php selected( $default, $channel['key'] ); ?>>
-							<?php echo $channel['channel']; ?>
+						<option value='<?php echo esc_attr( $channel['key'] ); ?>' <?php selected( $default, $channel['key'] ); ?>>
+							<?php echo esc_attr( $channel['channel'] ); ?>
 						</option>
 						<?php endforeach; ?>
 					</select>
