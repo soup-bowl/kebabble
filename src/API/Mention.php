@@ -95,7 +95,7 @@ class Mention {
 				$this->new_order(
 					$request['event']['channel'],
 					( ! empty( $place ) ) ? $place[0] : null,
-					"<@{$request['event']['user']}>"
+					$request['event']['user']
 				);
 
 				return [];
@@ -269,8 +269,19 @@ class Mention {
 	 * @return void Pubishes a new WordPress post.
 	 */
 	public function new_order( string $channel, ?string $resturant = null, ?string $collector = null ) {
-		$collector = ( isset( $collector ) ) ? $collector : 'Unspecified';
-		$company   = get_term_by( 'name', $resturant, 'kebabble_company' );
+		$collector       = ( isset( $collector ) ) ? $collector : 'Unspecified';
+		$company         = get_term_by( 'name', $resturant, 'kebabble_company' );
+		$collector_match = get_terms([
+			'hide_empty' => false,
+			'meta_query' => [
+				[
+					'key'       => 'keabble_collector_slackcode',
+					'value'     => $collector,
+					'compare'   => '='
+				]
+			],
+			'taxonomy'  => 'kebabble_collector',
+		]);
 
 		$post_title = 'Slack-generated order - ';
 		if ( isset( $resturant, $company ) ) {
@@ -294,16 +305,20 @@ class Mention {
 			die();
 		}
 
-		$this->orderstore->set(
-			$post_id,
-			[
-				'korder_name'                => [],
-				'korder_food'                => [],
-				'kebabbleOrderTypeSelection' => 'Kebab',
-				'kebabbleCompanySelection'   => $company->term_id,
-				'kebabbleDriver'             => $collector,
-			]
-		);
+		$order_details = [
+			'korder_name'                => [],
+			'korder_food'                => [],
+			'kebabbleOrderTypeSelection' => 'Kebab',
+			'kebabbleCompanySelection'   => $company->term_id,
+			'kebabbleDriver'             => "<@{$collector}>",
+		];
+
+		if ( ! empty( $collector_match ) ) {
+			$order_details['kebabbleDriverTax'] = get_term_meta( $collector_match[0]->term_id, 'kebabble_collector_tax', true );
+			$order_details['paymentOpts']       = get_term_meta( $collector_match[0]->term_id, 'kebabble_collector_payment_methods', true );
+		}
+
+		$this->orderstore->set( $post_id, $order_details );
 
 		add_post_meta( $post_id, '_kebabble-dnr', 1 );
 

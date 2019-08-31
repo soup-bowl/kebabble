@@ -10,6 +10,7 @@ Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versio
 - Company column shown in admin.
 - 'resource' is now 'assets'.
 - Tests moved out of src.
+- Drivers are now stored seperately, and come with their own payment and tax settings.
 
 ### Removed
 - 'Pull existing' removed as progress heads more towards Slack orientation.
