@@ -33,6 +33,8 @@ class Orderstore {
 	 * @return array The information stored in the database.
 	 */
 	public function set( int $post_id, array $response = null ):array {
+		$override = empty( $response['kebabbleCustomMessageEnabled'] ) ? false : true;
+
 		if ( empty( $response ) ) {
 			// phpcs:disable WordPress.Security.ValidatedSanitizedInput
 			if ( isset( $_POST ) && false !== wp_verify_nonce( sanitize_key( $_POST['kebabbleNonce'] ), 'kebabble_nonce' ) ) {
@@ -53,9 +55,19 @@ class Orderstore {
 			wp_delete_object_term_relationships( $post_id, 'kebabble_company' );
 		}
 
+		if ( (int) $response['kebabbleCollectorSelection'] > 0 ) {
+			wp_set_object_terms(
+				$post_id,
+				(int) $response['kebabbleCollectorSelection'],
+				'kebabble_collector'
+			);
+		} else {
+			wp_delete_object_term_relationships( $post_id, 'kebabble_collector' );
+		}
+
 		$conf_array = [
 			'override'    => [
-				'enabled' => empty( $response['kebabbleCustomMessageEnabled'] ) ? false : true,
+				'enabled' => $override,
 				'message' => ( isset( $response['kebabbleCustomMessageEntry'] ) ) ? $response['kebabbleCustomMessageEntry'] : null,
 			],
 			'food'        => $response['kebabbleOrderTypeSelection'],

@@ -47,10 +47,15 @@ class Save {
 	 * @return void Stores the expected data (got from POST) in the database.
 	 */
 	public function save_collector_options( int $term_id ):void {
-		if ( isset( $_POST['kebabble-collector-payopts'], $_POST['kebabbleNonce'] ) && wp_verify_nonce( sanitize_key( $_POST['kebabbleNonce'] ), 'kebabble_nonce' ) ) {
+		if ( isset( $_POST['kebabble-collector-payopts'], $_POST['kebabble-collector-charge'], $_POST['kebabbleNonce'] ) 
+		&& wp_verify_nonce( sanitize_key( $_POST['kebabbleNonce'] ), 'kebabble_nonce' ) ) {
 			$payment_opts       = explode( ',', sanitize_text_field( wp_unslash( $_POST['kebabble-collector-payopts'] ) ) );
 			$payment_opts_clean = array_filter( array_map( 'trim', $payment_opts ) );
+			$payment_charge     = (int) wp_unslash( $_POST['kebabble-collector-charge'] );
+			$payment_slackusr   = sanitize_text_field( wp_unslash( $_POST['kebabble-collector-slackcode'] ) );
 
+			update_term_meta( $term_id, 'kebabble_collector_tax', $payment_charge );
+			update_term_meta( $term_id, 'keabble_collector_slackcode', $payment_slackusr );
 			update_term_meta( $term_id, 'kebabble_collector_payment_methods', $payment_opts_clean );
 			update_term_meta( $term_id, '_kebabble_collector_payment_methods_org', $_POST['kebabble-collector-payopts'] );
 		}

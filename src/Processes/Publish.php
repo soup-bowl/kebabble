@@ -107,15 +107,27 @@ class Publish {
 			if ( $order_details['override']['enabled'] ) {
 				$timestamp = $this->slack->send_message( $order_details['override']['message'], $existing_message, $existing_channel );
 			} else {
+				$collector = $this->get_collector_details( $post_obj->ID );
+
+				if ( ! empty( $collector ) ) {
+					$collector_name  = $collector['name'];
+					$collector_tax   = $collector['tax'];
+					$collector_popts = $collector['payment_opts'];
+				} else {
+					$collector_name  = ( ! empty( $order_details['driver'] ) ) ? $order_details['driver'] : wp_get_current_user()->display_name;
+					$collector_tax   = (int) $order_details['tax'];
+					$collector_popts = ( is_array( $order_details['payment'] ) ) ? $order_details['payment'] : [ $order_details['payment'] ];
+				}
+
 				$timestamp = $this->slack->send_message(
 					$this->formatting->status(
 						$post_obj->ID,
 						$order_details['food'],
 						$order_details['order'],
-						( ! empty( $order_details['driver'] ) ) ? $order_details['driver'] : wp_get_current_user()->display_name,
-						(int) $order_details['tax'],
+						$collector_name,
+						$collector_tax,
 						Carbon::parse( get_the_date( 'Y-m-d H:i:s', $post_obj->ID ) ),
-						( is_array( $order_details['payment'] ) ) ? $order_details['payment'] : [ $order_details['payment'] ],
+						$collector_popts,
 						$order_details['paymentLink']
 					),
 					$existing_message,
@@ -164,5 +176,24 @@ class Publish {
 		}
 
 		return $data;
+	}
+
+	private function get_collector_details( $post_id ):?array {
+		$collector = null;
+		 if ( ! empty( wp_get_object_terms( $post_id, 'kebabble_collector' ) ) ) {
+			$collector = wp_get_object_terms( $post_id, 'kebabble_collector' )[0];
+		} else {
+			return null;
+		}
+
+		$tax       = get_term_meta( $collector->term_id, 'kebabble_collector_tax', true );
+		$slackcode = get_term_meta( $collector->term_id, 'keabble_collector_slackcode', true );
+		$payopts   = get_term_meta( $collector->term_id, 'kebabble_collector_payment_methods', true );
+
+		return [
+			'name'         => ( empty( $slackcode ) ) ? $collector->name : "<@{$slackcode}>",
+			'tax'          => $tax,
+			'payment_opts' => $payopts,
+		];
 	}
 }

@@ -179,7 +179,7 @@ class Hooks {
 	public function enqueued_scripts():void {
 		if ( 'kebabble_orders' === get_current_screen()->id ) {
 			wp_enqueue_style( 'kebabble-orders-css', plugins_url( '/../assets/orders.css', __FILE__ ), [], '1.1' );
-			wp_enqueue_script( 'kebabble-orders-js', plugins_url( '/../assets/orders.js', __FILE__ ), [ 'jquery' ], '1.0', true );
+			wp_enqueue_script( 'kebabble-orders-js', plugins_url( '/../assets/orders.js', __FILE__ ), [ 'jquery' ], '1.1', true );
 		}
 	}
 

@@ -77,9 +77,12 @@ class OrderFields {
 					$this->company_menu_selector( ( ! empty( $existing_order_details->existing_company ) ) ? $existing_order_details->existing_company[0] : null );
 					$this->food_selection( $existing_order_details->existing );
 					$this->order_input( $existing_order_details->existing );
-					$this->driver_input( $existing_order_details->existing );
-					$this->driver_tax_input( $existing_order_details->existing );
-					$this->payment_options( $existing_order_details->existing );
+					$this->collector_selector( ( ! empty( $existing_order_details->existing_collector ) ) ? $existing_order_details->existing_collector[0] : null );
+					?><div id="sctDriver"><?php
+						$this->driver_input( $existing_order_details->existing );
+						$this->driver_tax_input( $existing_order_details->existing );
+						$this->payment_options( $existing_order_details->existing );
+					?></div><?php
 					?>
 				</div>
 				<?php
@@ -257,6 +260,39 @@ class OrderFields {
 	}
 
 	/**
+	 * Select the person collecting the order. 
+	 *
+	 * @param WP_Term|null $existing Existing values in the database.
+	 * @return void Prints on the page.
+	 */
+	public function collector_selector( ?WP_Term $existing = null ):void {
+		$selected          = ( ! empty( $existing ) ) ? $existing->term_id : 0;
+		$options_available = get_terms(
+			[
+				'taxonomy'   => 'kebabble_collector',
+				'hide_empty' => false,
+			]
+		);
+
+		$select = '<option value=\'0\'>None</option>';
+		foreach ( $options_available as $option ) {
+			$mark_selected = ( $option->term_id === $selected ) ? 'selected' : '';
+			$select       .= "<option value='{$option->term_id}' {$mark_selected}>{$option->name}</option>";
+		}
+
+		// phpcs:disable WordPress.Security.EscapeOutput
+		?>
+		<div>
+			<p class="label"><label for="kebabbleCollectorSelection">Collector</label></p>
+			<select name="kebabbleCollectorSelection" id="selCollector">
+				<?php echo $select; ?>
+			</select>
+		</div>
+		<?php
+		// phpcs:enable
+	}
+
+	/**
 	 * Field for allocating the driver.
 	 *
 	 * @param array|null $existing Existing value (from orderstore) in the database.
@@ -266,7 +302,7 @@ class OrderFields {
 		$existing = ( ! empty( $existing ) ) ? $existing['driver'] : '';
 		?>
 		<div>
-			<p class="label"><label for="kebabbleDriver">Collector</label></p>
+			<p class="label"><label for="kebabbleDriver">Collector Name</label></p>
 			<input type="text" name="kebabbleDriver" id="kebabbleDriver" value="<?php echo esc_attr( $existing ); ?>" placeholder="Leave blank to use your WordPress name.">
 		</div>
 		<?php
@@ -367,12 +403,14 @@ class OrderFields {
 	 * @return stdClass
 	 */
 	private function get_existing_details( int $post_id ):stdClass {
-		$existing         = $this->orderstore->get( $post_id );
-		$existing_company = wp_get_post_terms( $post_id, 'kebabble_company' );
+		$existing           = $this->orderstore->get( $post_id );
+		$existing_company   = wp_get_post_terms( $post_id, 'kebabble_company' );
+		$existing_collector = wp_get_post_terms( $post_id, 'kebabble_collector' );
 
 		return (object) [
-			'existing'         => $existing,
-			'existing_company' => $existing_company,
+			'existing'           => $existing,
+			'existing_company'   => $existing_company,
+			'existing_collector' => $existing_collector,
 		];
 	}
 }
