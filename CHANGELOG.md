@@ -6,6 +6,9 @@ Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versio
 - Check for PHP 7.2 or higher to avoid runtime errors (#36).
 - Stat dashboard widget added, with simple analytics (#14).
 
+### Changed
+- Company column shown in admin.
+
 ## [0.3.3] - 2019-08-30
 ### Added
 - The channel is changable for new orders created via WordPress (#33).

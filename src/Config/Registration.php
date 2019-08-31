@@ -24,15 +24,7 @@ class Registration {
 			[
 				'label'        => __( 'Orders', 'text_domain' ),
 				'description'  => __( 'Order list', 'text_domain' ),
-				'labels'       => [
-					'name'          => _x( 'Orders', 'Post Type General Name', 'text_domain' ),
-					'singular_name' => _x( 'Order', 'Post Type Singular Name', 'text_domain' ),
-					'add_new_item'  => __( 'Add new order', 'text_domain' ),
-					'edit_item'     => __( 'Edit order', 'text_domain' ),
-					'update_item'   => __( 'Update order', 'text_domain' ),
-					'view_item'     => __( 'View order', 'text_domain' ),
-					'search_items'  => __( 'Search orders', 'text_domain' ),
-				],
+				'labels'       => $this->dymo( 'Order', 'Orders' ),
 				'supports'     => false,
 				'taxonomies'   => [ 'kebabble_company' ],
 				'public'       => false,
@@ -55,23 +47,37 @@ class Registration {
 			'kebabble_company',
 			[ 'kebabble_orders' ],
 			[
-				'label'        => __( 'Company', 'text_domain' ),
-				'description'  => __( 'Company list', 'text_domain' ),
-				'labels'       => [
-					'name'          => _x( 'Company', 'Post Type General Name', 'text_domain' ),
-					'singular_name' => _x( 'Company', 'Post Type Singular Name', 'text_domain' ),
-					'add_new_item'  => __( 'Add new company', 'text_domain' ),
-					'edit_item'     => __( 'Edit company', 'text_domain' ),
-					'update_item'   => __( 'Update company', 'text_domain' ),
-					'view_item'     => __( 'View company', 'text_domain' ),
-					'search_items'  => __( 'Search all companies', 'text_domain' ),
-				],
-				'supports'     => false,
-				'public'       => false,
-				'show_ui'      => true,
-				'show_in_menu' => true,
-				'meta_box_cb'  => false,
+				'label'             => __( 'Company', 'text_domain' ),
+				'description'       => __( 'Company list', 'text_domain' ),
+				'labels'            => $this->dymo( 'Company', 'Companies' ),
+				'supports'          => false,
+				'public'            => false,
+				'show_ui'           => true,
+				'show_in_menu'      => true,
+				'meta_box_cb'       => false,
+				'show_admin_column' => true,
 			]
 		);
+	}
+
+	/**
+	 * Generates tax/cpt labels.
+	 *
+	 * @param string $singular Singular name.
+	 * @param string $plural   Pluralised name (blank will append an 's').
+	 * @return string[]
+	 */
+	private function dymo( string $singular, string $plural = null ):array {
+		$plural = ( empty( $plural ) ) ? "{$singular}s" : $plural;
+
+		return [
+			'name'          => _x( $plural, 'Post Type General Name', 'text_domain' ),
+			'singular_name' => _x( $singular, 'Post Type Singular Name', 'text_domain' ),
+			'add_new_item'  => __( "Add new {$singular}", 'text_domain' ),
+			'edit_item'     => __( "Edit {$singular}", 'text_domain' ),
+			'update_item'   => __( "Update {$singular}", 'text_domain' ),
+			'view_item'     => __( "View {$singular}", 'text_domain' ),
+			'search_items'  => __( "Search all {$plural}", 'text_domain' ),
+		];
 	}
 }
