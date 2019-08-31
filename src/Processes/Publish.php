@@ -3,7 +3,7 @@
  * Food ordering management system for WordPress.
  *
  * @package kebabble
- * @author soup-bowl <code@revive.today>
+ * @author soup-bowl <code@soupbowl.io>
  * @license MIT
  */
 
@@ -53,6 +53,16 @@ class Publish {
 		$this->orderstore = $orderstore;
 		$this->formatting = $formatting;
 		$this->slack      = $slack;
+	}
+
+	/**
+	 * Registers WordPress hooks.
+	 *
+	 * @return void
+	 */
+	public function hook_publish() {
+		add_action( 'publish_kebabble_orders', [ &$this, 'hook_handle_publish' ], 10, 2 );
+		add_filter( 'wp_insert_post_data', [ &$this, 'change_title' ], 99, 2 );
 	}
 
 	/**

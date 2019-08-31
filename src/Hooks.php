@@ -142,15 +142,13 @@ class Hooks {
 	 */
 	public function main():void {
 		// Register post type and data entries.
-		add_action( 'init', [ &$this->registration, 'orders' ], 0 );
-		add_action( 'add_meta_boxes_kebabble_orders', [ &$this->order_fields, 'order_options_setup' ] );
+		$this->registration->hook_registration();
+		$this->order_fields->hook_order_fields();
 		$this->taxonomy_fields->hook_taxonomy_fields();
 
 		// Order functionality.
-		add_action( 'publish_kebabble_orders', [ &$this->publish, 'hook_handle_publish' ], 10, 2 );
-		add_filter( 'wp_insert_post_data', [ &$this->publish, 'change_title' ], 99, 2 );
-		add_action( 'trash_kebabble_orders', [ &$this->delete, 'handle_deletion' ], 10, 2 );
-		add_action( 'untrash_post', [ &$this->delete, 'handle_undeletion' ], 10, 2 );
+		$this->publish->hook_publish();
+		$this->delete->hook_deletion();
 
 		// Taxonomy functionality.
 		$this->save->hook_save_terms();
@@ -163,15 +161,13 @@ class Hooks {
 			$this->dashboard->hook_dashboard();
 
 			// Settings API hooks.
-			add_action( 'admin_menu', [ &$this->settings, 'page' ] );
-			add_action( 'admin_init', [ &$this->settings, 'settings' ] );
+			$this->settings->hook_settings();
 
 			// Resource queue.
 			add_action( 'admin_enqueue_scripts', [ &$this, 'enqueued_scripts' ] );
 
 			// Tables.
-			add_filter( 'manage_kebabble_orders_posts_columns', [ &$this->table, 'orders_column_definition' ] );
-			add_filter( 'manage_kebabble_orders_posts_custom_column', [ &$this->table, 'orders_table_data' ], 10, 2 );
+			$this->table->hook_table();
 		}
 	}
 

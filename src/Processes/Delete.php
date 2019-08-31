@@ -3,7 +3,7 @@
  * Food ordering management system for WordPress.
  *
  * @package kebabble
- * @author soup-bowl <code@revive.today>
+ * @author soup-bowl <code@soupbowl.io>
  * @license MIT
  */
 
@@ -51,6 +51,16 @@ class Delete {
 		$this->orderstore = $orderstore;
 		$this->formatting = $formatting;
 		$this->slack      = $slack;
+	}
+
+	/**
+	 * Registers WordPress hooks.
+	 *
+	 * @return void
+	 */
+	public function hook_deletion() {
+		add_action( 'trash_kebabble_orders', [ &$this, 'handle_deletion' ], 10, 2 );
+		add_action( 'untrash_post', [ &$this, 'handle_undeletion' ], 10, 2 );
 	}
 
 	/**

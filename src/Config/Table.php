@@ -3,7 +3,7 @@
  * Food ordering management system for WordPress.
  *
  * @package kebabble
- * @author soup-bowl <code@revive.today>
+ * @author soup-bowl <code@soupbowl.io>
  * @license MIT
  */
 
@@ -29,6 +29,16 @@ class Table {
 	 */
 	public function __construct( Slack $slack ) {
 		$this->slack = $slack;
+	}
+
+	/**
+	 * Registers WordPress hooks.
+	 *
+	 * @return void
+	 */
+	public function hook_table() {
+		add_filter( 'manage_kebabble_orders_posts_columns', [ &$this, 'orders_column_definition' ] );
+		add_filter( 'manage_kebabble_orders_posts_custom_column', [ &$this, 'orders_table_data' ], 10, 2 );
 	}
 
 	/**

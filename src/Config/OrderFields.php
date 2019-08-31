@@ -3,7 +3,7 @@
  * Food ordering management system for WordPress.
  *
  * @package kebabble
- * @author soup-bowl <code@revive.today>
+ * @author soup-bowl <code@soupbowl.io>
  * @license MIT
  */
 
@@ -45,6 +45,15 @@ class OrderFields {
 	public function __construct( Orderstore $orderstore, Slack $slack ) {
 		$this->orderstore = $orderstore;
 		$this->slack      = $slack;
+	}
+
+	/**
+	 * Registers WordPress hooks.
+	 *
+	 * @return void
+	 */
+	public function hook_order_fields() {
+		add_action( 'add_meta_boxes_kebabble_orders', [ &$this, 'order_options_setup' ] );
 	}
 
 	/**

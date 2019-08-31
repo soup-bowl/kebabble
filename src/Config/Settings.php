@@ -3,7 +3,7 @@
  * Food ordering management system for WordPress.
  *
  * @package kebabble
- * @author soup-bowl <code@revive.today>
+ * @author soup-bowl <code@soupbowl.io>
  * @license MIT
  */
 
@@ -29,6 +29,16 @@ class Settings {
 	 */
 	public function __construct( Slack $slack ) {
 		$this->slack = $slack;
+	}
+
+	/**
+	 * Registers WordPress hooks.
+	 *
+	 * @return void
+	 */
+	public function hook_settings() {
+		add_action( 'admin_menu', [ &$this, 'page' ] );
+		add_action( 'admin_init', [ &$this, 'settings' ] );
 	}
 
 	/**

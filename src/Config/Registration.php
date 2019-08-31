@@ -3,7 +3,7 @@
  * Food ordering management system for WordPress.
  *
  * @package kebabble
- * @author soup-bowl <code@revive.today>
+ * @author soup-bowl <code@soupbowl.io>
  * @license MIT
  */
 
@@ -13,6 +13,15 @@ namespace Kebabble\Config;
  * Configures the objects and terms with WordPress.
  */
 class Registration {
+	/**
+	 * Registers WordPress hooks.
+	 *
+	 * @return void
+	 */
+	public function hook_registration() {
+		add_action( 'init', [ &$this, 'orders' ], 0 );
+	}
+
 	/**
 	 * Creates a new custom post type for orders, and a accompanying company tax.
 	 *

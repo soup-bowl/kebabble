@@ -15,6 +15,11 @@ use WP_Term;
  * Display formatting on the kebabble taxonomies.
  */
 class TaxonomyFields {
+	/**
+	 * Registers WordPress hooks.
+	 *
+	 * @return void
+	 */
 	public function hook_taxonomy_fields() {
 		add_action( 'kebabble_company_add_form_fields', [ &$this, 'company_options_empty' ] );
 		add_action( 'kebabble_company_edit_form_fields', [ &$this, 'company_options' ] );
