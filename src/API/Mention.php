@@ -271,17 +271,7 @@ class Mention {
 	public function new_order( string $channel, ?string $resturant = null, ?string $collector = null ) {
 		$collector       = ( isset( $collector ) ) ? $collector : 'Unspecified';
 		$company         = get_term_by( 'name', $resturant, 'kebabble_company' );
-		$collector_match = get_terms([
-			'hide_empty' => false,
-			'meta_query' => [
-				[
-					'key'       => 'keabble_collector_slackcode',
-					'value'     => $collector,
-					'compare'   => '='
-				]
-			],
-			'taxonomy'  => 'kebabble_collector',
-		]);
+		$collector_match = $this->find_collector( $collector, true );
 
 		$post_title = 'Slack-generated order - ';
 		if ( isset( $resturant, $company ) ) {
@@ -314,8 +304,8 @@ class Mention {
 		];
 
 		if ( ! empty( $collector_match ) ) {
-			$order_details['kebabbleDriverTax'] = get_term_meta( $collector_match[0]->term_id, 'kebabble_collector_tax', true );
-			$order_details['paymentOpts']       = get_term_meta( $collector_match[0]->term_id, 'kebabble_collector_payment_methods', true );
+			$order_details['kebabbleDriverTax'] = get_term_meta( $collector_match->term_id, 'kebabble_collector_tax', true );
+			$order_details['paymentOpts']       = get_term_meta( $collector_match->term_id, 'kebabble_collector_payment_methods', true );
 		}
 
 		$this->orderstore->set( $post_id, $order_details );
@@ -384,6 +374,40 @@ class Mention {
 		}
 	}
 
+	/**
+	 * Finds the driver in the WordPress database.
+	 *
+	 * @param string  $name       Name (or slack identifer) of the person. 
+	 * @param boolean $slack_code If true, the codes will be looked up instead.
+	 * @return WP_Term|null
+	 */
+	private function find_collector( string $name, bool $slack_code = true ):?WP_Term {
+		if ( $slack_code ) {
+			$search_query = get_terms([
+				'hide_empty' => false,
+				'meta_query' => [
+					[
+						'key'       => 'keabble_collector_slackcode',
+						'value'     => $name,
+						'compare'   => '='
+					]
+				],
+				'taxonomy'  => 'kebabble_collector',
+			]);
+		} else {
+			$search_query = get_terms([
+				'hide_empty' => false,
+				'name'       => $name,
+				'taxonomy'   => 'kebabble_collector',
+			]);
+		}
+
+		if ( ! empty( $search_query ) ) {
+			return $search_query[0];
+		} else {
+			return null;
+		}
+	}
 	/**
 	 * Generates a simple menu of items ready for automatic parsing.
 	 *
