@@ -17,6 +17,7 @@ use Kebabble\Config\Settings;
 use Kebabble\Config\OrderFields;
 use Kebabble\Config\CompanyFields;
 use Kebabble\Config\Table;
+use Kebabble\Config\Dashboard;
 use Kebabble\API\Mention;
 
 use WP_Term;
@@ -91,6 +92,13 @@ class Hooks {
 	protected $api_mention;
 
 	/**
+	 * Handles the Kebabble-related dashboard widgets.
+	 *
+	 * @var Dashboard
+	 */
+	protected $dashboard;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param Registration  $registration   Connects with the system required objects.
@@ -102,6 +110,7 @@ class Hooks {
 	 * @param Table         $table          Table configurations.
 	 * @param Save          $save           Storage processing for saved term items.
 	 * @param Mention       $api_mention    Handles mentions from and to the Slack API.
+	 * @param Dashboard     $dashboard      Handles the Kebabble-related dashboard widgets.
 	 */
 	public function __construct(
 			Registration $registration,
@@ -112,7 +121,8 @@ class Hooks {
 			CompanyFields $company_fields,
 			Table $table,
 			Save $save,
-			Mention $api_mention
+			Mention $api_mention,
+			Dashboard $dashboard
 		) {
 		$this->registration   = $registration;
 		$this->publish        = $publish;
@@ -123,6 +133,7 @@ class Hooks {
 		$this->table          = $table;
 		$this->save           = $save;
 		$this->api_mention    = $api_mention;
+		$this->dashboard      = $dashboard;
 	}
 
 	/**
@@ -152,6 +163,8 @@ class Hooks {
 
 		// Admin area loaders.
 		if ( is_admin() ) {
+			$this->dashboard->hook_dashboard();
+
 			// Settings API hooks.
 			add_action( 'admin_menu', [ &$this->settings, 'page' ] );
 			add_action( 'admin_init', [ &$this->settings, 'settings' ] );

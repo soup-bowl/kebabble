@@ -4,6 +4,7 @@ Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versio
 ## Unreleased
 ### Added
 - Check for PHP 7.2 or higher to avoid runtime errors (#36).
+- Stat dashboard widget added, with simple analytics (#14).
 
 ## [0.3.3] - 2019-08-30
 ### Added
