@@ -360,16 +360,6 @@ class OrderFields {
 	private function get_existing_details( int $post_id ):stdClass {
 		$existing         = $this->orderstore->get( $post_id );
 		$existing_company = wp_get_post_terms( $post_id, 'kebabble_company' );
-		$pullthrough      = ( isset( get_option( 'kbfos_settings' )['kbfos_pullthrough'] ) && 1 === (int) get_option( 'kbfos_settings' )['kbfos_pullthrough'] ) ? true : false;
-
-		// Non-strict comparison needed here, until checkbox sanitization on meta is done.
-		if ( empty( $existing ) && $pullthrough && ! empty( get_previous_post() ) ) {
-			$existing         = $this->orderstore->get( get_previous_post()->ID );
-			$existing_company = wp_get_post_terms( get_previous_post()->ID, 'kebabble_company' );
-
-			$existing['override']['enabled'] = false;
-			$existing['override']['message'] = '';
-		}
 
 		return (object) [
 			'existing'         => $existing,

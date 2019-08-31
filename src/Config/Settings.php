@@ -140,21 +140,6 @@ class Settings {
 		);
 
 		add_settings_field(
-			'kbfos_pullthrough',
-			__( 'Use Existing', 'text_domain' ),
-			function() {
-				$options     = get_option( 'kbfos_settings' );
-				$pullthrough = ( isset( get_option( 'kbfos_settings' )['kbfos_pullthrough'] ) ) ? get_option( 'kbfos_settings' )['kbfos_pullthrough'] : 0;
-				?>
-				<input type='checkbox' name='kbfos_settings[kbfos_pullthrough]' <?php checked( $pullthrough, 1 ); ?> value='1'>
-				<p class="description">Pulls through the previously used values, excluding the order.</p>
-				<?php
-			},
-			'pluginPage',
-			'kbfos_pluginPage_section'
-		);
-
-		add_settings_field(
 			'kbfos_payopts',
 			__( 'Payment Formats', 'text_domain' ),
 			function() {

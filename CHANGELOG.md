@@ -11,6 +11,9 @@ Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versio
 - 'resource' is now 'assets'.
 - Tests moved out of src.
 
+### Removed
+- 'Pull existing' removed as progress heads more towards Slack orientation.
+
 ## [0.3.3] - 2019-08-30
 ### Added
 - The channel is changable for new orders created via WordPress (#33).

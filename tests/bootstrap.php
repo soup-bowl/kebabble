@@ -22,7 +22,6 @@ function get_option( $option = null ) {
 	return [
 		'kbfos_botkey'      => 'xorb-somefakestring',
 		'kbfos_botchannel'  => '#example',
-		'kbfos_pullthrough' => 1,
 		'kbfos_payopts'     => 'Cash, Other',
 	];
 }
