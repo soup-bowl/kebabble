@@ -15,12 +15,11 @@ use Kebabble\Processes\Term\Save;
 use Kebabble\Config\Registration;
 use Kebabble\Config\Settings;
 use Kebabble\Config\OrderFields;
-use Kebabble\Config\CompanyFields;
+use Kebabble\Config\TaxonomyFields;
 use Kebabble\Config\Table;
 use Kebabble\Config\Dashboard;
 use Kebabble\API\Mention;
 
-use WP_Term;
 use WP_Error;
 use WP_REST_Request;
 
@@ -64,11 +63,11 @@ class Hooks {
 	protected $order_fields;
 
 	/**
-	 * Fields for the company taxonomy.
+	 * Fields for the taxonomy.
 	 *
-	 * @var CompanyFields
+	 * @var TaxonomyFields
 	 */
-	protected $company_fields;
+	protected $taxonomy_fields;
 
 	/**
 	 * Table configurations.
@@ -101,16 +100,16 @@ class Hooks {
 	/**
 	 * Constructor.
 	 *
-	 * @param Registration  $registration   Connects with the system required objects.
-	 * @param Publish       $publish        Publish processes for order posts.
-	 * @param Delete        $delete         Handles deletion of posted orders.
-	 * @param Settings      $settings       Settings page handler.
-	 * @param OrderFields   $order_fields   Fields for the order form.
-	 * @param CompanyFields $company_fields Fields for the company taxonomy.
-	 * @param Table         $table          Table configurations.
-	 * @param Save          $save           Storage processing for saved term items.
-	 * @param Mention       $api_mention    Handles mentions from and to the Slack API.
-	 * @param Dashboard     $dashboard      Handles the Kebabble-related dashboard widgets.
+	 * @param Registration   $registration    Connects with the system required objects.
+	 * @param Publish        $publish         Publish processes for order posts.
+	 * @param Delete         $delete          Handles deletion of posted orders.
+	 * @param Settings       $settings        Settings page handler.
+	 * @param OrderFields    $order_fields    Fields for the order form.
+	 * @param TaxonomyFields $taxonomy_fields Fields for the taxonomy.
+	 * @param Table          $table           Table configurations.
+	 * @param Save           $save            Storage processing for saved term items.
+	 * @param Mention        $api_mention     Handles mentions from and to the Slack API.
+	 * @param Dashboard      $dashboard       Handles the Kebabble-related dashboard widgets.
 	 */
 	public function __construct(
 			Registration $registration,
@@ -118,22 +117,22 @@ class Hooks {
 			Delete $delete,
 			Settings $settings,
 			OrderFields $order_fields,
-			CompanyFields $company_fields,
+			TaxonomyFields $taxonomy_fields,
 			Table $table,
 			Save $save,
 			Mention $api_mention,
 			Dashboard $dashboard
 		) {
-		$this->registration   = $registration;
-		$this->publish        = $publish;
-		$this->delete         = $delete;
-		$this->settings       = $settings;
-		$this->order_fields   = $order_fields;
-		$this->company_fields = $company_fields;
-		$this->table          = $table;
-		$this->save           = $save;
-		$this->api_mention    = $api_mention;
-		$this->dashboard      = $dashboard;
+		$this->registration    = $registration;
+		$this->publish         = $publish;
+		$this->delete          = $delete;
+		$this->settings        = $settings;
+		$this->order_fields    = $order_fields;
+		$this->taxonomy_fields = $taxonomy_fields;
+		$this->table           = $table;
+		$this->save            = $save;
+		$this->api_mention     = $api_mention;
+		$this->dashboard       = $dashboard;
 	}
 
 	/**
@@ -145,8 +144,7 @@ class Hooks {
 		// Register post type and data entries.
 		add_action( 'init', [ &$this->registration, 'orders' ], 0 );
 		add_action( 'add_meta_boxes_kebabble_orders', [ &$this->order_fields, 'order_options_setup' ] );
-		add_action( 'kebabble_company_add_form_fields', [ &$this->company_fields, 'company_options_empty' ] );
-		add_action( 'kebabble_company_edit_form_fields', [ &$this->company_fields, 'company_options' ] );
+		$this->taxonomy_fields->hook_taxonomy_fields();
 
 		// Order functionality.
 		add_action( 'publish_kebabble_orders', [ &$this->publish, 'hook_handle_publish' ], 10, 2 );
@@ -154,9 +152,8 @@ class Hooks {
 		add_action( 'trash_kebabble_orders', [ &$this->delete, 'handle_deletion' ], 10, 2 );
 		add_action( 'untrash_post', [ &$this->delete, 'handle_undeletion' ], 10, 2 );
 
-		// Company functionality.
-		add_action( 'created_kebabble_company', [ &$this->save, 'save_custom_company_details' ] );
-		add_action( 'edited_kebabble_company', [ &$this->save, 'save_custom_company_details' ] );
+		// Taxonomy functionality.
+		$this->save->hook_save_terms();
 
 		// API Hooks.
 		add_action( 'rest_api_init', [ &$this, 'api_endpoints' ] );
