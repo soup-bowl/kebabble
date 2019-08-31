@@ -9,6 +9,7 @@ Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versio
 ### Changed
 - Company column shown in admin.
 - 'resource' is now 'assets'.
+- Tests moved out of src.
 
 ## [0.3.3] - 2019-08-30
 ### Added

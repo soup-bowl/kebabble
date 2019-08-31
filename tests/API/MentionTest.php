@@ -7,7 +7,7 @@
  * @license MIT
  */
 
-namespace Kebabble\Tests\API;
+namespace KebabbleTests\API;
 
 use Kebabble\API\Mention;
 

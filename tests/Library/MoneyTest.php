@@ -7,7 +7,7 @@
  * @license MIT
  */
 
-namespace Kebabble\Tests\Library;
+namespace KebabbleTests\Library;
 
 use Kebabble\Library\Money;
 

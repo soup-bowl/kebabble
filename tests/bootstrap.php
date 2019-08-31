@@ -3,14 +3,14 @@
  * Food ordering management system for WordPress.
  *
  * @package kebabble
- * @author soup-bowl <code@revive.today>
+ * @author soup-bowl <code@soupbowl.io>
  * @license MIT
  */
 
 /**
  * Composer.
  */
-require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 /**
  * Replicate the WordPress option functionality used by Kebabble to retrieve settings.
