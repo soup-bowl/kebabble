@@ -2,6 +2,9 @@
 Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Orders stop at midnight, to prevent people accidentally applying orders to previous days.
+
 ### Changed
 - Orders now stored in seperate meta entities, to improve internal accessibility (not backwards compatible).
 
