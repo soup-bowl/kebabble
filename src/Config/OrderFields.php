@@ -54,6 +54,25 @@ class OrderFields {
 	 */
 	public function hook_order_fields() {
 		add_action( 'add_meta_boxes_kebabble_orders', [ &$this, 'order_options_setup' ] );
+		add_action( 'post_submitbox_misc_actions', [ &$this, 'order_publish_box' ] );
+	}
+
+	/**
+	 * Displays additional details underneath the Publish box info.
+	 *
+	 * @return void Prints on the page.
+	 */
+	public function order_publish_box() {
+		if ( get_current_screen()->id === 'kebabble_orders' ) {
+			$is_expired = $this->orderstore->get( get_the_id() )['kebabble-is-expired'];
+			?>
+			<div class="misc-pub-section">
+				<span class="dashicons dashicons-clipboard" style="color:#82878c;"></span>&nbsp;
+				Order status:
+				<span id="post-status-display"><?php echo ( ! $is_expired ) ? 'Active' : 'Closed'; ?></span>
+			</div>
+			<?php
+		}
 	}
 
 	/**
@@ -68,7 +87,7 @@ class OrderFields {
 		add_meta_box(
 			'kebabbleorderdetails',
 			'Order',
-			function( $post ) use ( &$existing_order_details ) {
+			function ( $post ) use ( &$existing_order_details ) {
 				$this->custom_message_renderer( $existing_order_details->existing );
 				?>
 				<div id="kebabbleOrder">

@@ -22,9 +22,12 @@ class Orderstore {
 	 * @return array|null
 	 */
 	public function get( int $post_id ):?array {
-		$is_custom = ( empty( get_post_meta( $post_id, 'kebabble-custom-message', true ) ) ) ? false : true;
-		$options   = [
+		$is_custom  = ( empty( get_post_meta( $post_id, 'kebabble-custom-message', true ) ) ) ? false : true;
+		$is_expired = ( ! empty( get_post_meta( $post_id, 'kebabble-timeout', true ) ) ) ? get_post_meta( $post_id, 'kebabble-timeout', true ) : 0;
+
+		$options = [
 			'kebabble-is-custom'      => $is_custom,
+			'kebabble-is-expired'     => ( $is_expired >= Carbon::now()->timestamp ) ? false : true,
 			'kebabble-custom-message' => get_post_meta( $post_id, 'kebabble-custom-message', true ),
 			'kebabble-food'           => get_post_meta( $post_id, 'kebabble-food', true ),
 			'kebabble-order'          => get_post_meta( $post_id, 'kebabble-order', true ),
