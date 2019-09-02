@@ -278,7 +278,7 @@ class OrderFields {
 					?>
 				</tbody>
 			</table>
-			<a class="btnAddkorder button" href="#">Add</a>
+			<p><a class="btnAddkorder button" href="#">Add</a></p>
 			<input type=hidden value="" />
 		</div>
 		<?php
