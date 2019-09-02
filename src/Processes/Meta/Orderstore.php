@@ -83,8 +83,13 @@ class Orderstore {
 			'tax'          => ( isset( $response['kebabbleDriverTax'] ) ) ? $response['kebabbleDriverTax'] : null,
 			'payment'      => ( isset( $response['paymentOpts'] ) ) ? $response['paymentOpts'] : null,
 			'payment-link' => [],
-			'pin'          => empty( $response['pinState'] ) ? false : true,
 		];
+
+		if ( ! empty( $response['pinState'] ) ) {
+			update_post_meta( $post_id, 'kebabble-pin', true );
+		} else {
+			delete_post_meta( $post_id, 'kebabble-pin' );
+		}
 
 		foreach ( $items as $item_key => $item_value ) {
 			update_post_meta( $post_id, 'kebabble-' . $item_key, $item_value );

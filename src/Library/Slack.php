@@ -79,13 +79,41 @@ class Slack {
 	/**
 	 * Changes the pin status of the specified Slack message.
 	 *
-	 * @param boolean $pin    Represents the pin status.
-	 * @param string  $ts      Operation timestamp (basically an ID).
-	 * @param string  $channel Channel of operation.
+	 * @param boolean $pin                 Represents the pin status.
+	 * @param string  $ts                  Operation timestamp (basically an ID).
+	 * @param string  $channel             Channel of operation.
+	 * @param string $unpin_previous_order Should the previous order be removed.
 	 * @return void
 	 */
-	public function pin( bool $pin, string $ts, string $channel ) {
+	public function pin( bool $pin, string $ts, string $channel, bool $unpin_previous_order = false ) {
 		if ( $pin ) {
+			if ( $unpin_previous_order ) {
+				$order = get_posts(
+					[
+						'post_type'      => 'kebabble_orders',
+						'post_status'    => 'publish',
+						'posts_per_page' => 2,
+						'meta_query'     => [
+							[
+								'key'     => 'kebabble-custom-message',
+								'compare' => 'NOT EXISTS',
+							],
+							[
+								'key'     => 'kebabble-pin',
+								'compare' => 'EXISTS',
+							],
+						],
+					]
+				);
+
+				if ( ! empty( $order ) ) {
+					delete_post_meta( $order[1]->ID, 'kebabble-pin' );
+					$this->client->connect( $this->token )->setChannel( $channel )->unpin(
+						get_post_meta( $order[1]->ID, 'kebabble-slack-ts', true )
+					);
+				}
+			}
+
 			$this->client->connect( $this->token )->setChannel( $channel )->pin( $ts );
 		} else {
 			$this->client->connect( $this->token )->setChannel( $channel )->unpin( $ts );

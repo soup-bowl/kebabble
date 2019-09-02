@@ -139,7 +139,7 @@ class Publish {
 				);
 			}
 
-			$this->slack->pin( $order_details['kebabble-pin'], $timestamp, $existing_channel );
+			$this->slack->pin( $order_details['kebabble-pin'], $timestamp, $existing_channel, true );
 
 			if ( empty( $existing_message ) ) {
 				add_post_meta( $post_obj->ID, 'kebabble-slack-ts', $timestamp, true );
