@@ -31,8 +31,8 @@ class Registration {
 		register_post_type(
 			'kebabble_orders',
 			[
-				'label'        => __( 'Orders', 'text_domain' ),
-				'description'  => __( 'Order list', 'text_domain' ),
+				'label'        => __( 'Orders', 'kebabble' ),
+				'description'  => __( 'Order list', 'kebabble' ),
 				'labels'       => $this->dymo( 'Order', 'Orders' ),
 				'supports'     => false,
 				'taxonomies'   => [ 'kebabble_company' ],
@@ -56,8 +56,8 @@ class Registration {
 			'kebabble_company',
 			[ 'kebabble_orders' ],
 			[
-				'label'             => __( 'Company', 'text_domain' ),
-				'description'       => __( 'Company list', 'text_domain' ),
+				'label'             => __( 'Company', 'kebabble' ),
+				'description'       => __( 'Company list', 'kebabble' ),
 				'labels'            => $this->dymo( 'Company', 'Companies' ),
 				'supports'          => false,
 				'public'            => false,
@@ -72,8 +72,8 @@ class Registration {
 			'kebabble_collector',
 			[ 'kebabble_orders' ],
 			[
-				'label'        => __( 'Collector', 'text_domain' ),
-				'description'  => __( 'Collector list', 'text_domain' ),
+				'label'        => __( 'Collector', 'kebabble' ),
+				'description'  => __( 'Collector list', 'kebabble' ),
 				'labels'       => $this->dymo( 'Collector', 'Collectors' ),
 				'supports'     => false,
 				'public'       => false,
@@ -95,13 +95,13 @@ class Registration {
 		$plural = ( empty( $plural ) ) ? "{$singular}s" : $plural;
 
 		return [
-			'name'          => _x( $plural, 'Post Type General Name', 'text_domain' ),
-			'singular_name' => _x( $singular, 'Post Type Singular Name', 'text_domain' ),
-			'add_new_item'  => __( "Add new {$singular}", 'text_domain' ),
-			'edit_item'     => __( "Edit {$singular}", 'text_domain' ),
-			'update_item'   => __( "Update {$singular}", 'text_domain' ),
-			'view_item'     => __( "View {$singular}", 'text_domain' ),
-			'search_items'  => __( "Search all {$plural}", 'text_domain' ),
+			'name'          => _x( $plural, 'Post Type General Name', 'kebabble' ),
+			'singular_name' => _x( $singular, 'Post Type Singular Name', 'kebabble' ),
+			'add_new_item'  => __( "Add new {$singular}", 'kebabble' ),
+			'edit_item'     => __( "Edit {$singular}", 'kebabble' ),
+			'update_item'   => __( "Update {$singular}", 'kebabble' ),
+			'view_item'     => __( "View {$singular}", 'kebabble' ),
+			'search_items'  => __( "Search all {$plural}", 'kebabble' ),
 		];
 	}
 }

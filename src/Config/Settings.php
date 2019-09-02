@@ -94,7 +94,7 @@ class Settings {
 	public function render_description():void {
 		add_settings_section(
 			'kbfos_pluginPage_section',
-			__( 'Slack Configuration', 'text_domain' ),
+			__( 'Slack Configuration', 'kebabble' ),
 			function() {
 					echo 'Configure Kebabble to use your Slack.';
 			},
@@ -110,7 +110,7 @@ class Settings {
 	public function render_slack_config():void {
 		add_settings_field(
 			'kbfos_botkey',
-			__( 'Slack Bot Auth key', 'text_domain' ),
+			__( 'Slack Bot Auth key', 'kebabble' ),
 			function () {
 				if ( getenv( 'KEBABBLE_BOT_AUTH' ) !== false ) {
 					?>
@@ -129,7 +129,7 @@ class Settings {
 
 		add_settings_field(
 			'kbfos_botchannel',
-			__( 'Default Slack Channel', 'text_domain' ),
+			__( 'Default Slack Channel', 'kebabble' ),
 			function() {
 				$options  = get_option( 'kbfos_settings' );
 				$channels = $this->slack->channels();
@@ -151,7 +151,7 @@ class Settings {
 
 		add_settings_field(
 			'kbfos_payopts',
-			__( 'Payment Formats', 'text_domain' ),
+			__( 'Payment Formats', 'kebabble' ),
 			function() {
 				$options = get_option( 'kbfos_settings' );
 				?>
@@ -165,7 +165,7 @@ class Settings {
 
 		add_settings_field(
 			'kbfos_place_type',
-			__( 'Place Types', 'text_domain' ),
+			__( 'Place Types', 'kebabble' ),
 			function() {
 				$options = get_option( 'kbfos_settings' );
 				?>

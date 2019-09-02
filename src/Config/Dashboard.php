@@ -59,12 +59,20 @@ class Dashboard {
 	 * @return void
 	 */
 	public function info_widget_content() {
-		$counts = $this->stats->order_counts();
-		?>
-		<p>There has been a <b>total of <?php echo esc_html( $counts['max'] ); ?></b> orders, <b><?php echo esc_html( $counts['month'] ); ?></b> within the previous month.</p>
-		<p>The most popular company is <b><?php echo esc_html( $counts['best_company'] ); ?></b> with <b><?php echo esc_html( $counts['best_company_count'] ); ?></b> orders.</p>
-		<p><i>(Statistics reset daily).</i></p>
-		<p><a href="<?php echo esc_url( get_admin_url() ); ?>post-new.php?post_type=kebabble_orders" class="button button-primary">Create Order</a></p>
-		<?php
+		$counts     = $this->stats->order_counts();
+		$kses_allow = [
+			'a' => [
+				'href'  => [],
+				'class' => [],
+			],
+			'p' => [],
+		];
+
+		/* Translators: %1$s is the total order number from the system lifetime, and %2$s is a month previous from now. */
+		printf( wp_kses( '<p>' . __( 'There has been a total of %1$s orders, %2$s within the previous month.', 'kebabble' ) . '</p>', $kses_allow ), esc_html( $counts['max'] ), esc_html( $counts['month'] ) );
+		/* Translators: %1$s is the most popular company name, and %2$s is it's linked custom post type count. */
+		printf( wp_kses( '<p>' . __( 'The most popular company is %1$s with %2$s orders.', 'kebabble' ) . '</p>', $kses_allow ), esc_html( $counts['best_company'] ), esc_html( $counts['best_company_count'] ) );
+		echo wp_kses( '<p>' . __( 'Statistics reset daily.', 'kebabble' ) . '</p>', $kses_allow );
+		printf( wp_kses( '<p><a href="%1$spost-new.php?post_type=kebabble_orders" class="button button-primary">' . __( 'Create Order', 'kebabble' ) . '</a></p>', $kses_allow ), esc_url( get_admin_url() ) );
 	}
 }
