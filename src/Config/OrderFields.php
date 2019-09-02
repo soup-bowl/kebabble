@@ -85,7 +85,7 @@ class OrderFields {
 						$this->driver_tax_input( $existing_order_details->existing );
 						$this->payment_options( $existing_order_details->existing );
 					?>
-					</div>				</div>
+					</div></div>
 				<?php
 			},
 			'kebabble_orders',
@@ -152,7 +152,14 @@ class OrderFields {
 			</div>
 			<div id="kebabbleCustomMessage">
 				<p class="label"><label for="kebabbleCustomMessageEntry">Custom Message</label></p>
-				<textarea name="kebabbleCustomMessageEntry"><?php echo esc_textarea( $existing['kebabble-custom-message'] ); ?></textarea>
+				<?php wp_editor(
+					$existing['kebabble-custom-message'],
+					'kebabbleCustomMessageEntry',
+					[
+						'media_buttons' => false,
+						'quicktags'     => false,
+					]
+				); ?>
 			</div>
 		</div>
 		<?php

@@ -105,7 +105,11 @@ class Publish {
 
 			$timestamp = null;
 			if ( $order_details['kebabble-is-custom'] ) {
-				$timestamp = $this->slack->send_message( $order_details['kebabble-custom-message'], $existing_message, $existing_channel );
+				$timestamp = $this->slack->send_message(
+					$this->slack->html_to_slack_string( $order_details['kebabble-custom-message'] ),
+					$existing_message,
+					$existing_channel
+				);
 			} else {
 				$collector = $this->get_collector_details( $post_obj->ID );
 

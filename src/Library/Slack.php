@@ -129,4 +129,24 @@ class Slack {
 
 		return $channels;
 	}
+
+	/**
+	 * Converts basic HTML to slack code.
+	 *
+	 * @param string $import HTML string to be parsed.
+	 * @return string HTML code as Slack code.
+	 */
+	public function html_to_slack_string(string $import ):string {
+		// Handle bold/strong.
+		$bad_bold  = ['<strong>', '</strong>'];
+		$good_bold = ['*', '*'];
+		$export    = str_replace( $bad_bold, $good_bold, $import );
+
+		// Handle italics/emphasis.
+		$bad_em  = ['<em>', '</em>'];
+		$good_em = ['_', '_'];
+		$export  = str_replace( $bad_em, $good_em, $export );
+
+		return $export;
+	}
 }
