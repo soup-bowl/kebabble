@@ -175,6 +175,11 @@ class Slack {
 		$good_em = ['_', '_'];
 		$export  = str_replace( $bad_em, $good_em, $export );
 
+		// Handle code.
+		$bad_code  = ['<code>', '</code>'];
+		$good_code = ['```', '```'];
+		$export    = str_replace( $bad_code, $good_code, $export );
+
 		return $export;
 	}
 }

@@ -182,7 +182,8 @@ class OrderFields {
 					'kebabbleCustomMessageEntry',
 					[
 						'media_buttons' => false,
-						'quicktags'     => false,
+						'tinymce'       => false,
+						'quicktags'     => [ 'buttons' => 'strong,em,code' ],
 					]
 				); ?>
 			</div>
