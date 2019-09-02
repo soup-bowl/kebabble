@@ -21,6 +21,12 @@ jQuery( document ).ready(
 			}
 		);
 
+		jQuery( '#selCompany' ).change(
+			function(){
+				kebabbleOrderUpdateShowedAreas();
+			}
+		);
+
 		jQuery( ".btnAddkorder" ).on(
 			'click',
 			function(e) {
@@ -46,6 +52,7 @@ function reloadRemHooks() {
 
 function kebabbleOrderUpdateShowedAreas() {
 	var cmState = jQuery( "#cmCheckBox" ).is( ":checked" );
+	var cpState = parseInt( jQuery( '#selCompany' ).val() );
 	var crState = parseInt( jQuery( '#selCollector' ).val() );
 
 	if (cmState) {
@@ -60,5 +67,11 @@ function kebabbleOrderUpdateShowedAreas() {
 		jQuery( "#sctDriver" ).show();
 	} else {
 		jQuery( "#sctDriver" ).hide();
+	}
+
+	if (cpState === 0) {
+		jQuery( "#sctCompany" ).show();
+	} else {
+		jQuery( "#sctCompany" ).hide();
 	}
 }

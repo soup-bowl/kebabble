@@ -52,13 +52,23 @@ class TaxonomyFields {
 	 * @return void Prints return on the page.
 	 */
 	public function company_options( ?WP_Term $term = null ):void {
-		$existing = ( ! empty( $term ) ) ? get_term_meta( $term->term_id, 'kebabble_ordpri_org', true ) : '';
+		$existing_pricing = ( ! empty( $term ) ) ? get_term_meta( $term->term_id, 'kebabble_ordpri_org', true ) : '';
+		$existing_place   = ( ! empty( $term ) ) ? get_term_meta( $term->term_id, 'kebabble_place_type', true ) : '';
+		$place_choices    = explode( ',', ( ! empty( get_option( 'kbfos_settings' )['kbfos_place_type'] ) ) ? get_option( 'kbfos_settings' )['kbfos_place_type'] : 'Kebab, Pizza, Regular' );
 		?>
 		<div class="form-field">
-		<input type="hidden" name="kebabbleNonce" value="<?php echo esc_attr( wp_create_nonce( 'kebabble_nonce' ) ); ?>">
+			<input type="hidden" name="kebabbleNonce" value="<?php echo esc_attr( wp_create_nonce( 'kebabble_nonce' ) ); ?>">
 			<label for="tag-kebabble-pricing">Options & Pricing</label>
-			<input name="ctOrderPricing" id="tag-kebabble-pricing" value="<?php echo esc_attr( $existing ); ?>" size="40" type="text" placeholder="food|price,food|price...">
+			<input name="ctOrderPricing" id="tag-kebabble-pricing" value="<?php echo esc_attr( $existing_pricing ); ?>" size="40" type="text" placeholder="food|price,food|price...">
 			<p>Comma-separated list of menu items, with a pipe-separated option of a price.</p>
+		</div>
+		<div class="form-field">
+			<label for="tag-kebabble-place-type">Options & Pricing</label>
+			<select name="ctPlaceType" id="tag-kebabble-place-type">
+				<?php foreach ( $place_choices as $place_choice ) : ?>
+					<option <?php echo ( $existing_place === trim( $place_choice ) ) ? 'selected' : ''; ?> id='<?php echo trim( $place_choice ); ?>'><?php echo trim( $place_choice ); ?></option>
+				<?php endforeach; ?>
+			</select>
 		</div>
 		<?php
 	}

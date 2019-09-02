@@ -36,7 +36,7 @@ class Formatting {
 	 * Makes a kebabble menu listing status.
 	 *
 	 * @param integer $id       ID of the post in question.
-	 * @param string  $food     Dictates header. e.g. Kebab Mondays.
+	 * @param string  $food     Dictates header. e.g. Kebab Mondays. Overridden by company if set.
 	 * @param array   $order    Array of people and their orders ('person' and 'food' collection).
 	 * @param string  $driver   Driver name.
 	 * @param integer $tax      Additional charge for orders.
@@ -48,6 +48,7 @@ class Formatting {
 	public function status( int $id, string $food, array $order, string $driver, int $tax = 0, ?Carbon $date = null, array $payments = [ 'Cash' ], array $pay_opts = [] ):string {
 		$location    = ( ! empty( wp_get_object_terms( $id, 'kebabble_company' ) ) ) ? wp_get_object_terms( $id, 'kebabble_company' )[0] : null;
 		$location_id = ( ! empty( $location ) ) ? $location->term_id : 0;
+		$food        = ( $location_id !== 0 ) ? get_term_meta( $location_id, 'kebabble_place_type', true ) : $food;
 		$loc_str     = ( ! empty( $location ) ) ? " at {$location->name}" : '';
 		$order       = ( empty( $order ) ) ? '_None yet!_' : $this->order_formatter( $order, $location_id, $tax );
 		$driver      = ( '' === $driver ) ? 'Unknown' : $driver;

@@ -94,7 +94,13 @@ class OrderFields {
 					<input type="hidden" name="kebabbleNonce" value="<?php echo esc_attr( wp_create_nonce( 'kebabble_nonce' ) ); ?>">
 					<?php
 					$this->company_menu_selector( ( ! empty( $existing_order_details->existing_company ) ) ? $existing_order_details->existing_company[0] : null );
-					$this->food_selection( $existing_order_details->existing );
+					?>
+					<div id="sctCompany">
+						<?php
+						$this->food_selection( $existing_order_details->existing );
+						?>
+					</div>
+					<?php
 					$this->order_input( $existing_order_details->existing );
 					$this->collector_selector( ( ! empty( $existing_order_details->existing_collector ) ) ? $existing_order_details->existing_collector[0] : null );
 					?>
@@ -210,7 +216,7 @@ class OrderFields {
 		?>
 		<div>
 			<p class="label"><label for="kebabbleCompanySelection">Company</label></p>
-			<select name="kebabbleCompanySelection">
+			<select name="kebabbleCompanySelection" id="selCompany">
 				<?php echo $select; ?>
 			</select>
 		</div>

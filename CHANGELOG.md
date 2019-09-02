@@ -4,6 +4,7 @@ Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versio
 ## [Unreleased]
 ### Added
 - Orders stop at midnight, to prevent people accidentally applying orders to previous days.
+- Ability to decide the 'place' indicator from within the Company settings.
 
 ### Changed
 - Orders now stored in seperate meta entities, to improve internal accessibility (not backwards compatible).

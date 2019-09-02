@@ -33,8 +33,10 @@ class Save {
 	 */
 	public function save_custom_company_details( int $term_id ):void {
 		if ( isset( $_POST['ctOrderPricing'], $_POST['kebabbleNonce'] ) && wp_verify_nonce( sanitize_key( $_POST['kebabbleNonce'] ), 'kebabble_nonce' ) ) {
-			$foodstr = sanitize_text_field( wp_unslash( $_POST['ctOrderPricing'] ) );
+			$foodstr  = sanitize_text_field( wp_unslash( $_POST['ctOrderPricing'] ) );
+			$placestr = sanitize_text_field( wp_unslash( $_POST['ctPlaceType'] ) );
 
+			update_term_meta( $term_id, 'kebabble_place_type', $placestr );
 			update_term_meta( $term_id, 'kebabble_ordpri_org', $foodstr );
 			update_term_meta( $term_id, 'kebabble_ordpri', ( ! empty( $foodstr ) ) ? $this->parse_food_options( $foodstr ) : null );
 		}
