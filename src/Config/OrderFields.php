@@ -78,13 +78,14 @@ class OrderFields {
 					$this->food_selection( $existing_order_details->existing );
 					$this->order_input( $existing_order_details->existing );
 					$this->collector_selector( ( ! empty( $existing_order_details->existing_collector ) ) ? $existing_order_details->existing_collector[0] : null );
-					?><div id="sctDriver"><?php
+					?>
+					<div id="sctDriver">
+					<?php
 						$this->driver_input( $existing_order_details->existing );
 						$this->driver_tax_input( $existing_order_details->existing );
 						$this->payment_options( $existing_order_details->existing );
-					?></div><?php
 					?>
-				</div>
+					</div>				</div>
 				<?php
 			},
 			'kebabble_orders',
@@ -140,9 +141,7 @@ class OrderFields {
 	 * @return void Constructs on page where called.
 	 */
 	public function custom_message_renderer( ?array $existing = null ):void {
-		$existing_contents = ( ! empty( $existing ) ) ? (object) $existing['override'] : false;
-		$enabled           = ( false !== $existing_contents && $existing_contents->enabled ) ? 'checked' : '';
-		$message           = ( ! empty( $existing_contents->message ) ) ? $existing_contents->message : '';
+		$enabled = ( $existing['kebabble-is-custom'] ) ? 'checked' : '';
 		?>
 		<div>
 			<div>
@@ -153,7 +152,7 @@ class OrderFields {
 			</div>
 			<div id="kebabbleCustomMessage">
 				<p class="label"><label for="kebabbleCustomMessageEntry">Custom Message</label></p>
-				<textarea name="kebabbleCustomMessageEntry"><?php echo esc_textarea( $message ); ?></textarea>
+				<textarea name="kebabbleCustomMessageEntry"><?php echo esc_textarea( $existing['kebabble-custom-message'] ); ?></textarea>
 			</div>
 		</div>
 		<?php
@@ -200,7 +199,7 @@ class OrderFields {
 	 * @return void Constructs on page where called.
 	 */
 	public function food_selection( ?array $existing = null ):void {
-		$selected = ( ! empty( $existing ) ) ? $existing['food'] : '';
+		$selected = ( ! empty( $existing ) ) ? $existing['kebabble-food'] : '';
 		$options  = [ 'Kebab', 'Pizza', 'Burger', 'Restaurant', 'Event', 'Other' ];
 
 		$select = '';
@@ -228,7 +227,7 @@ class OrderFields {
 	 * @return void Constructs on page where called.
 	 */
 	public function order_input( ?array $existings = null ):void {
-		$existings = ( ! empty( $existings ) ) ? $existings['order'] : '';
+		$existings = ( ! empty( $existings ) ) ? $existings['kebabble-order'] : '';
 		?>
 		<div>
 			<p class="label"><label for="kebabbleOrders">Orders</label></p>
@@ -260,7 +259,7 @@ class OrderFields {
 	}
 
 	/**
-	 * Select the person collecting the order. 
+	 * Select the person collecting the order.
 	 *
 	 * @param WP_Term|null $existing Existing values in the database.
 	 * @return void Prints on the page.
@@ -299,7 +298,7 @@ class OrderFields {
 	 * @return void Constructs on page where called.
 	 */
 	public function driver_input( ?array $existing = null ) {
-		$existing = ( ! empty( $existing ) ) ? $existing['driver'] : '';
+		$existing = ( ! empty( $existing ) ) ? $existing['kebabble-driver'] : '';
 		?>
 		<div>
 			<p class="label"><label for="kebabbleDriver">Collector Name</label></p>
@@ -315,7 +314,7 @@ class OrderFields {
 	 * @return void Constructs on page where called.
 	 */
 	public function driver_tax_input( ?array $existing = null ):void {
-		$existing = ( ! empty( $existing ) ) ? $existing['tax'] : '';
+		$existing = ( ! empty( $existing ) ) ? $existing['kebabble-tax'] : '';
 		?>
 		<div>
 			<p class="label"><label for="kebabbleDriverTax">Collector Charge (in pence)</label></p>
@@ -331,8 +330,8 @@ class OrderFields {
 	 * @return void Constructs on page where called.
 	 */
 	public function payment_options( ?array $existing = null ):void {
-		$existing_pm = ( ! empty( $existing ) ) ? $existing['payment'] : '';
-		$existing_pl = ( ! empty( $existing ) ) ? $existing['paymentLink'] : [];
+		$existing_pm = ( ! empty( $existing ) ) ? $existing['kebabble-payment'] : '';
+		$existing_pl = ( ! empty( $existing ) ) ? $existing['kebabble-payment-link'] : [];
 		$opts        = get_option( 'kbfos_settings' );
 		$options     = ( empty( $opts['kbfos_payopts'] ) ) ? [ 'Cash' ] : explode( ',', $opts['kbfos_payopts'] );
 
@@ -366,7 +365,7 @@ class OrderFields {
 	 * @return void Constructs on page where called.
 	 */
 	public function pin_status( ?array $existing = null ):void {
-		$existing = ( ! empty( $existing ) ) ? $existing['pin'] : false;
+		$existing = ( ! empty( $existing ) ) ? $existing['kebabble-pin'] : false;
 		?>
 		<div>
 			<p class="label"><label>Pin to Slack Channel</label></p>

@@ -104,8 +104,8 @@ class Publish {
 			}
 
 			$timestamp = null;
-			if ( $order_details['override']['enabled'] ) {
-				$timestamp = $this->slack->send_message( $order_details['override']['message'], $existing_message, $existing_channel );
+			if ( $order_details['kebabble-is-custom'] ) {
+				$timestamp = $this->slack->send_message( $order_details['kebabble-custom-message'], $existing_message, $existing_channel );
 			} else {
 				$collector = $this->get_collector_details( $post_obj->ID );
 
@@ -114,28 +114,28 @@ class Publish {
 					$collector_tax   = $collector['tax'];
 					$collector_popts = $collector['payment_opts'];
 				} else {
-					$collector_name  = ( ! empty( $order_details['driver'] ) ) ? $order_details['driver'] : wp_get_current_user()->display_name;
-					$collector_tax   = (int) $order_details['tax'];
-					$collector_popts = ( is_array( $order_details['payment'] ) ) ? $order_details['payment'] : [ $order_details['payment'] ];
+					$collector_name  = ( ! empty( $order_details['kebabble-driver'] ) ) ? $order_details['kebabble-driver'] : wp_get_current_user()->display_name;
+					$collector_tax   = (int) $order_details['kebabble-tax'];
+					$collector_popts = ( is_array( $order_details['kebabble-payment'] ) ) ? $order_details['kebabble-payment'] : [ $order_details['kebabble-payment'] ];
 				}
 
 				$timestamp = $this->slack->send_message(
 					$this->formatting->status(
 						$post_obj->ID,
-						$order_details['food'],
-						$order_details['order'],
+						$order_details['kebabble-food'],
+						( ! empty( $order_details['kebabble-order'] ) ) ? $order_details['kebabble-order'] : [],
 						$collector_name,
 						$collector_tax,
 						Carbon::parse( get_the_date( 'Y-m-d H:i:s', $post_obj->ID ) ),
 						$collector_popts,
-						$order_details['paymentLink']
+						$order_details['kebabble-payment-link']
 					),
 					$existing_message,
 					$existing_channel
 				);
 			}
 
-			$this->slack->pin( $order_details['pin'], $timestamp, $existing_channel );
+			$this->slack->pin( $order_details['kebabble-pin'], $timestamp, $existing_channel );
 
 			if ( empty( $existing_message ) ) {
 				add_post_meta( $post_obj->ID, 'kebabble-slack-ts', $timestamp, true );
@@ -164,13 +164,13 @@ class Publish {
 			$contents = $this->orderstore->set( $post_id );
 
 			if ( false !== $contents ) {
-				if ( $contents['override']['enabled'] ) {
-					$message             = $contents['override']['message'];
+				if ( $contents['kebabble-is-custom'] ) {
+					$message             = $contents['kebabble-custom-message'];
 					$data['post_title']  = 'Custom message - "';
 					$data['post_title'] .= ( strlen( $message ) > 25 ) ? substr( $message, 0, 25 ) . '...' : $message;
 					$data['post_title'] .= '"';
 				} else {
-					$data['post_title'] = "{$contents['food']} order - " . Carbon::now()->format( 'd/m/Y' );
+					$data['post_title'] = "{$contents['kebabble-food']} order - " . Carbon::now()->format( 'd/m/Y' );
 				}
 			}
 		}
@@ -178,9 +178,15 @@ class Publish {
 		return $data;
 	}
 
-	private function get_collector_details( $post_id ):?array {
+	/**
+	 * Gets stored collector details, if available.
+	 *
+	 * @param integer $post_id Post ID you want the details from.
+	 * @return array|null
+	 */
+	private function get_collector_details( int $post_id ):?array {
 		$collector = null;
-		 if ( ! empty( wp_get_object_terms( $post_id, 'kebabble_collector' ) ) ) {
+		if ( ! empty( wp_get_object_terms( $post_id, 'kebabble_collector' ) ) ) {
 			$collector = wp_get_object_terms( $post_id, 'kebabble_collector' )[0];
 		} else {
 			return null;

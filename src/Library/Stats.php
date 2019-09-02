@@ -73,8 +73,8 @@ class Stats {
 					'meta_query'     => [
 						[
 							'key'     => 'kebabble-order',
-							'value'   => '"override":{"enabled":false',
-							'compare' => 'LIKE',
+							'value'   => '',
+							'compare' => '=',
 						],
 					],
 				]

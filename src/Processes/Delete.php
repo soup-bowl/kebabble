@@ -90,25 +90,25 @@ class Delete {
 		$post_adt = $this->orderstore->get( $post_ID );
 
 		$timestamp = null;
-		if ( $post_adt['override']['enabled'] ) {
-			$timestamp = $this->slack->send_message( $post_adt['override']['message'] );
+		if ( $post_adt['kebabble-is-custom'] ) {
+			$timestamp = $this->slack->send_message( $post_adt['kebabble-custom-message'] );
 		} else {
 			$timestamp = $this->slack->send_message(
 				$this->formatting->status(
 					$post_ID,
-					$post_adt['food'],
-					$post_adt['order'],
-					( ! empty( $post_adt['driver'] ) ) ? $post_adt['driver'] : wp_get_current_user()->display_name,
-					(int) $post_adt['tax'],
+					$post_adt['kebabble-food'],
+					$post_adt['kebabble-order'],
+					( ! empty( $post_adt['kebabble-driver'] ) ) ? $post_adt['kebabble-driver'] : wp_get_current_user()->display_name,
+					(int) $post_adt['kebabble-tax'],
 					Carbon::parse( get_the_date( 'Y-m-d H:i:s', $post_ID ) ),
-					( is_array( $post_adt['payment'] ) ) ? $post_adt['payment'] : [ $post_adt['payment'] ],
-					$post_adt['paymentLink']
+					( is_array( $post_adt['kebabble-payment'] ) ) ? $post_adt['kebabble-payment'] : [ $post_adt['kebabble-payment'] ],
+					$post_adt['kebabble-payment-link']
 				)
 			);
 		}
 
 		update_post_meta( $post_ID, 'kebabble-slack-ts', $timestamp );
 
-		$this->slack->pin( $post_adt['pin'], $timestamp, get_option( 'kbfos_settings' )['kbfos_botchannel'] );
+		$this->slack->pin( $post_adt['kebabble-pin'], $timestamp, get_option( 'kbfos_settings' )['kbfos_botchannel'] );
 	}
 }

@@ -72,14 +72,14 @@ class Registration {
 			'kebabble_collector',
 			[ 'kebabble_orders' ],
 			[
-				'label'             => __( 'Collector', 'text_domain' ),
-				'description'       => __( 'Collector list', 'text_domain' ),
-				'labels'            => $this->dymo( 'Collector', 'Collectors' ),
-				'supports'          => false,
-				'public'            => false,
-				'show_ui'           => true,
-				'show_in_menu'      => true,
-				'meta_box_cb'       => false,
+				'label'        => __( 'Collector', 'text_domain' ),
+				'description'  => __( 'Collector list', 'text_domain' ),
+				'labels'       => $this->dymo( 'Collector', 'Collectors' ),
+				'supports'     => false,
+				'public'       => false,
+				'show_ui'      => true,
+				'show_in_menu' => true,
+				'meta_box_cb'  => false,
 			]
 		);
 	}

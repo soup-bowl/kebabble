@@ -46,7 +46,7 @@ function reloadRemHooks() {
 
 function kebabbleOrderUpdateShowedAreas() {
 	var cmState = jQuery( "#cmCheckBox" ).is( ":checked" );
-	var crState = parseInt( jQuery('#selCollector').val() );
+	var crState = parseInt( jQuery( '#selCollector' ).val() );
 
 	if (cmState) {
 		jQuery( "#kebabbleCustomMessage" ).show();

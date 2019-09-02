@@ -20,9 +20,9 @@ require_once __DIR__ . '/../vendor/autoload.php';
  */
 function get_option( $option = null ) {
 	return [
-		'kbfos_botkey'      => 'xorb-somefakestring',
-		'kbfos_botchannel'  => '#example',
-		'kbfos_payopts'     => 'Cash, Other',
+		'kbfos_botkey'     => 'xorb-somefakestring',
+		'kbfos_botchannel' => '#example',
+		'kbfos_payopts'    => 'Cash, Other',
 	];
 }
 

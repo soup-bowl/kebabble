@@ -20,7 +20,20 @@ class Orderstore {
 	 * @return array|null
 	 */
 	public function get( int $post_id ):?array {
-		return json_decode( get_post_meta( $post_id, 'kebabble-order', true ), true );
+		$is_custom = ( empty( get_post_meta( $post_id, 'kebabble-custom-message', true ) ) ) ? false : true;
+		$options   = [
+			'kebabble-is-custom'      => $is_custom,
+			'kebabble-custom-message' => get_post_meta( $post_id, 'kebabble-custom-message', true ),
+			'kebabble-food'           => get_post_meta( $post_id, 'kebabble-food', true ),
+			'kebabble-order'          => get_post_meta( $post_id, 'kebabble-order', true ),
+			'kebabble-driver'         => get_post_meta( $post_id, 'kebabble-driver', true ),
+			'kebabble-tax'            => get_post_meta( $post_id, 'kebabble-tax', true ),
+			'kebabble-payment'        => get_post_meta( $post_id, 'kebabble-payment', true ),
+			'kebabble-payment-link'   => get_post_meta( $post_id, 'kebabble-payment-link', true ),
+			'kebabble-pin'            => get_post_meta( $post_id, 'kebabble-pin', true ),
+		];
+
+		return $options;
 	}
 
 	/**
@@ -33,8 +46,6 @@ class Orderstore {
 	 * @return array The information stored in the database.
 	 */
 	public function set( int $post_id, array $response = null ):array {
-		$override = empty( $response['kebabbleCustomMessageEnabled'] ) ? false : true;
-
 		if ( empty( $response ) ) {
 			// phpcs:disable WordPress.Security.ValidatedSanitizedInput
 			if ( isset( $_POST ) && false !== wp_verify_nonce( sanitize_key( $_POST['kebabbleNonce'] ), 'kebabble_nonce' ) ) {
@@ -65,28 +76,26 @@ class Orderstore {
 			wp_delete_object_term_relationships( $post_id, 'kebabble_collector' );
 		}
 
-		$conf_array = [
-			'override'    => [
-				'enabled' => $override,
-				'message' => ( isset( $response['kebabbleCustomMessageEntry'] ) ) ? $response['kebabbleCustomMessageEntry'] : null,
-			],
-			'food'        => $response['kebabbleOrderTypeSelection'],
-			'order'       => $this->order_list_collator( $response['korder_name'], $response['korder_food'] ),
-			'driver'      => ( isset( $response['kebabbleDriver'] ) ) ? $response['kebabbleDriver'] : wp_get_current_user()->display_name,
-			'tax'         => ( isset( $response['kebabbleDriverTax'] ) ) ? $response['kebabbleDriverTax'] : 0,
-			'payment'     => ( isset( $response['paymentOpts'] ) ) ? $response['paymentOpts'] : [],
-			'paymentLink' => [],
-			'pin'         => empty( $response['pinState'] ) ? false : true,
+		$items = [
+			'order'        => $this->order_list_collator( $response['korder_name'], $response['korder_food'] ),
+			'food'         => ( isset( $response['kebabbleOrderTypeSelection'] ) ) ? $response['kebabbleOrderTypeSelection'] : null,
+			'driver'       => ( isset( $response['kebabbleDriver'] ) ) ? $response['kebabbleDriver'] : null,
+			'tax'          => ( isset( $response['kebabbleDriverTax'] ) ) ? $response['kebabbleDriverTax'] : null,
+			'payment'      => ( isset( $response['paymentOpts'] ) ) ? $response['paymentOpts'] : null,
+			'payment-link' => [],
+			'pin'          => empty( $response['pinState'] ) ? false : true,
 		];
 
-		$opts    = get_option( 'kbfos_settings' );
-		$options = ( empty( $opts['kbfos_payopts'] ) ) ? [ 'Cash' ] : explode( ',', $opts['kbfos_payopts'] );
-
-		foreach ( $options as $option ) {
-			$conf_array['paymentLink'][ $option ] = $response[ "kopt{$option}" ];
+		foreach ( $items as $item_key => $item_value ) {
+			update_post_meta( $post_id, 'kebabble-' . $item_key, $item_value );
 		}
 
-		update_post_meta( $post_id, 'kebabble-order', wp_json_encode( $conf_array ) );
+		$custom = ( ! empty( $response['kebabbleCustomMessageEntry'] ) ) ? $response['kebabbleCustomMessageEntry'] : null;
+		if ( isset( $custom ) ) {
+			update_post_meta( $post_id, 'kebabble-custom-message', $custom );
+		} else {
+			delete_post_meta( $post_id, 'kebabble-custom-message' );
+		}
 
 		return $this->get( $post_id );
 	}

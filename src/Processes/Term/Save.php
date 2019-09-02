@@ -47,7 +47,7 @@ class Save {
 	 * @return void Stores the expected data (got from POST) in the database.
 	 */
 	public function save_collector_options( int $term_id ):void {
-		if ( isset( $_POST['kebabble-collector-payopts'], $_POST['kebabble-collector-charge'], $_POST['kebabbleNonce'] ) 
+		if ( isset( $_POST['kebabble-collector-payopts'], $_POST['kebabble-collector-charge'], $_POST['kebabbleNonce'] )
 		&& wp_verify_nonce( sanitize_key( $_POST['kebabbleNonce'] ), 'kebabble_nonce' ) ) {
 			$payment_opts       = explode( ',', sanitize_text_field( wp_unslash( $_POST['kebabble-collector-payopts'] ) ) );
 			$payment_opts_clean = array_filter( array_map( 'trim', $payment_opts ) );

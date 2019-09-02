@@ -1,6 +1,10 @@
 # Changelog
 Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Changed
+- Orders now stored in seperate meta entities, to improve internal accessibility (not backwards compatible).
+
 ## [0.3.4] - 2019-09-02
 ### Added
 - Check for PHP 7.2 or higher to avoid runtime errors (#36).

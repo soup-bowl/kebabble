@@ -126,9 +126,7 @@ class Mention {
 			// Detect command to change the collector.
 			$new_driver = $this->change_collector( $request['event']['text'], $order );
 			if ( isset( $new_driver ) ) {
-				$order['driver'] = $new_driver;
-
-				$this->orderstore->update( $order_obj->ID, $order );
+				update_post_meta( $order_obj->ID, 'kebabble-driver', $new_driver );
 				$this->publish->handle_publish( $order_obj, false );
 				$this->slack->react( Emojis::positive( 2 ), $request['event']['ts'], $request['event']['channel'] );
 
@@ -144,14 +142,14 @@ class Mention {
 				);
 			} else {
 				$result = $this->process_input_request(
+					$order_obj->ID,
 					$request['event']['user'],
 					$request['event']['text'],
-					$place,
-					$order
+					$place
 				);
 
 				if ( $result['success'] ) {
-					$this->orderstore->update( $order_obj->ID, $result['order'] );
+					update_post_meta( $order_obj->ID, 'kebabble-order', $result['order'] );
 					$this->publish->handle_publish( $order_obj, false );
 					$this->slack->react( Emojis::positive( 0 ), $request['event']['ts'], $request['event']['channel'] );
 				} else {
@@ -166,13 +164,15 @@ class Mention {
 	/**
 	 * Processes the request contents and modifies the order accordingly.
 	 *
+	 * @param integer $post_id Currently working Order.
 	 * @param string  $user    Slack user code.
 	 * @param string  $request The whole message string that's been sent to our bot.
-	 * @param WP_Term $place  The place to operate with.
-	 * @param array   $order    The existing order entity to modify, if necessary.
+	 * @param WP_Term $place   The place to operate with.
 	 * @return array Choices reflect on the current post and the Slack channel.
 	 */
-	public function process_input_request( string $user, string $request, ?WP_Term $place, ?array $order ):array {
+	public function process_input_request( int $post_id, string $user, string $request, ?WP_Term $place ):array {
+		$order = get_post_meta( $post_id, 'kebabble-order', true );
+
 		// Split up the presence of commas, and remove the @kebabble call. A better way would be appreciated.
 		$message_split = explode( ',', str_replace( '<>', '', preg_replace( '/@\w+/', '', strtolower( $request ), 1 ) ) );
 
@@ -184,8 +184,8 @@ class Mention {
 			);
 		}
 
-		$order_items   = $order['order'];
-		$order_count   = count( $order['order'] );
+		$order_items   = $order;
+		$order_count   = count( $order );
 		$success_count = 0;
 		// Each segment of a multiple request. Normally only one.
 		foreach ( $messages as $message ) {
@@ -230,8 +230,8 @@ class Mention {
 		}
 
 		if ( $success_count > 0 ) {
-			unset( $order['order'] );
-			$order['order'] = array_values( $order_items );
+			unset( $order );
+			$order = array_values( $order_items );
 
 			return [
 				'success' => true,
@@ -353,9 +353,8 @@ class Mention {
 				'order'          => 'DESC',
 				'meta_query'     => [
 					[
-						'key'     => 'kebabble-order',
-						'value'   => '"override":{"enabled":false',
-						'compare' => 'LIKE',
+						'key'     => 'kebabble-custom-message',
+						'compare' => 'NOT EXISTS',
 					],
 					[
 						'key'     => 'kebabble-slack-channel',
@@ -377,29 +376,33 @@ class Mention {
 	/**
 	 * Finds the driver in the WordPress database.
 	 *
-	 * @param string  $name       Name (or slack identifer) of the person. 
+	 * @param string  $name       Name (or slack identifer) of the person.
 	 * @param boolean $slack_code If true, the codes will be looked up instead.
 	 * @return WP_Term|null
 	 */
 	private function find_collector( string $name, bool $slack_code = true ):?WP_Term {
 		if ( $slack_code ) {
-			$search_query = get_terms([
-				'hide_empty' => false,
-				'meta_query' => [
-					[
-						'key'       => 'keabble_collector_slackcode',
-						'value'     => $name,
-						'compare'   => '='
-					]
-				],
-				'taxonomy'  => 'kebabble_collector',
-			]);
+			$search_query = get_terms(
+				[
+					'hide_empty' => false,
+					'meta_query' => [
+						[
+							'key'     => 'keabble_collector_slackcode',
+							'value'   => $name,
+							'compare' => '=',
+						],
+					],
+					'taxonomy'   => 'kebabble_collector',
+				]
+			);
 		} else {
-			$search_query = get_terms([
-				'hide_empty' => false,
-				'name'       => $name,
-				'taxonomy'   => 'kebabble_collector',
-			]);
+			$search_query = get_terms(
+				[
+					'hide_empty' => false,
+					'name'       => $name,
+					'taxonomy'   => 'kebabble_collector',
+				]
+			);
 		}
 
 		if ( ! empty( $search_query ) ) {
