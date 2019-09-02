@@ -361,6 +361,11 @@ class Mention {
 						'value'   => $channel,
 						'compare' => '=',
 					],
+					[
+						'key'     => 'kebabble-timeout',
+						'value'   => Carbon::now()->timestamp,
+						'compare' => '>=',
+					]
 				],
 			]
 		);

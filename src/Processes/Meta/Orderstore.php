@@ -9,6 +9,8 @@
 
 namespace Kebabble\Processes\Meta;
 
+use Carbon\Carbon;
+
 /**
  * Stores and retrieves the order field data.
  */
@@ -83,6 +85,7 @@ class Orderstore {
 			'tax'          => ( isset( $response['kebabbleDriverTax'] ) ) ? $response['kebabbleDriverTax'] : null,
 			'payment'      => ( isset( $response['paymentOpts'] ) ) ? $response['paymentOpts'] : null,
 			'payment-link' => [],
+			'timeout'      => Carbon::createMidnightDate()->addDay()->timestamp,
 		];
 
 		if ( ! empty( $response['pinState'] ) ) {
