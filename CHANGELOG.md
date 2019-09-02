@@ -5,6 +5,7 @@ Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versio
 ### Added
 - Orders stop at midnight, to prevent people accidentally applying orders to previous days.
 - Ability to decide the 'place' indicator from within the Company settings.
+- Can cancel orders via Slack, if the cancel comes from the order creator.
 
 ### Changed
 - Orders now stored in seperate meta entities, to improve internal accessibility (not backwards compatible).

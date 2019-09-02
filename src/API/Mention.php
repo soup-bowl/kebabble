@@ -90,6 +90,7 @@ class Mention {
 		}
 
 		if ( ! empty( $request['event'] ) && $request['event']['type'] === 'app_mention' ) {
+			// Begin a new order.
 			if ( preg_match( '/\bnew order\b/', strtolower( $request['event']['text'] ) ) ) {
 				preg_match( '/(?<=at ).*$/i', $request['event']['text'], $place );
 				$this->new_order(
@@ -101,6 +102,7 @@ class Mention {
 				return [];
 			}
 
+			// Grabs the latest order (or reports back if non-existent).
 			$order_obj = $this->get_latest_order( $request['event']['channel'] );
 			if ( empty( $order_obj ) ) {
 				$this->slack->send_message(
@@ -109,6 +111,27 @@ class Mention {
 					$request['event']['channel'],
 					$request['event']['ts']
 				);
+
+				return [];
+			}
+
+			// Close an existing order (if created by the user).
+			if ( preg_match( '/\bclose order\b/', strtolower( $request['event']['text'] ) ) ) {
+				$collector = wp_get_object_terms( $order_obj->ID, 'kebabble_collector' );
+				$collector = ( ! empty( $collector ) ) ? get_term_meta( $collector[0]->term_id, 'keabble_collector_slackcode', true ) : null;
+
+				if ( $collector === $request['event']['user'] ) {
+					update_post_meta( $order_obj->ID, 'kebabble-timeout', Carbon::now()->timestamp );
+
+					$this->slack->react( Emojis::positive(), $request['event']['ts'], $request['event']['channel'] );
+				} else {
+					$this->slack->send_message(
+						'You do not have permission to cancel this order.',
+						null,
+						$request['event']['channel'],
+						$request['event']['ts']
+					);
+				}
 
 				return [];
 			}
