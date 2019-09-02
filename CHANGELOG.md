@@ -1,7 +1,7 @@
 # Changelog
 Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [0.3.4] - 2019-09-02
 ### Added
 - Check for PHP 7.2 or higher to avoid runtime errors (#36).
 - Stat dashboard widget added, with simple analytics (#14).
@@ -95,3 +95,4 @@ Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versio
 [0.3.1]: https://gitlab.com/soup-bowl/kebabble/tags/v0.3.1-alpha
 [0.3.2]: https://gitlab.com/soup-bowl/kebabble/tags/v0.3.2-alpha
 [0.3.3]: https://gitlab.com/soup-bowl/kebabble/tags/v0.3.3-alpha
+[0.3.4]: https://gitlab.com/soup-bowl/kebabble/tags/v0.3.4-alpha
