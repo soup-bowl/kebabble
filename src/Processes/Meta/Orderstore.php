@@ -25,17 +25,19 @@ class Orderstore {
 		$is_custom  = ( empty( get_post_meta( $post_id, 'kebabble-custom-message', true ) ) ) ? false : true;
 		$is_expired = ( ! empty( get_post_meta( $post_id, 'kebabble-timeout', true ) ) ) ? get_post_meta( $post_id, 'kebabble-timeout', true ) : 0;
 
+		$n       = 'kebabble'; 
 		$options = [
-			'kebabble-is-custom'      => $is_custom,
-			'kebabble-is-expired'     => ( $is_expired >= Carbon::now()->timestamp ) ? false : true,
-			'kebabble-custom-message' => get_post_meta( $post_id, 'kebabble-custom-message', true ),
-			'kebabble-food'           => get_post_meta( $post_id, 'kebabble-food', true ),
-			'kebabble-order'          => get_post_meta( $post_id, 'kebabble-order', true ),
-			'kebabble-driver'         => get_post_meta( $post_id, 'kebabble-driver', true ),
-			'kebabble-tax'            => get_post_meta( $post_id, 'kebabble-tax', true ),
-			'kebabble-payment'        => get_post_meta( $post_id, 'kebabble-payment', true ),
-			'kebabble-payment-link'   => get_post_meta( $post_id, 'kebabble-payment-link', true ),
-			'kebabble-pin'            => get_post_meta( $post_id, 'kebabble-pin', true ),
+			"{$n}-is-custom"          => $is_custom,
+			"{$n}-is-expired"         => ( $is_expired >= Carbon::now()->timestamp ) ? false : true,
+			"{$n}-custom-message"     => get_post_meta( $post_id, "{$n}-custom-message", true ),
+			"{$n}-food"               => get_post_meta( $post_id, "{$n}-food", true ),
+			"{$n}-order"              => get_post_meta( $post_id, "{$n}-order", true ),
+			"{$n}-driver"             => get_post_meta( $post_id, "{$n}-driver", true ),
+			"{$n}-tax"                => get_post_meta( $post_id, "{$n}-tax", true ),
+			"{$n}-payment"            => get_post_meta( $post_id, "{$n}-payment", true ),
+			"{$n}-payment-link"       => get_post_meta( $post_id, "{$n}-payment-link", true ),
+			"{$n}-pin"                => get_post_meta( $post_id, "{$n}-pin", true ),
+			"{$n}-additional-message" => get_post_meta( $post_id, "{$n}-additional-message", true ),
 		];
 
 		return $options;
@@ -82,13 +84,14 @@ class Orderstore {
 		}
 
 		$items = [
-			'order'        => $this->order_list_collator( $response['korder_name'], $response['korder_food'] ),
-			'food'         => ( isset( $response['kebabbleOrderTypeSelection'] ) ) ? $response['kebabbleOrderTypeSelection'] : null,
-			'driver'       => ( isset( $response['kebabbleDriver'] ) ) ? $response['kebabbleDriver'] : null,
-			'tax'          => ( isset( $response['kebabbleDriverTax'] ) ) ? $response['kebabbleDriverTax'] : null,
-			'payment'      => ( isset( $response['paymentOpts'] ) ) ? $response['paymentOpts'] : null,
-			'payment-link' => [],
-			'timeout'      => Carbon::createMidnightDate()->addDay()->timestamp,
+			'order'              => $this->order_list_collator( $response['korder_name'], $response['korder_food'] ),
+			'food'               => ( isset( $response['kebabbleOrderTypeSelection'] ) ) ? $response['kebabbleOrderTypeSelection'] : null,
+			'driver'             => ( isset( $response['kebabbleDriver'] ) ) ? $response['kebabbleDriver'] : null,
+			'tax'                => ( isset( $response['kebabbleDriverTax'] ) ) ? $response['kebabbleDriverTax'] : null,
+			'payment'            => ( isset( $response['paymentOpts'] ) ) ? $response['paymentOpts'] : null,
+			'payment-link'       => [],
+			'timeout'            => Carbon::createMidnightDate()->addDay()->timestamp,
+			'additional-message' => ( isset( $response['kebabbleAdditionalMessage'] ) ) ? $response['kebabbleAdditionalMessage'] : null,
 		];
 
 		if ( ! empty( $response['pinState'] ) ) {

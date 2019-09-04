@@ -132,7 +132,8 @@ class Publish {
 						$collector_tax,
 						Carbon::parse( get_the_date( 'Y-m-d H:i:s', $post_obj->ID ) ),
 						$collector_popts,
-						$order_details['kebabble-payment-link']
+						$order_details['kebabble-payment-link'],
+						$this->slack->html_to_slack_string( $order_details['kebabble-additional-message'] )
 					),
 					$existing_message,
 					$existing_channel

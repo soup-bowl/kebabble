@@ -43,9 +43,10 @@ class Formatting {
 	 * @param Carbon  $date     Date of order, typically today.
 	 * @param array   $payments Payment methods accepted.
 	 * @param array   $pay_opts URL links for the above (matched by array key to payment type).
+	 * @param string  $notes    Optional message displayed under order.
 	 * @return string
 	 */
-	public function status( int $id, string $food, array $order, string $driver, int $tax = 0, ?Carbon $date = null, array $payments = [ 'Cash' ], array $pay_opts = [] ):string {
+	public function status( int $id, string $food, array $order, string $driver, int $tax = 0, ?Carbon $date = null, array $payments = [ 'Cash' ], array $pay_opts = [], string $notes = null ):string {
 		$location    = ( ! empty( wp_get_object_terms( $id, 'kebabble_company' ) ) ) ? wp_get_object_terms( $id, 'kebabble_company' )[0] : null;
 		$location_id = ( ! empty( $location ) ) ? $location->term_id : 0;
 		$food        = ( $location_id !== 0 ) ? get_term_meta( $location_id, 'kebabble_place_type', true ) : $food;
@@ -62,6 +63,10 @@ class Formatting {
 			( $tax > 0 ) ? Emojis::misc( 'money' ) . ' *' . sprintf( __( 'Additional %1$s per person', 'kebabble' ), $this->money->output( $tax ) ) . '* ' . __( 'to fund the collector', 'kebabble' ) . '.' : null,
 			$this->accepts_payment_formatter( $payments, $pay_opts ),
 		];
+
+		if ( isset( $notes ) ) {
+			$formatted_posts[] = $notes;
+		}
 
 		return str_replace( "\n\n\n\n", "\n\n", implode( "\n\n", $formatted_posts ) );
 	}

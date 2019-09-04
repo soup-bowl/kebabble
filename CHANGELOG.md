@@ -7,6 +7,7 @@ Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versio
 - Ability to decide the 'place' indicator from within the Company settings.
 - Can cancel orders via Slack, if the cancel comes from the order creator.
 - Internationalisation (i18n) support increased. gettext support added (#32).
+- Custom message per order (#5).
 
 ### Changed
 - Orders now stored in seperate meta entities, to improve internal accessibility (not backwards compatible).

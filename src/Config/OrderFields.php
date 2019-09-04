@@ -110,7 +110,9 @@ class OrderFields {
 						$this->driver_tax_input( $existing_order_details->existing );
 						$this->payment_options( $existing_order_details->existing );
 					?>
-					</div></div>
+					</div>
+					<?php $this->additional_message_renderer( $existing_order_details->existing ); ?>
+				</div>
 				<?php
 			},
 			'kebabble_orders',
@@ -391,6 +393,31 @@ class OrderFields {
 		</div>
 		<?php
 		// phpcs:enable
+	}
+
+	/**
+	 * Input block for an additional message.
+	 *
+	 * @param array|null $existing Existing message in the database.
+	 * @return void Constructs on page where called.
+	 */
+	public function additional_message_renderer( ?array $existing = null ):void {
+		?>
+		<div>
+			<p class="label"><label for="kebabbleAdditionalMessage"><?php esc_html_e( 'Additional Message', 'kebabble' ); ?></label></p>
+			<?php
+			wp_editor(
+				$existing['kebabble-additional-message'],
+				'kebabbleAdditionalMessage',
+				[
+					'media_buttons' => false,
+					'tinymce'       => false,
+					'quicktags'     => [ 'buttons' => 'strong,em,code' ],
+				]
+			);
+			?>
+		</div>
+		<?php
 	}
 
 	/**
