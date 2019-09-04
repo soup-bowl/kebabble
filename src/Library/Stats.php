@@ -72,9 +72,8 @@ class Stats {
 					'order'          => 'DESC',
 					'meta_query'     => [
 						[
-							'key'     => 'kebabble-order',
-							'value'   => '',
-							'compare' => '=',
+							'key'     => 'kebabble-custom-message',
+							'compare' => 'NOT EXISTS',
 						],
 					],
 				]
