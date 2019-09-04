@@ -88,27 +88,27 @@ class Emojis {
 	public static function food( string $desc ):string {
 		$items = [
 			// Food types.
-			'kebab'      => ':stuffed_flatbread:',
-			'flatbread'  => ':stuffed_flatbread:',
-			'pita'       => ':stuffed_flatbread:',
-			'burrito'    => ':burrito:',
-			'pizza'      => ':pizza:',
-			'burger'     => ':hamburger:',
-			'salad'      => ':green_salad:',
-			'sushi'      => ':sushi:',
-			'pudding'    => ':ice_cream:',
-			'dessert'    => ':ice_cream:',
+			__( 'kebab' )      => ':stuffed_flatbread:',
+			__( 'flatbread' )  => ':stuffed_flatbread:',
+			__( 'pita' )       => ':stuffed_flatbread:',
+			__( 'burrito' )    => ':burrito:',
+			__( 'pizza' )      => ':pizza:',
+			__( 'burger' )     => ':hamburger:',
+			__( 'salad' )      => ':green_salad:',
+			__( 'sushi' )      => ':sushi:',
+			__( 'pudding' )    => ':ice_cream:',
+			__( 'dessert' )    => ':ice_cream:',
 			// Lifestyles.
-			'vegetarian' => ':green_salad:',
-			'vegan'      => ':avocado:',
+			__( 'vegetarian' ) => ':green_salad:',
+			__( 'vegan' )      => ':avocado:',
 			// Places.
-			'restaurant' => ':knife_fork_plate:',
-			'cafe'       => ':knife_fork_plate:',
+			__( 'restaurant' ) => ':knife_fork_plate:',
+			__( 'cafe' )       => ':knife_fork_plate:',
 			// Familiar cultural stereotypes of UK.
-			'chinese'    => ':takeout_box:',
-			'indian'     => ':curry:',
-			'mexican'    => ':taco:',
-			'japanese'   => ':sushi:',
+			__( 'chinese' )    => ':takeout_box:',
+			__( 'indian' )     => ':curry:',
+			__( 'mexican' )    => ':taco:',
+			__( 'japanese' )   => ':sushi:',
 		];
 
 		$desc = strtolower( $desc );
@@ -127,10 +127,10 @@ class Emojis {
 	 */
 	public static function misc( string $name ):string {
 		switch ( strtolower( $name ) ) {
-			case 'driver':
-			case 'collector':
+			case __( 'driver', 'kebbable' ):
+			case __( 'collector', 'kebbable' ):
 				return ':truck:';
-			case 'money':
+			case __( 'money', 'kebbable' ):
 				return ':pound:';
 			default:
 				return ':question:';

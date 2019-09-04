@@ -50,8 +50,8 @@ class Table {
 	 * @return string[] The inputted array is returned with modifications.
 	 */
 	public function orders_column_definition( array $columns ):array {
-		$columns['kebabble_channel']      = 'Channel';
-		$columns['kebabble_order_status'] = 'Status';
+		$columns['kebabble_channel']      = __( 'Channel', 'kebabble' );
+		$columns['kebabble_order_status'] = __( 'Status', 'kebabble' );
 
 		return $columns;
 	}
@@ -84,9 +84,9 @@ class Table {
 				if ( ! empty( $expiry ) ) {
 					$kses_allow = [ 'span' => [ 'style' => [] ] ];
 					if ( $expiry >= Carbon::now()->timestamp ) {
-						echo wp_kses( '<span style="color:green;">Active</span>', $kses_allow );
+						echo wp_kses( '<span style="color:green;">' . __( 'Active', 'kebabble' ) . '</span>', $kses_allow );
 					} else {
-						echo wp_kses( '<span style="color:red;">Closed</span>', $kses_allow );
+						echo wp_kses( '<span style="color:red;">' . __( 'Closed', 'kebabble' ) . '</span>', $kses_allow );
 					}
 				} else {
 					echo wp_kses( 'N/A', [] );

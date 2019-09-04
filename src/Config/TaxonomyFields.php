@@ -58,15 +58,15 @@ class TaxonomyFields {
 		?>
 		<div class="form-field">
 			<input type="hidden" name="kebabbleNonce" value="<?php echo esc_attr( wp_create_nonce( 'kebabble_nonce' ) ); ?>">
-			<label for="tag-kebabble-pricing">Options & Pricing</label>
+			<label for="tag-kebabble-pricing"><?php esc_html_e( 'Options & Pricing', 'kebabble' ); ?></label>
 			<input name="ctOrderPricing" id="tag-kebabble-pricing" value="<?php echo esc_attr( $existing_pricing ); ?>" size="40" type="text" placeholder="food|price,food|price...">
-			<p>Comma-separated list of menu items, with a pipe-separated option of a price.</p>
+			<p><?php esc_html_e( 'Comma-separated list of menu items, with a pipe-separated option of a price', 'kebabble' ); ?>.</p>
 		</div>
 		<div class="form-field">
-			<label for="tag-kebabble-place-type">Options & Pricing</label>
+			<label for="tag-kebabble-place-type"><?php esc_html_e( 'Place Type', 'kebabble' ); ?></label>
 			<select name="ctPlaceType" id="tag-kebabble-place-type">
 				<?php foreach ( $place_choices as $place_choice ) : ?>
-					<option <?php echo ( $existing_place === trim( $place_choice ) ) ? 'selected' : ''; ?> id='<?php echo trim( $place_choice ); ?>'><?php echo trim( $place_choice ); ?></option>
+					<option <?php echo ( $existing_place === trim( $place_choice ) ) ? 'selected' : ''; ?> id='<?php echo esc_attr( trim( $place_choice ) ); ?>'><?php echo esc_attr( trim( $place_choice ) ); ?></option>
 				<?php endforeach; ?>
 			</select>
 		</div>
@@ -86,18 +86,18 @@ class TaxonomyFields {
 		?>
 		<div class="form-field">
 			<input type="hidden" name="kebabbleNonce" value="<?php echo esc_attr( wp_create_nonce( 'kebabble_nonce' ) ); ?>">
-			<label for="kebabble-collector-payopts">Accepted Payment Methods</label>
+			<label for="kebabble-collector-payopts"><?php esc_attr_e( 'Accepted Payment Methods', 'kebabble' ); ?></label>
 			<input name="kebabble-collector-payopts" value="<?php echo esc_attr( $ext_payopts ); ?>" size="40" type="text" placeholder="Cash, Card...">
-			<p>Comma-separated list of payment methods.</p>
+			<p><?php esc_attr_e( 'Comma-separated list of payment methods', 'kebabble' ); ?>.</p>
 		</div>
 		<div class="form-field">
-			<label for="kebabble-collector-charge">Tax (in pence)</label>
+			<label for="kebabble-collector-charge"><?php esc_attr_e( 'Tax (non-decimal)', 'kebabble' ); ?></label>
 			<input name="kebabble-collector-charge" value="<?php echo (int) $ext_charge; ?>" type="number">
 		</div>
 		<div class="form-field">
-			<label for="kebabble-collector-slackcode">Slack User Code</label>
+			<label for="kebabble-collector-slackcode"><?php esc_attr_e( 'Slack User Code', 'kebabble' ); ?></label>
 			<input name="kebabble-collector-slackcode" value="<?php echo esc_attr( $ext_slackusr ); ?>" size="40" type="text">
-			<p>Start an order, and the code will be revealed. Copy the content between <@ and >.</p>
+			<p><?php esc_attr_e( 'Start an order, and the code will be revealed. Copy the content between <@ and >', 'kebabble' ); ?>.</p>
 		</div>
 		<?php
 	}

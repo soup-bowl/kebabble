@@ -170,14 +170,15 @@ class OrderFields {
 		?>
 		<div>
 			<div>
-				<p class="label"><label>Custom Message</label></p>
+				<p class="label"><label><?php esc_html_e( 'Custom Message', 'kebabble' ); ?></label></p>
 				<ul>
 					<input name="kebabbleCustomMessageEnabled" id="cmCheckBox" type="checkbox" <?php echo esc_attr( $enabled ); ?>>
 				</ul>
 			</div>
 			<div id="kebabbleCustomMessage">
-				<p class="label"><label for="kebabbleCustomMessageEntry">Custom Message</label></p>
-				<?php wp_editor(
+				<p class="label"><label for="kebabbleCustomMessageEntry"><?php esc_html_e( 'Custom Message', 'kebabble' ); ?></label></p>
+				<?php
+				wp_editor(
 					$existing['kebabble-custom-message'],
 					'kebabbleCustomMessageEntry',
 					[
@@ -185,7 +186,8 @@ class OrderFields {
 						'tinymce'       => false,
 						'quicktags'     => [ 'buttons' => 'strong,em,code' ],
 					]
-				); ?>
+				);
+				?>
 			</div>
 		</div>
 		<?php
@@ -216,7 +218,7 @@ class OrderFields {
 		// phpcs:disable WordPress.Security.EscapeOutput
 		?>
 		<div>
-			<p class="label"><label for="kebabbleCompanySelection">Company</label></p>
+			<p class="label"><label for="kebabbleCompanySelection"><?php _e( 'Company', 'kebabble' ); ?></label></p>
 			<select name="kebabbleCompanySelection" id="selCompany">
 				<?php echo $select; ?>
 			</select>
@@ -244,7 +246,7 @@ class OrderFields {
 		// phpcs:disable WordPress.Security.EscapeOutput
 		?>
 		<div>
-			<p class="label"><label for="kebabbleOrderTypeSelection">Food</label></p>
+			<p class="label"><label for="kebabbleOrderTypeSelection"><?php _e( 'Food', 'kebabble' ); ?></label></p>
 			<select name="kebabbleOrderTypeSelection">
 				<?php echo $select; ?>
 			</select>
@@ -263,7 +265,7 @@ class OrderFields {
 		$existings = ( ! empty( $existings ) ) ? $existings['kebabble-order'] : '';
 		?>
 		<div>
-			<p class="label"><label for="kebabbleOrders">Orders</label></p>
+			<p class="label"><label for="kebabbleOrders"><?php esc_html_e( 'Orders', 'kebabble' ); ?></label></p>
 			<table class="wp-list-table widefat fixed striped">
 				<thead>
 					<tr>
@@ -285,7 +287,7 @@ class OrderFields {
 					?>
 				</tbody>
 			</table>
-			<p><a class="btnAddkorder button" href="#">Add</a></p>
+			<p><a class="btnAddkorder button" href="#"><?php esc_html_e( 'Add order', 'kebabble' ); ?></a></p>
 			<input type=hidden value="" />
 		</div>
 		<?php
@@ -315,7 +317,7 @@ class OrderFields {
 		// phpcs:disable WordPress.Security.EscapeOutput
 		?>
 		<div>
-			<p class="label"><label for="kebabbleCollectorSelection">Collector</label></p>
+			<p class="label"><label for="kebabbleCollectorSelection"><?php _e( 'Collector', 'kebabble' ); ?></label></p>
 			<select name="kebabbleCollectorSelection" id="selCollector">
 				<?php echo $select; ?>
 			</select>
@@ -334,8 +336,8 @@ class OrderFields {
 		$existing = ( ! empty( $existing ) ) ? $existing['kebabble-driver'] : '';
 		?>
 		<div>
-			<p class="label"><label for="kebabbleDriver">Collector Name</label></p>
-			<input type="text" name="kebabbleDriver" id="kebabbleDriver" value="<?php echo esc_attr( $existing ); ?>" placeholder="Leave blank to use your WordPress name.">
+			<p class="label"><label for="kebabbleDriver"><?php esc_html_e( 'Collector Name', 'kebabble' ); ?></label></p>
+			<input type="text" name="kebabbleDriver" id="kebabbleDriver" value="<?php echo esc_attr( $existing ); ?>" placeholder="<?php esc_html_e( 'Leave blank to use your WordPress name', 'kebabble' ); ?>">
 		</div>
 		<?php
 	}
@@ -350,7 +352,7 @@ class OrderFields {
 		$existing = ( ! empty( $existing ) ) ? $existing['kebabble-tax'] : '';
 		?>
 		<div>
-			<p class="label"><label for="kebabbleDriverTax">Collector Charge (in pence)</label></p>
+			<p class="label"><label for="kebabbleDriverTax"><?php esc_html_e( 'Collector Charge (non-decimal)', 'kebabble' ); ?></label></p>
 			<input type="number" name="kebabbleDriverTax" id="kebabbleDriverTax" value="<?php echo intval( $existing ); ?>">
 		</div>
 		<?php
@@ -382,7 +384,7 @@ class OrderFields {
 		// phpcs:disable WordPress.Security.EscapeOutput
 		?>
 		<div>
-			<p class="label"><label for="kebabblePaymentOptions">Payment Options</label></p>
+			<p class="label"><label for="kebabblePaymentOptions"><?php _e( 'Payment Options', 'kebabble' ); ?></label></p>
 			<ul>
 				<?php echo $lists; ?>
 			</ul>
@@ -401,7 +403,7 @@ class OrderFields {
 		$existing = ( ! empty( $existing ) ) ? $existing['kebabble-pin'] : false;
 		?>
 		<div>
-			<p class="label"><label>Pin to Slack Channel</label></p>
+			<p class="label"><label><?php esc_html_e( 'Pin to Slack Channel', 'kebabble' ); ?></label></p>
 			<ul>
 				<input name='pinState' type='checkbox' <?php checked( $existing ); ?> value='1'>
 			</ul>
@@ -423,7 +425,7 @@ class OrderFields {
 		<tr id="<?php echo esc_attr( $id ); ?>" class="<?php echo esc_attr( $class ); ?>">
 			<td><input type="text" name="korder_name[]" id="korder_name[]" value="<?php echo esc_attr( $name ); ?>"></td>
 			<td><input type="text" name="korder_food[]" id="korder_food[]" value="<?php echo esc_attr( $food ); ?>"></td>
-			<td><a class="btnRemkorder button" href="#">Remove</a></td>
+			<td><a class="btnRemkorder button" href="#"><?php esc_html_e( 'Remove order', 'kebabble' ); ?></a></td>
 		</tr>
 		<?php
 	}

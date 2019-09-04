@@ -49,17 +49,17 @@ class Formatting {
 		$location    = ( ! empty( wp_get_object_terms( $id, 'kebabble_company' ) ) ) ? wp_get_object_terms( $id, 'kebabble_company' )[0] : null;
 		$location_id = ( ! empty( $location ) ) ? $location->term_id : 0;
 		$food        = ( $location_id !== 0 ) ? get_term_meta( $location_id, 'kebabble_place_type', true ) : $food;
-		$loc_str     = ( ! empty( $location ) ) ? " at {$location->name}" : '';
-		$order       = ( empty( $order ) ) ? '_None yet!_' : $this->order_formatter( $order, $location_id, $tax );
-		$driver      = ( '' === $driver ) ? 'Unknown' : $driver;
+		$loc_str     = ( ! empty( $location ) ) ? " @ {$location->name}" : '';
+		$order       = ( empty( $order ) ) ? '_' . __( 'None yet!', 'kebabble' ) . '_' : $this->order_formatter( $order, $location_id, $tax );
+		$driver      = ( '' === $driver ) ? __( 'Unknown Collector', 'kebabble' ) : $driver;
 		$date        = ( empty( $date ) ) ? Carbon::now() : $date;
 		$slack_emoji = Emojis::food( $food );
 
 		$formatted_posts = [
 			"{$slack_emoji} *{$food} {$date->format('l')}{$loc_str} ({$date->format('jS F')})* {$slack_emoji}",
 			$order,
-			"Polling <!here> for orders. Today's collector is *{$driver}* " . Emojis::misc( 'collector' ),
-			( $tax > 0 ) ? Emojis::misc( 'money' ) . ' *Additional ' . $this->money->output( $tax ) . ' per person* to fund the collector.' : null,
+			sprintf( __( 'Polling %1$s for orders. Today\'s collector is %2$s', 'kebabble' ), '<!here>', "*{$driver}*" ) . Emojis::misc( 'collector' ),
+			( $tax > 0 ) ? Emojis::misc( 'money' ) . ' *' . sprintf( __( 'Additional %1$s per person', 'kebabble' ), $this->money->output( $tax ) ) . '* ' . __( 'to fund the collector', 'kebabble' ) . '.' : null,
 			$this->accepts_payment_formatter( $payments, $pay_opts ),
 		];
 
@@ -133,8 +133,8 @@ class Formatting {
 		$cost_box = '';
 		if ( $cost_overall > 0 ) {
 			$cost_box  = "\n\n";
-			$cost_box .= "*Cost*: {$this->money->output($cost_overall)} _for priced orders_.\n";
-			$cost_box .= "*Tax*: {$this->money->output($cost_tax)}.";
+			$cost_box .= '*' . __( 'Cost', 'kebabble' ) . '*: ' . $this->money->output( $cost_overall ) . ' _' . __( 'for priced orders', 'kebabble' ) . "_.\n";
+			$cost_box .= '*' . __( 'Tax', 'kebabble' ) . "*: {$this->money->output($cost_tax)}.";
 		}
 
 		return substr( $content, 0, -2 ) . $cost_box;
@@ -154,7 +154,7 @@ class Formatting {
 			return '';
 		}
 
-		$format_string = 'Driver accepts ';
+		$format_string = __( 'Driver accepts', 'kebabble' ) . ' ';
 
 		if ( 1 !== $ap_count ) {
 			for ( $i = 0; $i < $ap_count; $i++ ) {

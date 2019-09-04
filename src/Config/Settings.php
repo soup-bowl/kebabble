@@ -156,7 +156,7 @@ class Settings {
 				$options = get_option( 'kbfos_settings' );
 				?>
 				<input type='text' class='regular-text'  name='kbfos_settings[kbfos_payopts]' placeholder='Cash, PayPal, etc...' value='<?php echo esc_attr( $options['kbfos_payopts'] ); ?>'>
-				<p class="description">Comma-seperated values accepted.</p>
+				<p class="description"><?php esc_html_e( 'Comma-seperated values accepted', 'kebabble' ); ?></p>
 				<?php
 			},
 			'pluginPage',
@@ -170,7 +170,7 @@ class Settings {
 				$options = get_option( 'kbfos_settings' );
 				?>
 				<input type='text' class='regular-text'  name='kbfos_settings[kbfos_place_type]' placeholder='Kebab, Pizza, etc...' value='<?php echo esc_attr( $options['kbfos_place_type'] ); ?>'>
-				<p class="description">Used primarily for emojis. Comma-seperated values accepted.</p>
+				<p class="description"><?php esc_html_e( 'Used primarily for emojis. Comma-seperated values accepted', 'kebabble' ); ?>.</p>
 				<?php
 			},
 			'pluginPage',
