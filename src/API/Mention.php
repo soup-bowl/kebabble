@@ -21,6 +21,11 @@ use WP_Term;
 use WP_REST_Request;
 use Carbon\Carbon;
 
+use BotMan\BotMan\BotMan;
+use BotMan\BotMan\Drivers\DriverManager;
+use BotMan\BotMan\BotManFactory;
+use BotMan\Drivers\Slack\SlackDriver;
+
 /**
  * Handles Slack mentions, and processes the contents for relevant information.
  */
@@ -89,8 +94,36 @@ class Mention {
 			return [ 'challenge' => $request['challenge'] ];
 		}
 
-		if ( ! empty( $request['event'] ) && $request['event']['type'] === 'app_mention' ) {
-			// Begin a new order.
+		DriverManager::loadDriver( SlackDriver::class );
+
+		// Create BotMan instance
+		$botman = BotManFactory::create([
+			'slack' => [
+				'token' => 'xoxb-276944771697-RyJFOmq1k5usd4i0risLXPpt'
+			]
+		]);
+
+		// give the bot something to listen for.
+		$botman->hears(
+			'kebab',
+			function ( BotMan $bot ) {
+				error_log( var_export( $bot, true ) );
+				$bot->reply( 'Hello world!' );
+			}
+		);
+
+		// start listening
+		$botman->listen();
+
+		//$this->slack->send_message(
+		//	"```\n" . 'Ended sucessfully.' . "\n```",
+		//	null,
+		//	$request['event']['channel'],
+		//	$request['event']['ts']
+		//);
+
+		//if ( ! empty( $request['event'] ) && $request['event']['type'] === 'app_mention' ) {
+			/* Begin a new order.
 			if ( preg_match( '/\bnew order\b/', strtolower( $request['event']['text'] ) ) ) {
 				preg_match( '/(?<=at ).*$/i', $request['event']['text'], $place );
 				$this->new_order(
@@ -178,10 +211,10 @@ class Mention {
 				} else {
 					$this->slack->react( Emojis::negative( 0 ), $request['event']['ts'], $request['event']['channel'] );
 				}
-			}
+			}*/
 
 			return [];
-		}
+		//}
 	}
 
 	/**
