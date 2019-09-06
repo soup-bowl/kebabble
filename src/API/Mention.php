@@ -99,18 +99,17 @@ class Mention {
 		// Create BotMan instance
 		$botman = BotManFactory::create([
 			'slack' => [
-				'token' => 'xoxb-276944771697-RyJFOmq1k5usd4i0risLXPpt'
+				'token' => ( getenv( 'KEBABBLE_BOT_AUTH' ) === false ) ? get_option( 'kbfos_settings' )['kbfos_botkey'] : getenv( 'KEBABBLE_BOT_AUTH' ),
 			]
 		]);
 
+		$kebabble_user = $this->slack->get_bot_details()['user_id'];
+		$kebabble_tag  = "<@{$kebabble_user}>";
+
 		// give the bot something to listen for.
-		$botman->hears(
-			'kebab',
-			function ( BotMan $bot ) {
-				error_log( var_export( $bot, true ) );
-				$bot->reply( 'Hello world!' );
-			}
-		);
+		$botman->hears( "{$kebabble_tag} kebab", function ( BotMan $bot ) {
+			$bot->reply( 'Hello world!' );
+		});
 
 		// start listening
 		$botman->listen();

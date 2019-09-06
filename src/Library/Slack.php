@@ -140,7 +140,7 @@ class Slack {
 	public function channels() {
 		$channels = get_transient( 'kebabble_channels' );
 
-		if ( $channels === false ) {
+		if ( $channels === false && empty( $channels ) ) {
 			$response = $this->client->connect( $this->token )->findChannels();
 
 			$channels = [];
@@ -156,6 +156,18 @@ class Slack {
 		}
 
 		return $channels;
+	}
+	
+	public function get_bot_details() {
+		$response = get_transient( 'kebabble_bot_info' );
+
+		if ( $response === false && empty( $response ) ) {
+			$response = $this->client->connect( $this->token )->aboutMe();
+
+			set_transient( 'kebabble_bot_info', $response, YEAR_IN_SECONDS );
+		}
+
+		return $response;
 	}
 
 	/**
