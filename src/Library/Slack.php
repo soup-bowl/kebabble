@@ -9,24 +9,12 @@
 
 namespace Kebabble\Library;
 
-use Kebabble\Processes\Formatting;
-
-use SlackClient\BotClient;
-use Carbon\Carbon;
+use GuzzleHttp\Client;
 
 /**
  * Intermediary between Kebabble WP and Slack.
- *
- * @todo Become parent of botclient. Remove formatting dependency and declare in use.
  */
 class Slack {
-	/**
-	 * Slack based communications library.
-	 *
-	 * @var Botclient
-	 */
-	protected $client;
-
 	/**
 	 * Authorisation key, either from WP options or environment.
 	 *
@@ -36,12 +24,9 @@ class Slack {
 
 	/**
 	 * Constructor.
-	 *
-	 * @param BotClient $client Slack based communications library.
 	 */
-	public function __construct( BotClient $client ) {
-		$this->client = $client;
-		$this->token  = ( getenv( 'KEBABBLE_BOT_AUTH' ) === false ) ? get_option( 'kbfos_settings' )['kbfos_botkey'] : getenv( 'KEBABBLE_BOT_AUTH' );
+	public function __construct() {
+		$this->token = ( getenv( 'KEBABBLE_BOT_AUTH' ) === false ) ? get_option( 'kbfos_settings' )['kbfos_botkey'] : getenv( 'KEBABBLE_BOT_AUTH' );
 	}
 
 	/**
@@ -54,13 +39,29 @@ class Slack {
 	 * @return string Unique timestamp of the message, used for editing.
 	 */
 	public function send_message( string $message, ?string $existing_timestamp = null, ?string $channel = null, ?string $thread_timestamp = null ):string {
-		return $this->client->connect( $this->token )
-			->setChannel( ( empty( $channel ) ) ? get_option( 'kbfos_settings' )['kbfos_botchannel'] : $channel )
-			->message(
-				$message,
-				( ! empty( $existing_timestamp ) ) ? $existing_timestamp : false,
-				( ! empty( $thread_timestamp ) ) ? $thread_timestamp : false
-			);
+		$args = [
+			'text'       => $message,
+			'link_names' => 1
+		];
+		
+		if ( ! empty( $thread_timestamp ) ) {
+				$args['thread_ts'] = $thread_timestamp;
+		}
+
+		if ( ! $existing_timestamp ) {
+			// New message.
+			$response = $this->send_request('chat.postMessage', $channel, $args );
+		} else {
+			// Edit previous message.
+			$args['ts'] = $existing_timestamp;
+			$response = $this->send_request('chat.update', $channel, $args );
+		}
+
+		if ( $response !== false ) {
+			return $response['ts'];
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -71,7 +72,7 @@ class Slack {
 	 * @return boolean
 	 */
 	public function remove_message( string $ts, string $channel ) {
-		$this->client->connect( $this->token )->setChannel( $channel )->deleteMessage( $ts );
+		$this->send_request( 'chat.delete', $channel, [ 'ts' => $ts ] );
 
 		return true;
 	}
@@ -108,15 +109,13 @@ class Slack {
 
 				if ( ! empty( $order ) ) {
 					delete_post_meta( $order[1]->ID, 'kebabble-pin' );
-					$this->client->connect( $this->token )->setChannel( $channel )->unpin(
-						get_post_meta( $order[1]->ID, 'kebabble-slack-ts', true )
-					);
+					$this->send_request( 'pins.remove', $channel, [ 'timestamp' => get_post_meta( $order[1]->ID, 'kebabble-slack-ts', true ) ] );
 				}
 			}
 
-			$this->client->connect( $this->token )->setChannel( $channel )->pin( $ts );
+			$this->send_request( 'pins.add', $channel, [ 'timestamp' => $ts ] );
 		} else {
-			$this->client->connect( $this->token )->setChannel( $channel )->unpin( $ts );
+			$this->send_request( 'pins.remove', $channel, [ 'timestamp' => $ts ] );
 		}
 	}
 
@@ -129,7 +128,23 @@ class Slack {
 	 * @return void
 	 */
 	public function react( string $reaction, string $ts, string $channel ) {
-		$this->client->connect( $this->token )->setChannel( $channel )->react( $ts, $reaction );
+		// Remove colon denominators if present.
+		$emoji = str_replace( ':', '', $reaction );
+
+		$response = $this->send_request(
+			'reactions.add',
+			$channel,
+			[
+				'name'      => $emoji,
+				'timestamp' => $ts,
+			]
+		);
+		
+		if ( $response['ok'] === true ) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -141,7 +156,7 @@ class Slack {
 		$channels = get_transient( 'kebabble_channels' );
 
 		if ( $channels === false && empty( $channels ) ) {
-			$response = $this->client->connect( $this->token )->findChannels();
+			$response = $this->send_request( 'conversations.list', '', ['exclude_archived' => true] );
 
 			$channels = [];
 			foreach ( $response['channels'] as $channel ) {
@@ -162,7 +177,7 @@ class Slack {
 		$response = get_transient( 'kebabble_bot_info' );
 
 		if ( $response === false && empty( $response ) ) {
-			$response = $this->client->connect( $this->token )->aboutMe();
+			$response = $this->send_request( 'auth.test', '' );
 
 			set_transient( 'kebabble_bot_info', $response, YEAR_IN_SECONDS );
 		}
@@ -193,5 +208,42 @@ class Slack {
 		$export    = str_replace( $bad_code, $good_code, $export );
 
 		return $export;
+	}
+
+	/**
+	 * Sends a CURL request to the Slack API, using application/x-www-form-urlencoded.
+	 * The token is already sent, so is unneeded in $args. Channel is also, if provided.
+	 *
+	 * @param string $token    Your app token for accessing API features.
+	 * @param string $slackapi Which api segment you're calling (e.g. post.update)
+	 * @param array  $args     Additional parameters.
+	 * @param string $type     HTTP request type
+	 * @return array|null
+	 */
+	private function send_request( $slackapi, $channel, $args = [], $type = "POST" ) {
+		$args['token']    = $this->token;
+		$args['channel']  = $channel;
+		$args['base_uri'] = 'https://slack.com/api/';
+		if ( isset( $this->custom_handler ) ) {
+			$args['handler'] = $this->custom_handler;
+		}
+
+		$client   = new Client( $args );
+		$response = $client->request(
+			$type,
+			$slackapi,
+			[
+				'form_params' => $args
+			]
+		);
+		
+		$result = json_decode( (string) $response->getBody(), true );
+		
+		if ( $result['ok'] == false ) {
+			error_log( $result['error'] );
+			return null;
+		} else {
+			return $result;
+		}
 	}
 }

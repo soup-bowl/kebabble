@@ -8,10 +8,10 @@
         "monolog/monolog": "^1.22",
         "nesbot/carbon": "^2.0.0",
         "php-di/php-di": "^6.0",
-        "soup-bowl/slack-client-php": "dev-master",
         "soup-bowl/kebabble-order-parser": "0.1",
         "botman/botman": "^2.5",
-        "botman/driver-slack": "^2.2"
+        "botman/driver-slack": "^2.2",
+        "guzzlehttp/guzzle": "^6.3"
     },
     "require-dev": {
         "phpunit/phpunit": "^8.2",
