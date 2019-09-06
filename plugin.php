@@ -10,14 +10,17 @@
  * Description: Office food management system.
  * Author: soup-bowl
  * Author URI: https://gitlab.com/soup-bowl/kebabble
- * Version: 0.4.0-Alpha
+ * Version: botman-implementation
  * Text Domain: kebabble
  */
 
 defined( 'ABSPATH' ) || die( 'Operation not permitted.' );
 
 $php_version = explode( '.', phpversion() );
-if ( (int) $php_version[0] >= 7 && (int) $php_version[1] >= 2 ) {
+$min_version = 7.2;
+
+$mv = explode( '.', (string) $min_version );
+if ( (int) $php_version[0] >= $mv[0] && (int) $php_version[1] >= $mv[1] ) {
 	/**
 	 * Composer Autoloader.
 	 */
@@ -27,12 +30,19 @@ if ( (int) $php_version[0] >= 7 && (int) $php_version[1] >= 2 ) {
 } else {
 	add_action(
 		'admin_notices',
-		function() {
-			?>
-			<div class="notice notice-error">
-				<p><b>Kebabble</b> is not supported on this PHP version. Please use <b>7.2 or higher</b>.</p>
-			</div>
-			<?php
+		function() use( $min_version ) {
+			echo wp_kses(
+				"<div class='notice notice-error'>
+				<p>" . sprintf( __( '<b>%1$s</b> is not supported on this PHP version. Please use <b>%2$s or higher</b>', 'kebabble' ), 'Kebabble', (string) $min_version ) . "</p>
+				</div>",
+				[
+					'div' => [
+						'class' => [],
+					],
+					'p' => [],
+					'b' => [],
+				]
+			);
 		}
 	);
 }
