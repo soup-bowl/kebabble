@@ -106,9 +106,27 @@ class Mention {
 		$kebabble_user = $this->slack->get_bot_details()['user_id'];
 		$kebabble_tag  = "<@{$kebabble_user}>";
 
-		// give the bot something to listen for.
-		$botman->hears( "{$kebabble_tag} kebab", function ( BotMan $bot ) {
-			$bot->reply( 'Hello world!' );
+		$botman->hears( "{$kebabble_tag} help", function ( BotMan $bot ) {
+			$help = $this->informational_commands( 'help', $bot->getUser()->getId() );
+			$bot->reply( $help );
+		});
+
+		$botman->hears( "{$kebabble_tag} menu", function ( BotMan $bot ) {
+			$info = $this->get_order_details(
+				$bot->getMessage()->getPayload()['channel']
+			);
+
+			if ( ! empty( $info ) ) {
+				$help = $this->informational_commands(
+					'menu',
+					$bot->getUser()->getId(),
+					$info['place']
+				);
+
+				$bot->reply( $help );
+			} else {
+				$bot->reply( $this->message( 3 ) );
+			}
 		});
 
 		// start listening
@@ -214,6 +232,22 @@ class Mention {
 
 			return [];
 		//}
+	}
+
+	private function get_order_details( string $channel ) {
+		$order_obj = $this->get_latest_order( $channel );
+		if ( ! empty( $order_obj ) ) {
+			$places = wp_get_object_terms( $order_obj->ID, 'kebabble_company' );
+			$place  = ( isset( $places ) ) ? $places[0] : null;
+			$order  = $this->orderstore->get( $order_obj->ID );
+
+			return [
+				'place' => $place,
+				'order' => $order,
+			];
+		} else {
+			return null;
+		}
 	}
 
 	/**
