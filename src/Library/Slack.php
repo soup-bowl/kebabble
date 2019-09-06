@@ -26,7 +26,26 @@ class Slack {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->token = ( getenv( 'KEBABBLE_BOT_AUTH' ) === false ) ? get_option( 'kbfos_settings' )['kbfos_botkey'] : getenv( 'KEBABBLE_BOT_AUTH' );
+		$this->token = $this->get_auth();
+	}
+
+	/**
+	 * Gets the bot key. Prioritises an environmental definition over WordPress-stored.
+	 *
+	 * @return string|null
+	 */
+	public function get_auth() {
+		$bkey = getenv( 'KEBABBLE_BOT_AUTH' );
+		if ( $bkey !== false ) {
+			return $bkey;
+		}
+
+		$bkey = get_option( 'kbfos_settings' );
+		if ( ! empty( $bkey ) && array_key_exists( 'kbfos_botkey', $bkey ) ) {
+			return $bkey['kbfos_botkey'];
+		}
+
+		return null;
 	}
 
 	/**

@@ -171,7 +171,7 @@ class Publish {
 			if ( false !== $contents ) {
 				if ( $contents['kebabble-is-custom'] ) {
 					$message             = $contents['kebabble-custom-message'];
-					$data['post_title']  = esc_html_e( 'Custom message', 'kebabble' ) . ' - "';
+					$data['post_title']  = esc_html( 'Custom message', 'kebabble' ) . ' - "';
 					$data['post_title'] .= ( strlen( $message ) > 25 ) ? substr( $message, 0, 25 ) . '...' : $message;
 					$data['post_title'] .= '"';
 				} else {

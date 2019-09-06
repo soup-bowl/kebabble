@@ -99,7 +99,7 @@ class Mention {
 		// Create BotMan instance
 		$botman = BotManFactory::create([
 			'slack' => [
-				'token' => ( getenv( 'KEBABBLE_BOT_AUTH' ) === false ) ? get_option( 'kbfos_settings' )['kbfos_botkey'] : getenv( 'KEBABBLE_BOT_AUTH' ),
+				'token' => $this->slack->get_auth(),
 			]
 		]);
 
