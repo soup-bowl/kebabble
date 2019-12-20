@@ -14,7 +14,6 @@ use Kebabble\Processes\Publish;
 use Kebabble\Library\Money;
 use Kebabble\Library\Slack;
 use Kebabble\Library\Emojis;
-use KOrderParser\Parser;
 
 use WP_Post;
 use WP_Term;
@@ -59,27 +58,18 @@ class Mention {
 	protected $slack;
 
 	/**
-	 * Natural-language order parser.
-	 *
-	 * @var Parser
-	 */
-	protected $order_parser;
-
-	/**
 	 * Constructor.
 	 *
 	 * @param Orderstore $orderstore Stores and retrieves order data.
 	 * @param Publish    $publish    Handles the communication with the WordPress post.
 	 * @param Money      $money      Formattings money representations.
 	 * @param Slack      $slack      Communication handler for Slack.
-	 * @param Parser     $parser     Natural-language order parser.
 	 */
-	public function __construct( Orderstore $orderstore, Publish $publish, Money $money, Slack $slack, Parser $parser ) {
-		$this->orderstore   = $orderstore;
-		$this->publish      = $publish;
-		$this->money        = $money;
-		$this->slack        = $slack;
-		$this->order_parser = $parser;
+	public function __construct( Orderstore $orderstore, Publish $publish, Money $money, Slack $slack ) {
+		$this->orderstore = $orderstore;
+		$this->publish    = $publish;
+		$this->money      = $money;
+		$this->slack      = $slack;
 	}
 
 	/**
