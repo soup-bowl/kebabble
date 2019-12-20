@@ -10,7 +10,7 @@
  * Description: Office food management system.
  * Author: soup-bowl
  * Author URI: https://gitlab.com/soup-bowl/kebabble
- * Version: botman-implementation
+ * Version: 0.4.0-Alpha
  * Text Domain: kebabble
  */
 
