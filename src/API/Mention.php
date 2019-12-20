@@ -137,6 +137,8 @@ class Mention {
 
 		$p = $this->publish;
 		$c = true;
+
+		// Create a new order.
 		$botman->hears( "{$kebabble_tag} new order at (.*)", function ( BotMan $bot, string $place ) use ( &$c, &$p, &$request ) {
 			if ( $c === true ) {
 				$this->new_order(
@@ -149,6 +151,7 @@ class Mention {
 			}
 		});
 
+		// Changes the collector marked for the ongoing order.
 		$botman->hears( "{$kebabble_tag} change (?:the )?(?:(?:collector)|(?:driver)) to (.*)", function ( BotMan $bot, string $collector ) use ( &$c, &$p, &$order_obj ) {
 			if ( $c === true ) {
 				update_post_meta( $order_obj->ID, 'kebabble-driver', $collector );
@@ -159,6 +162,7 @@ class Mention {
 			}
 		});
 
+		// Removes an item from the current order.
 		$botman->hears( "{$kebabble_tag} .*remove .*{$menu}.*", function ( BotMan $bot, string $order ) use ( &$c, &$p, &$order_obj, &$request ) {
 			if ( $c === true ) {
 				$response = $this->remove_from_order( $order_obj->ID, $order, $request['event']['user'] );
@@ -172,7 +176,8 @@ class Mention {
 				}
 			}
 		});
-		
+
+		// Adds a new item to the current order.
 		$botman->hears( "{$kebabble_tag} .*{$menu}.*", function ( BotMan $bot, string $order ) use ( &$c, &$p, &$order_obj, &$request ) {
 			if ( $c === true ) {
 				$response = $this->add_to_order( $order_obj->ID, $order, $request['event']['user'] );
@@ -187,6 +192,7 @@ class Mention {
 			}
 		});
 
+		// Closes the current order off to new requests.
 		$botman->hears( "{$kebabble_tag} close order", function ( BotMan $bot ) use ( &$c, &$p, &$order_obj, &$request ) {
 			if ( $c === true ) {
 				$collector = wp_get_object_terms( $order_obj->ID, 'kebabble_collector' );
@@ -209,23 +215,15 @@ class Mention {
 		return [];
 	}
 
-	private function get_order_details( string $channel ) {
-		$order_obj = $this->get_latest_order( $channel );
-		if ( ! empty( $order_obj ) ) {
-			$places = wp_get_object_terms( $order_obj->ID, 'kebabble_company' );
-			$place  = ( isset( $places ) ) ? $places[0] : null;
-			$order  = $this->orderstore->get( $order_obj->ID );
-
-			return [
-				'place' => $place,
-				'order' => $order,
-			];
-		} else {
-			return null;
-		}
-	}
-
-	public function add_to_order( int $post_id, string $item, string $person ) {
+	/**
+	 * Adds an item to the specified order.
+	 *
+	 * @param integer $post_id The ID of the post to modify.
+	 * @param string  $item    The product to be ordered, which must be in the company item list.
+	 * @param string  $person  The slack code of the orderer.
+	 * @return boolean Always true.
+	 */
+	public function add_to_order( int $post_id, string $item, string $person ):bool {
 		$order = get_post_meta( $post_id, 'kebabble-order', true );
 
 		$order[] = [
@@ -238,7 +236,15 @@ class Mention {
 		return true;
 	}
 
-	public function remove_from_order( int $post_id, string $item, string $person ) {
+	/**
+	 * Removes an item to the specified order.
+	 *
+	 * @param integer $post_id The ID of the post to modify.
+	 * @param string  $item    The product to be removed, which must be in the company item list.
+	 * @param string  $person  The slack code of the orderer.
+	 * @return boolean true if removed, false if not found within the list.
+	 */
+	public function remove_from_order( int $post_id, string $item, string $person ):bool {
 		$order = get_post_meta( $post_id, 'kebabble-order', true );
 
 		foreach ( $order as $key => $food ) {
@@ -367,6 +373,27 @@ class Mention {
 
 		if ( ! empty( $order ) ) {
 			return $order[0];
+		} else {
+			return null;
+		}
+	}
+	
+	/**
+	 * Gets details about the latest order in the selected channel.
+	 *
+	 * @param string $channel The channel to retrieve order details from.
+	 */
+	private function get_order_details( string $channel ) {
+		$order_obj = $this->get_latest_order( $channel );
+		if ( ! empty( $order_obj ) ) {
+			$places = wp_get_object_terms( $order_obj->ID, 'kebabble_company' );
+			$place  = ( isset( $places ) ) ? $places[0] : null;
+			$order  = $this->orderstore->get( $order_obj->ID );
+
+			return [
+				'place' => $place,
+				'order' => $order,
+			];
 		} else {
 			return null;
 		}
