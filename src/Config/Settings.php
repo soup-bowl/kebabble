@@ -109,6 +109,25 @@ class Settings {
 	 */
 	public function render_slack_config():void {
 		add_settings_field(
+			'kbfos_appid',
+			__( 'Slack app ID', 'kebabble' ),
+			function () {
+				if ( getenv( 'KEBABBLE_SLACK_APP_ID' ) !== false ) {
+					?>
+					<input type='text' class='regular-text disabled' name='kbfos_settings[kbfos_appid]' value='<?php echo esc_attr( getenv( 'KEBABBLE_SLACK_APP_ID' ) ); ?>' disabled>
+					<?php
+				} else {
+					$options = get_option( 'kbfos_settings' );
+					?>
+					<input type='text' class='regular-text' name='kbfos_settings[kbfos_appid]' value='<?php echo esc_attr( $options['kbfos_appid'] ); ?>'>
+					<?php
+				}
+			},
+			'pluginPage',
+			'kbfos_pluginPage_section'
+		);
+		
+		add_settings_field(
 			'kbfos_botkey',
 			__( 'Slack Bot Auth key', 'kebabble' ),
 			function () {

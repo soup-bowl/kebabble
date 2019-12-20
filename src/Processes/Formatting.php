@@ -46,7 +46,7 @@ class Formatting {
 	 * @param string  $notes    Optional message displayed under order.
 	 * @return string
 	 */
-	public function status( int $id, string $food, array $order, string $driver, int $tax = 0, ?Carbon $date = null, array $payments = [ 'Cash' ], array $pay_opts = [], string $notes = null ):string {
+	public function status( int $id, string $food, array $order, string $driver, int $tax = 0, ?Carbon $date = null, array $payments = [ 'Cash' ], array $pay_opts = [], ?string $notes = null ):string {
 		$location    = ( ! empty( wp_get_object_terms( $id, 'kebabble_company' ) ) ) ? wp_get_object_terms( $id, 'kebabble_company' )[0] : null;
 		$location_id = ( ! empty( $location ) ) ? $location->term_id : 0;
 		$food        = ( $location_id !== 0 ) ? get_term_meta( $location_id, 'kebabble_place_type', true ) : $food;
