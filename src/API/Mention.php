@@ -187,6 +187,22 @@ class Mention {
 			}
 		});
 
+		$botman->hears( "{$kebabble_tag} close order", function ( BotMan $bot ) use ( &$c, &$p, &$order_obj, &$request ) {
+			if ( $c === true ) {
+				$collector = wp_get_object_terms( $order_obj->ID, 'kebabble_collector' );
+				$collector = ( ! empty( $collector ) ) ? get_term_meta( $collector[0]->term_id, 'keabble_collector_slackcode', true ) : null;
+
+				$c = false;
+				if ( $collector === $request['event']['user'] ) {
+					update_post_meta( $order_obj->ID, 'kebabble-timeout', Carbon::now()->timestamp );
+
+					$bot->reply( 'Order concluded.' );
+				} else {
+					$bot->reply( 'You do not have permission to cancel this order.' );
+				}
+			}
+		});
+
 		// start listening
 		$botman->listen();
 
