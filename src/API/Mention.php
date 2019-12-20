@@ -137,7 +137,29 @@ class Mention {
 
 		$p = $this->publish;
 		$c = true;
-		$botman->hears( "{$kebabble_tag} .*remove .*{$menu}.*", function ( BotMan $bot, string $order ) use ( &$c, &$order_obj, &$request, &$p ) {
+		$botman->hears( "{$kebabble_tag} new order at (.*)", function ( BotMan $bot, string $place ) use ( &$c, &$p, &$request ) {
+			if ( $c === true ) {
+				$this->new_order(
+					$request['event']['channel'],
+					$place,
+					$request['event']['user']
+				);
+
+				$c = false;
+			}
+		});
+
+		$botman->hears( "{$kebabble_tag} change (?:the )?(?:(?:collector)|(?:driver)) to (.*)", function ( BotMan $bot, string $collector ) use ( &$c, &$p, &$order_obj ) {
+			if ( $c === true ) {
+				update_post_meta( $order_obj->ID, 'kebabble-driver', $collector );
+				$p->handle_publish( $order_obj, false );
+
+				$c = false;
+				$bot->reply( "Collector changed to {$collector}." );
+			}
+		});
+
+		$botman->hears( "{$kebabble_tag} .*remove .*{$menu}.*", function ( BotMan $bot, string $order ) use ( &$c, &$p, &$order_obj, &$request ) {
 			if ( $c === true ) {
 				$response = $this->remove_from_order( $order_obj->ID, $order, $request['event']['user'] );
 				$p->handle_publish( $order_obj, false );
@@ -151,7 +173,7 @@ class Mention {
 			}
 		});
 		
-		$botman->hears( "{$kebabble_tag} .*{$menu}.*", function ( BotMan $bot, string $order ) use ( &$c, &$order_obj, &$request, &$p ) {
+		$botman->hears( "{$kebabble_tag} .*{$menu}.*", function ( BotMan $bot, string $order ) use ( &$c, &$p, &$order_obj, &$request ) {
 			if ( $c === true ) {
 				$response = $this->add_to_order( $order_obj->ID, $order, $request['event']['user'] );
 				$p->handle_publish( $order_obj, false );
@@ -214,21 +236,6 @@ class Mention {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Detects a request to change the driver, and returns their name.
-	 *
-	 * @param string $request Request to parse.
-	 * @return string|null Name of the collector, or null if no request was made.
-	 */
-	public function change_collector( string $request ):?string {
-		$confirm = preg_match( '/change (?:the )?(?:(?:collector)|(?:driver)) to (.*)/i', $request, $result );
-		if ( $confirm ) {
-			return $result[1];
-		}
-
-		return null;
 	}
 
 	/**
