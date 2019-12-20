@@ -166,9 +166,9 @@ class Mention {
 
 				$c = false;
 				if ( $response ) {
-					$bot->reply( 'Success' );
+					$bot->reply( "Cool, your {$order} has been chucked off the list." );
 				} else {
-					$bot->reply( 'Failed' );
+					$bot->reply( 'Oops! Something went wrong trying to process your removal.' );
 				}
 			}
 		});
@@ -180,9 +180,9 @@ class Mention {
 
 				$c = false;
 				if ( $response ) {
-					$bot->reply( 'Success' );
+					$bot->reply( "{$order} added to the order!" );
 				} else {
-					$bot->reply( 'Failed' );
+					$bot->reply( 'Something went wrong adding your order. Check the menu and try again!' );
 				}
 			}
 		});
