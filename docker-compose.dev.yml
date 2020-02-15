@@ -1,35 +1,37 @@
-version: '3.0'
+version: '3.6'
 services:
-  rbb_db:
+  db:
     image: mariadb:latest
     environment:
       MYSQL_ROOT_PASSWORD: zd09d7r39406d7s869f5s
-  rbb_db_pma:
+  db_pma:
+    depends_on:
+      - db
     image: phpmyadmin/phpmyadmin:latest
-    links:
-     - rbb_db:db
     ports:
-    - 8081:80
+      - 8081:80
     environment:
       MYSQL_ROOT_PASSWORD: zd09d7r39406d7s869f5s
       PMA_USER: root
       PMA_PASSWORD: zd09d7r39406d7s869f5s
-  rbb_www:
+  www:
     depends_on:
-    - rbb_db
+      - db
     image: wordpress:latest
     volumes:
-    - ".:/var/www/html/wp-content/plugins/kebabble"
+      - ".:/var/www/html/wp-content/plugins/kebabble"
     ports:
-    - 8080:80
+      - 8080:80
     env_file: .env
     environment:
-      WORDPRESS_DB_HOST: rbb_db
+      WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: root
       WORDPRESS_DB_PASSWORD: zd09d7r39406d7s869f5s
       WORDPRESS_DB_NAME: wp_kebabble
       WORDPRESS_DEBUG: 1
       WORDPRESS_CONFIG_EXTRA: |
+        define('WP_HOME', "http://{$_SERVER['SERVER_NAME']}/");
+        define('WP_SITEURL', "http://{$_SERVER['SERVER_NAME']}/");
         define('WP_DEBUG', true);
         define('WP_DEBUG_LOG', true);
         define('WP_DEBUG_DISPLAY', false);
