@@ -11,6 +11,7 @@ Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versio
 
 ### Changed
 - Orders now stored in seperate meta entities, to improve internal accessibility (not backwards compatible).
+- Improved handling of bad requests via the events API.
 
 ## [0.3.4] - 2019-09-02
 ### Added

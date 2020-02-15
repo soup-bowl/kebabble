@@ -94,11 +94,17 @@ class Mention {
 		]);
 
 		$order_obj = $this->get_latest_order( $request['event']['channel'] );
+		$order     = null;
+		$places    = null;
+		$place     = null;
+		$menu      = null;
 		if ( $order_obj !== null ) {
 			$order  = $this->orderstore->get( $order_obj->ID );
 			$places = wp_get_object_terms( $order_obj->ID, 'kebabble_company' );
-			$place  = ( isset( $places ) ) ? $places[0] : null;
-			$menu   = '(' . implode( '|', $this->get_potentials( $place->term_id ) ) . ')';
+			$place  = ( isset( $places, $places[0] ) ) ? $places[0] : null;
+			if ( $place !== null ) {
+				$menu = '(' . implode( '|', $this->get_potentials( $place->term_id ) ) . ')';
+			}
 		}
 
 		$kebabble_user = $this->slack->get_bot_details()['user_id'];
@@ -133,17 +139,20 @@ class Mention {
 		// Create a new order.
 		$botman->hears( "{$kebabble_tag} new order at (.*)", function ( BotMan $bot, string $place ) use ( &$c, &$p, &$request ) {
 			if ( $c === true ) {
-				$this->new_order(
+				$response = $this->new_order(
 					$request['event']['channel'],
 					$place,
 					$request['event']['user']
 				);
 
 				$c = false;
+				if ( $response === false ) {
+					$bot->reply( "Sorry, I don't recognise the resturant {$place}." );
+				}
 			}
 		});
 
-		if ( $order_obj !== null ) {
+		if ( $order_obj !== null && $place !== null ) {
 			// Changes the collector marked for the ongoing order.
 			$botman->hears( "{$kebabble_tag} change (?:the )?(?:(?:collector)|(?:driver)) to (.*)", function ( BotMan $bot, string $collector ) use ( &$c, &$p, &$order_obj ) {
 				if ( $c === true ) {
@@ -260,12 +269,16 @@ class Mention {
 	 * @param string $channel   The Slack channel of operation.
 	 * @param string $resturant The place chosen, if in the system.
 	 * @param string $collector The name of the collector.
-	 * @return void Pubishes a new WordPress post.
+	 * @return boolean Pubishes a new WordPress post. Boolean indicates success.
 	 */
 	public function new_order( string $channel, ?string $resturant = null, ?string $collector = null ) {
 		$collector       = ( isset( $collector ) ) ? $collector : 'Unspecified';
 		$company         = get_term_by( 'name', $resturant, 'kebabble_company' );
 		$collector_match = $this->find_collector( $collector, true );
+
+		if ( $company === false ) {
+			return false;
+		}
 
 		$post_title = 'Slack-generated order - ';
 		if ( isset( $resturant, $company ) ) {
@@ -307,6 +320,8 @@ class Mention {
 		add_post_meta( $post_id, '_kebabble-dnr', 1 );
 
 		wp_publish_post( $post_id );
+
+		return true;
 	}
 
 	/**
