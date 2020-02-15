@@ -5,8 +5,8 @@
     "license": "MIT",
     "homepage": "https://gitlab.com/soup-bowl/kebabble",
     "require": {
-        "monolog/monolog": "^1.22",
-        "nesbot/carbon": "^2.0.0",
+        "monolog/monolog": "^2.0",
+        "nesbot/carbon": "^2.30",
         "php-di/php-di": "^6.0",
         "botman/botman": "^2.5",
         "botman/driver-slack": "^2.2",
