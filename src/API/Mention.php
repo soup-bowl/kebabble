@@ -86,12 +86,14 @@ class Mention {
 
 		DriverManager::loadDriver( SlackDriver::class );
 
-		// Create BotMan instance
-		$botman = BotManFactory::create([
-			'slack' => [
-				'token' => $this->slack->get_auth(),
+		// Create BotMan instance.
+		$botman = BotManFactory::create(
+			[
+				'slack' => [
+					'token' => $this->slack->get_auth(),
+				],
 			]
-		]);
+		);
 
 		$order_obj = $this->get_latest_order( $request['event']['channel'] );
 		$order     = null;
@@ -110,123 +112,149 @@ class Mention {
 		$kebabble_user = $this->slack->get_bot_details()['user_id'];
 		$kebabble_tag  = "<@{$kebabble_user}>";
 
-		$botman->hears( "{$kebabble_tag} help", function ( BotMan $bot ) {
-			$help = $this->informational_commands( 'help', $bot->getUser()->getId() );
-			$bot->reply( $help );
-		});
+		$botman->hears(
+			"{$kebabble_tag} help",
+			function ( BotMan $bot ) {
+				$help = $this->informational_commands( 'help', $bot->getUser()->getId() );
+				$bot->reply( $help );
+			}
+		);
 
-		$botman->hears( "{$kebabble_tag} menu", function ( BotMan $bot ) {
-			$info = $this->get_order_details(
-				$bot->getMessage()->getPayload()['channel']
-			);
-
-			if ( ! empty( $info ) ) {
-				$help = $this->informational_commands(
-					'menu',
-					$bot->getUser()->getId(),
-					$info['place']
+		$botman->hears(
+			"{$kebabble_tag} menu",
+			function ( BotMan $bot ) {
+				$info = $this->get_order_details(
+					$bot->getMessage()->getPayload()['channel']
 				);
 
-				$bot->reply( $help );
-			} else {
-				$bot->reply( $this->message( 3 ) );
+				if ( ! empty( $info ) ) {
+					$help = $this->informational_commands(
+						'menu',
+						$bot->getUser()->getId(),
+						$info['place']
+					);
+
+					$bot->reply( $help );
+				} else {
+					$bot->reply( $this->message( 3 ) );
+				}
 			}
-		});
+		);
 
-		$botman->hears( "{$kebabble_tag} places", function ( BotMan $bot ) {
-			$places = get_terms([
-				'taxonomy'   => 'kebabble_company',
-				'hide_empty' => false,
-			]);
+		$botman->hears(
+			"{$kebabble_tag} places",
+			function ( BotMan $bot ) {
+				$places = get_terms(
+					[
+						'taxonomy'   => 'kebabble_company',
+						'hide_empty' => false,
+					]
+				);
 
-			$place_list = [];
-			foreach ( $places as $place ) {
-				$place_list[] = $place->name;
+				$place_list = [];
+				foreach ( $places as $place ) {
+					$place_list[] = $place->name;
+				}
+
+				$bot->reply( $this->places( $place_list ) );
 			}
-
-			$bot->reply( $this->places( $place_list ) );
-		});
+		);
 
 		$p = $this->publish;
 		$c = true;
 
 		// Create a new order.
-		$botman->hears( "{$kebabble_tag} new order at (.*)", function ( BotMan $bot, string $place ) use ( &$c, &$p, &$request ) {
-			if ( $c === true ) {
-				$response = $this->new_order(
-					$request['event']['channel'],
-					$place,
-					$request['event']['user']
-				);
+		$botman->hears(
+			"{$kebabble_tag} new order at (.*)",
+			function ( BotMan $bot, string $place ) use ( &$c, &$p, &$request ) {
+				if ( $c === true ) {
+					$response = $this->new_order(
+						$request['event']['channel'],
+						$place,
+						$request['event']['user']
+					);
 
-				$c = false;
-				if ( $response === false ) {
-					$bot->reply( "Sorry, I don't recognise the resturant {$place}." );
+					$c = false;
+					if ( $response === false ) {
+						$bot->reply( "Sorry, I don't recognise the resturant {$place}." );
+					}
 				}
 			}
-		});
+		);
 
 		if ( $order_obj !== null && $place !== null ) {
 			// Changes the collector marked for the ongoing order.
-			$botman->hears( "{$kebabble_tag} change (?:the )?(?:(?:collector)|(?:driver)) to (.*)", function ( BotMan $bot, string $collector ) use ( &$c, &$p, &$order_obj ) {
-				if ( $c === true ) {
-					update_post_meta( $order_obj->ID, 'kebabble-driver', $collector );
-					$p->handle_publish( $order_obj, false );
+			$botman->hears(
+				"{$kebabble_tag} change (?:the )?(?:(?:collector)|(?:driver)) to (.*)",
+				function ( BotMan $bot, string $collector ) use ( &$c, &$p, &$order_obj ) {
+					if ( $c === true ) {
+						update_post_meta( $order_obj->ID, 'kebabble-driver', $collector );
+						$p->handle_publish( $order_obj, false );
 
-					$c = false;
-					$bot->reply( "Collector changed to {$collector}." );
+						$c = false;
+						$bot->reply( "Collector changed to {$collector}." );
+					}
 				}
-			});
+			);
 
 			// Removes an item from the current order.
-			$botman->hears( "{$kebabble_tag} .*remove .*{$menu}.*", function ( BotMan $bot, string $order ) use ( &$c, &$p, &$order_obj, &$request ) {
-				if ( $c === true ) {
-					$response = $this->remove_from_order( $order_obj->ID, $order, $request['event']['user'] );
-					$p->handle_publish( $order_obj, false );
+			$botman->hears(
+				"{$kebabble_tag} .*remove .*{$menu}.*",
+				function ( BotMan $bot, string $order ) use ( &$c, &$p, &$order_obj, &$request ) {
+					if ( $c === true ) {
+						$response = $this->remove_from_order( $order_obj->ID, $order, $request['event']['user'] );
+						$p->handle_publish( $order_obj, false );
 
-					$c = false;
-					if ( $response ) {
-						$bot->reply( "Cool, your {$order} has been chucked off the list." );
-					} else {
-						$bot->reply( 'Oops! Something went wrong trying to process your removal.' );
+						$c = false;
+						if ( $response ) {
+							$bot->reply( "Cool, your {$order} has been chucked off the list." );
+						} else {
+							$bot->reply( 'Oops! Something went wrong trying to process your removal.' );
+						}
 					}
 				}
-			});
+			);
 
 			// Adds a new item to the current order.
-			$botman->hears( "{$kebabble_tag} .*{$menu}.*", function ( BotMan $bot, string $order ) use ( &$c, &$p, &$order_obj, &$request ) {
-				if ( $c === true ) {
-					$response = $this->add_to_order( $order_obj->ID, $order, $request['event']['user'] );
-					$p->handle_publish( $order_obj, false );
+			$botman->hears(
+				"{$kebabble_tag} .*{$menu}.*",
+				function ( BotMan $bot, string $order ) use ( &$c, &$p, &$order_obj, &$request ) {
+					if ( $c === true ) {
+						$response = $this->add_to_order( $order_obj->ID, $order, $request['event']['user'] );
+						$p->handle_publish( $order_obj, false );
 
-					$c = false;
-					if ( $response ) {
-						$bot->reply( "{$order} added to the order!" );
-					} else {
-						$bot->reply( 'Something went wrong adding your order. Check the menu and try again!' );
+						$c = false;
+						if ( $response ) {
+							$bot->reply( "{$order} added to the order!" );
+						} else {
+							$bot->reply( 'Something went wrong adding your order. Check the menu and try again!' );
+						}
 					}
 				}
-			});
+			);
 
 			// Closes the current order off to new requests.
-			$botman->hears( "{$kebabble_tag} close order", function ( BotMan $bot ) use ( &$c, &$p, &$order_obj, &$request ) {
-				if ( $c === true ) {
-					$collector = wp_get_object_terms( $order_obj->ID, 'kebabble_collector' );
-					$collector = ( ! empty( $collector ) ) ? get_term_meta( $collector[0]->term_id, 'keabble_collector_slackcode', true ) : null;
+			$botman->hears(
+				"{$kebabble_tag} close order",
+				function ( BotMan $bot ) use ( &$c, &$p, &$order_obj, &$request ) {
+					if ( $c === true ) {
+						$collector = wp_get_object_terms( $order_obj->ID, 'kebabble_collector' );
+						$collector = ( ! empty( $collector ) ) ? get_term_meta( $collector[0]->term_id, 'keabble_collector_slackcode', true ) : null;
 
-					$c = false;
-					if ( $collector === $request['event']['user'] ) {
-						update_post_meta( $order_obj->ID, 'kebabble-timeout', Carbon::now()->timestamp );
+						$c = false;
+						if ( $collector === $request['event']['user'] ) {
+							update_post_meta( $order_obj->ID, 'kebabble-timeout', Carbon::now()->timestamp );
 
-						$bot->reply( 'Order concluded.' );
-					} else {
-						$bot->reply( 'You do not have permission to cancel this order.' );
+							$bot->reply( 'Order concluded.' );
+						} else {
+							$bot->reply( 'You do not have permission to cancel this order.' );
+						}
 					}
 				}
-			});
+			);
 		}
 
-		// start listening
+		// start listening.
 		$botman->listen();
 
 		return [];
@@ -266,7 +294,7 @@ class Mention {
 
 		foreach ( $order as $key => $food ) {
 			if ( $food['person'] === "SLACK_{$person}" && $food['food'] === $item ) {
-				unset( $order[$key] );
+				unset( $order[ $key ] );
 
 				update_post_meta( $post_id, 'kebabble-order', $order );
 
@@ -388,7 +416,7 @@ class Mention {
 						'key'     => 'kebabble-timeout',
 						'value'   => Carbon::now()->timestamp,
 						'compare' => '>=',
-					]
+					],
 				],
 			]
 		);
@@ -400,7 +428,7 @@ class Mention {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Gets details about the latest order in the selected channel.
 	 *

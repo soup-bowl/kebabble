@@ -60,20 +60,20 @@ class Slack {
 	public function send_message( string $message, ?string $existing_timestamp = null, ?string $channel = null, ?string $thread_timestamp = null ):string {
 		$args = [
 			'text'       => $message,
-			'link_names' => 1
+			'link_names' => 1,
 		];
-		
+
 		if ( ! empty( $thread_timestamp ) ) {
 				$args['thread_ts'] = $thread_timestamp;
 		}
 
 		if ( ! $existing_timestamp ) {
 			// New message.
-			$response = $this->send_request('chat.postMessage', $channel, $args );
+			$response = $this->send_request( 'chat.postMessage', $channel, $args );
 		} else {
 			// Edit previous message.
 			$args['ts'] = $existing_timestamp;
-			$response = $this->send_request('chat.update', $channel, $args );
+			$response   = $this->send_request( 'chat.update', $channel, $args );
 		}
 
 		if ( $response !== false ) {
@@ -99,10 +99,10 @@ class Slack {
 	/**
 	 * Changes the pin status of the specified Slack message.
 	 *
-	 * @param boolean $pin                 Represents the pin status.
-	 * @param string  $ts                  Operation timestamp (basically an ID).
-	 * @param string  $channel             Channel of operation.
-	 * @param string $unpin_previous_order Should the previous order be removed.
+	 * @param boolean $pin                  Represents the pin status.
+	 * @param string  $ts                   Operation timestamp (basically an ID).
+	 * @param string  $channel              Channel of operation.
+	 * @param bool    $unpin_previous_order Should the previous order be removed.
 	 * @return void
 	 */
 	public function pin( bool $pin, string $ts, string $channel, bool $unpin_previous_order = false ) {
@@ -144,7 +144,7 @@ class Slack {
 	 * @param string $reaction Emoji to be used.
 	 * @param string $ts       Operation timestamp (basically an ID).
 	 * @param string $channel  Channel of operation.
-	 * @return void
+	 * @return boolean
 	 */
 	public function react( string $reaction, string $ts, string $channel ) {
 		// Remove colon denominators if present.
@@ -158,7 +158,7 @@ class Slack {
 				'timestamp' => $ts,
 			]
 		);
-		
+
 		if ( $response['ok'] === true ) {
 			return true;
 		} else {
@@ -175,7 +175,7 @@ class Slack {
 		$channels = get_transient( 'kebabble_channels' );
 
 		if ( $channels === false && empty( $channels ) ) {
-			$response = $this->send_request( 'conversations.list', '', ['exclude_archived' => true] );
+			$response = $this->send_request( 'conversations.list', '', [ 'exclude_archived' => true ] );
 
 			$channels = [];
 			foreach ( $response['channels'] as $channel ) {
@@ -191,7 +191,12 @@ class Slack {
 
 		return $channels;
 	}
-	
+
+	/**
+	 * Tests the API.
+	 *
+	 * @return string
+	 */
 	public function get_bot_details() {
 		$response = get_transient( 'kebabble_bot_info' );
 
@@ -210,20 +215,20 @@ class Slack {
 	 * @param string $import HTML string to be parsed.
 	 * @return string HTML code as Slack code.
 	 */
-	public function html_to_slack_string(string $import ):string {
+	public function html_to_slack_string( string $import ):string {
 		// Handle bold/strong.
-		$bad_bold  = ['<strong>', '</strong>'];
-		$good_bold = ['*', '*'];
+		$bad_bold  = [ '<strong>', '</strong>' ];
+		$good_bold = [ '*', '*' ];
 		$export    = str_replace( $bad_bold, $good_bold, $import );
 
 		// Handle italics/emphasis.
-		$bad_em  = ['<em>', '</em>'];
-		$good_em = ['_', '_'];
+		$bad_em  = [ '<em>', '</em>' ];
+		$good_em = [ '_', '_' ];
 		$export  = str_replace( $bad_em, $good_em, $export );
 
 		// Handle code.
-		$bad_code  = ['<code>', '</code>'];
-		$good_code = ['```', '```'];
+		$bad_code  = [ '<code>', '</code>' ];
+		$good_code = [ '```', '```' ];
 		$export    = str_replace( $bad_code, $good_code, $export );
 
 		return $export;
@@ -233,13 +238,13 @@ class Slack {
 	 * Sends a CURL request to the Slack API, using application/x-www-form-urlencoded.
 	 * The token is already sent, so is unneeded in $args. Channel is also, if provided.
 	 *
-	 * @param string $token    Your app token for accessing API features.
-	 * @param string $slackapi Which api segment you're calling (e.g. post.update)
+	 * @param string $slackapi Which api segment you're calling (e.g. post.update).
+	 * @param string $channel  Slack channel to operate on.
 	 * @param array  $args     Additional parameters.
-	 * @param string $type     HTTP request type
+	 * @param string $type     HTTP request type.
 	 * @return array|null
 	 */
-	private function send_request( $slackapi, $channel, $args = [], $type = "POST" ) {
+	private function send_request( $slackapi, $channel, $args = [], $type = 'POST' ) {
 		$args['token']    = $this->token;
 		$args['channel']  = $channel;
 		$args['base_uri'] = 'https://slack.com/api/';
@@ -252,13 +257,13 @@ class Slack {
 			$type,
 			$slackapi,
 			[
-				'form_params' => $args
+				'form_params' => $args,
 			]
 		);
-		
+
 		$result = json_decode( (string) $response->getBody(), true );
-		
-		if ( $result['ok'] == false ) {
+
+		if ( $result['ok'] === false ) {
 			error_log( $result['error'] );
 			return null;
 		} else {

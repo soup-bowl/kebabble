@@ -126,7 +126,7 @@ class Settings {
 			'pluginPage',
 			'kbfos_pluginPage_section'
 		);
-		
+
 		add_settings_field(
 			'kbfos_botkey',
 			__( 'Slack Bot Auth key', 'kebabble' ),

@@ -25,7 +25,7 @@ class Orderstore {
 		$is_custom  = ( empty( get_post_meta( $post_id, 'kebabble-custom-message', true ) ) ) ? false : true;
 		$is_expired = ( ! empty( get_post_meta( $post_id, 'kebabble-timeout', true ) ) ) ? get_post_meta( $post_id, 'kebabble-timeout', true ) : 0;
 
-		$n       = 'kebabble'; 
+		$n       = 'kebabble';
 		$options = [
 			"{$n}-is-custom"          => $is_custom,
 			"{$n}-is-expired"         => ( $is_expired >= Carbon::now()->timestamp ) ? false : true,

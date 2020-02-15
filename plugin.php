@@ -30,17 +30,17 @@ if ( (int) $php_version[0] >= $mv[0] && (int) $php_version[1] >= $mv[1] ) {
 } else {
 	add_action(
 		'admin_notices',
-		function() use( $min_version ) {
+		function() use ( $min_version ) {
 			echo wp_kses(
 				"<div class='notice notice-error'>
-				<p>" . sprintf( __( '<b>%1$s</b> is not supported on this PHP version. Please use <b>%2$s or higher</b>', 'kebabble' ), 'Kebabble', (string) $min_version ) . "</p>
-				</div>",
+				<p>" . sprintf( __( '<b>%1$s</b> is not supported on this PHP version. Please use <b>%2$s or higher</b>', 'kebabble' ), 'Kebabble', (string) $min_version ) . '</p>
+				</div>',
 				[
 					'div' => [
 						'class' => [],
 					],
-					'p' => [],
-					'b' => [],
+					'p'   => [],
+					'b'   => [],
 				]
 			);
 		}
