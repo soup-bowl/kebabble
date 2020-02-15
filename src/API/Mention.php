@@ -94,10 +94,12 @@ class Mention {
 		]);
 
 		$order_obj = $this->get_latest_order( $request['event']['channel'] );
-		$order     = $this->orderstore->get( $order_obj->ID );
-		$places    = wp_get_object_terms( $order_obj->ID, 'kebabble_company' );
-		$place     = ( isset( $places ) ) ? $places[0] : null;
-		$menu      = '(' . implode( '|', $this->get_potentials( $place->term_id ) ) . ')';
+		if ( $order_obj !== null ) {
+			$order  = $this->orderstore->get( $order_obj->ID );
+			$places = wp_get_object_terms( $order_obj->ID, 'kebabble_company' );
+			$place  = ( isset( $places ) ) ? $places[0] : null;
+			$menu   = '(' . implode( '|', $this->get_potentials( $place->term_id ) ) . ')';
+		}
 
 		$kebabble_user = $this->slack->get_bot_details()['user_id'];
 		$kebabble_tag  = "<@{$kebabble_user}>";
@@ -141,63 +143,65 @@ class Mention {
 			}
 		});
 
-		// Changes the collector marked for the ongoing order.
-		$botman->hears( "{$kebabble_tag} change (?:the )?(?:(?:collector)|(?:driver)) to (.*)", function ( BotMan $bot, string $collector ) use ( &$c, &$p, &$order_obj ) {
-			if ( $c === true ) {
-				update_post_meta( $order_obj->ID, 'kebabble-driver', $collector );
-				$p->handle_publish( $order_obj, false );
+		if ( $order_obj !== null ) {
+			// Changes the collector marked for the ongoing order.
+			$botman->hears( "{$kebabble_tag} change (?:the )?(?:(?:collector)|(?:driver)) to (.*)", function ( BotMan $bot, string $collector ) use ( &$c, &$p, &$order_obj ) {
+				if ( $c === true ) {
+					update_post_meta( $order_obj->ID, 'kebabble-driver', $collector );
+					$p->handle_publish( $order_obj, false );
 
-				$c = false;
-				$bot->reply( "Collector changed to {$collector}." );
-			}
-		});
-
-		// Removes an item from the current order.
-		$botman->hears( "{$kebabble_tag} .*remove .*{$menu}.*", function ( BotMan $bot, string $order ) use ( &$c, &$p, &$order_obj, &$request ) {
-			if ( $c === true ) {
-				$response = $this->remove_from_order( $order_obj->ID, $order, $request['event']['user'] );
-				$p->handle_publish( $order_obj, false );
-
-				$c = false;
-				if ( $response ) {
-					$bot->reply( "Cool, your {$order} has been chucked off the list." );
-				} else {
-					$bot->reply( 'Oops! Something went wrong trying to process your removal.' );
+					$c = false;
+					$bot->reply( "Collector changed to {$collector}." );
 				}
-			}
-		});
+			});
 
-		// Adds a new item to the current order.
-		$botman->hears( "{$kebabble_tag} .*{$menu}.*", function ( BotMan $bot, string $order ) use ( &$c, &$p, &$order_obj, &$request ) {
-			if ( $c === true ) {
-				$response = $this->add_to_order( $order_obj->ID, $order, $request['event']['user'] );
-				$p->handle_publish( $order_obj, false );
+			// Removes an item from the current order.
+			$botman->hears( "{$kebabble_tag} .*remove .*{$menu}.*", function ( BotMan $bot, string $order ) use ( &$c, &$p, &$order_obj, &$request ) {
+				if ( $c === true ) {
+					$response = $this->remove_from_order( $order_obj->ID, $order, $request['event']['user'] );
+					$p->handle_publish( $order_obj, false );
 
-				$c = false;
-				if ( $response ) {
-					$bot->reply( "{$order} added to the order!" );
-				} else {
-					$bot->reply( 'Something went wrong adding your order. Check the menu and try again!' );
+					$c = false;
+					if ( $response ) {
+						$bot->reply( "Cool, your {$order} has been chucked off the list." );
+					} else {
+						$bot->reply( 'Oops! Something went wrong trying to process your removal.' );
+					}
 				}
-			}
-		});
+			});
 
-		// Closes the current order off to new requests.
-		$botman->hears( "{$kebabble_tag} close order", function ( BotMan $bot ) use ( &$c, &$p, &$order_obj, &$request ) {
-			if ( $c === true ) {
-				$collector = wp_get_object_terms( $order_obj->ID, 'kebabble_collector' );
-				$collector = ( ! empty( $collector ) ) ? get_term_meta( $collector[0]->term_id, 'keabble_collector_slackcode', true ) : null;
+			// Adds a new item to the current order.
+			$botman->hears( "{$kebabble_tag} .*{$menu}.*", function ( BotMan $bot, string $order ) use ( &$c, &$p, &$order_obj, &$request ) {
+				if ( $c === true ) {
+					$response = $this->add_to_order( $order_obj->ID, $order, $request['event']['user'] );
+					$p->handle_publish( $order_obj, false );
 
-				$c = false;
-				if ( $collector === $request['event']['user'] ) {
-					update_post_meta( $order_obj->ID, 'kebabble-timeout', Carbon::now()->timestamp );
-
-					$bot->reply( 'Order concluded.' );
-				} else {
-					$bot->reply( 'You do not have permission to cancel this order.' );
+					$c = false;
+					if ( $response ) {
+						$bot->reply( "{$order} added to the order!" );
+					} else {
+						$bot->reply( 'Something went wrong adding your order. Check the menu and try again!' );
+					}
 				}
-			}
-		});
+			});
+
+			// Closes the current order off to new requests.
+			$botman->hears( "{$kebabble_tag} close order", function ( BotMan $bot ) use ( &$c, &$p, &$order_obj, &$request ) {
+				if ( $c === true ) {
+					$collector = wp_get_object_terms( $order_obj->ID, 'kebabble_collector' );
+					$collector = ( ! empty( $collector ) ) ? get_term_meta( $collector[0]->term_id, 'keabble_collector_slackcode', true ) : null;
+
+					$c = false;
+					if ( $collector === $request['event']['user'] ) {
+						update_post_meta( $order_obj->ID, 'kebabble-timeout', Carbon::now()->timestamp );
+
+						$bot->reply( 'Order concluded.' );
+					} else {
+						$bot->reply( 'You do not have permission to cancel this order.' );
+					}
+				}
+			});
+		}
 
 		// start listening
 		$botman->listen();
