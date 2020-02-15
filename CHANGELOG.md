@@ -8,6 +8,7 @@ Uses [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) & [Semantic Versio
 - Can cancel orders via Slack, if the cancel comes from the order creator.
 - Internationalisation (i18n) support increased. gettext support added (#32).
 - Custom message per order (#5).
+- Kebabble can now be asked to list places.
 
 ### Changed
 - Orders now stored in seperate meta entities, to improve internal accessibility (not backwards compatible).

@@ -133,6 +133,20 @@ class Mention {
 			}
 		});
 
+		$botman->hears( "{$kebabble_tag} places", function ( BotMan $bot ) {
+			$places = get_terms([
+				'taxonomy'   => 'kebabble_company',
+				'hide_empty' => false,
+			]);
+
+			$place_list = [];
+			foreach ( $places as $place ) {
+				$place_list[] = $place->name;
+			}
+
+			$bot->reply( $this->places( $place_list ) );
+		});
+
 		$p = $this->publish;
 		$c = true;
 
@@ -469,6 +483,22 @@ class Mention {
 	}
 
 	/**
+	 * Creates a formatted list of places to order.
+	 *
+	 * @param string[] $places Company names.
+	 * @return string Pre-formatted for Slack use.
+	 */
+	private function places( array $places ) {
+		$msg = $this->message( 5 ) . "\n\n";
+
+		foreach ( $places as $place ) {
+			$msg .= "• *{$place}*.\n";
+		}
+
+		return $msg;
+	}
+
+	/**
 	 * Collects an array of menu items listed against the provided company.
 	 *
 	 * @param int $company_id Company meta ID to obtain details from.
@@ -512,6 +542,8 @@ I will respond with a :thumbsup: if I've added your order, a :question: if I'm u
 				return Emojis::negative() . ' Drat, I don\'t know this place! Let the order manager know instead.';
 			case 4:
 				return Emojis::negative( 2 ) . ' I can\'t see an order, please check if the channel is correct!';
+			case 5:
+				return 'A new order can be created for the following places:';
 			default:
 				return null;
 		}
