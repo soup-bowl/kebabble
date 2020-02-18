@@ -84,6 +84,25 @@ class Mention {
 			return [ 'challenge' => $request['challenge'] ];
 		}
 
+		$kebabble_user = $this->slack->get_bot_details()['user_id'];
+		$kebabble_tag  = "<@{$kebabble_user}>";
+		// Check to ensure the incoming request is for Kebabble.
+		if ( isset( $request['event']['text'] ) && strpos( $request['event']['text'], $kebabble_user ) === false ) {
+			return [];
+		}
+
+		$order_obj = $this->get_latest_order( $request['event']['channel'] );
+		$places    = null;
+		$place     = null;
+		$menu      = null;
+		if ( $order_obj !== null ) {
+			$places = wp_get_object_terms( $order_obj->ID, 'kebabble_company' );
+			$place  = ( isset( $places, $places[0] ) ) ? $places[0] : null;
+			if ( $place !== null ) {
+				$menu = '(' . implode( '|', $this->get_potentials( $place->term_id ) ) . ')';
+			}
+		}
+
 		DriverManager::loadDriver( SlackDriver::class );
 
 		// Create BotMan instance.
@@ -94,23 +113,6 @@ class Mention {
 				],
 			]
 		);
-
-		$order_obj = $this->get_latest_order( $request['event']['channel'] );
-		$order     = null;
-		$places    = null;
-		$place     = null;
-		$menu      = null;
-		if ( $order_obj !== null ) {
-			$order  = $this->orderstore->get( $order_obj->ID );
-			$places = wp_get_object_terms( $order_obj->ID, 'kebabble_company' );
-			$place  = ( isset( $places, $places[0] ) ) ? $places[0] : null;
-			if ( $place !== null ) {
-				$menu = '(' . implode( '|', $this->get_potentials( $place->term_id ) ) . ')';
-			}
-		}
-
-		$kebabble_user = $this->slack->get_bot_details()['user_id'];
-		$kebabble_tag  = "<@{$kebabble_user}>";
 
 		$botman->hears(
 			"{$kebabble_tag} help",
